@@ -1,0 +1,87 @@
+// @ts-nocheck
+// This module intentionally replaces the production backend in the demo repository.
+// No network, persistence, credentials or production service initialization.
+import type {SupabaseClient} from '@supabase/supabase-js';
+import seed from './demo-seed';
+import {meetingRpc} from './demo-meeting';
+import {workspaceSchema,type Role} from './model';
+const initial=structuredClone(seed);
+let state:any;
+let role:Role='representative';
+const now=()=>new Date().toISOString();
+const id=()=>crypto.randomUUID();
+export function resetDemo(){
+ state=structuredClone(initial);
+ Object.assign(state,{workflowV2Enabled:true,questionnaireV2Enabled:true,familyWorkEnabled:true,familyDirectoryEnabled:true,activityFeedEnabled:true,resourceLibraryEnabled:true,professionalPoolEnabled:true,familyTasks:[],familyContacts:[]});
+ state.families.forEach(f=>{f.representative_id='rep1';f.phone='';f.email='family@example.invalid';});
+ state.professionals=[1,2,3].map(n=>({id:'pro'+n,profile_id:'professional'+n,name:['מומחה א׳ לדוגמה','מומחה ב׳ לדוגמה','מומחה ג׳ לדוגמה'][n-1],active:true,profile_active:true,analysis_enabled:true,execution_enabled:true,business_name:'משרד לדוגמה'}));
+ state.professionalServices=state.professionals.flatMap(p=>state.services.map(s=>({id:p.id+s.id,professional_id:p.id,service_id:s.id,analysis_enabled:true,execution_enabled:true})));
+ state.representatives=[{id:'rep1',profile_id:'representative',name:'נציג לדוגמה',active:true,permissions:['families.edit','documents.manage','analysis.send','analysis.approve','execution.send','execution.approve']}];
+ state.profiles=[{id:'client',name:'לקוח לדוגמה',role:'client',active:true},{id:'representative',name:'נציג לדוגמה',role:'representative',active:true},...state.professionals.map(p=>({id:p.profile_id,name:p.name,role:'professional',active:true}))];
+ state.familyTasks=[{id:'ft1',family_id:'f1',title:'להכין רשימת הוצאות חודשית',details:'דוגמה למשימה בתיק שאינה תלויה בפגישה.',owner_role:'client',owner_name:'המשפחה',due_on:new Date(Date.now()+86400000*4).toISOString().slice(0,10),visible_to_client:true,status:'open',revision:1,updated_at:now()}];
+ state.familyContacts=[{id:'fc1',family_id:'f1',kind:'phone',summary:'שיחת היכרות לדוגמה: תואם איסוף מסמכים לקראת המשך הבדיקה.',occurred_at:now(),author_name:'נציג לדוגמה',next_task_id:'ft1'}];
+ state.resources=[{id:'resource1',title:'פריט לדוגמה בספרייה',description:'טיוטה להמחשת עריכת פרטי קשר. אין כאן המלצה או מקור שנבדק.',url:'https://example.com',phone:'',chapter:'general',active:false,verified_at:null,revision:1}];
+ state.offers=[{id:'offer1',family_service_id:'fs2',kind:'analysis',service_name:'פנסיה וחסכונות',candidates:['pro1','pro2'],status:'open',created_at:now(),expires_at:new Date(Date.now()+86400000*2).toISOString(),claimed_by:null}];
+ state.notifications=[{id:'notice1',title:'ברוכים הבאים לדמו',body:'הנתונים והפעולות כאן הם להמחשה בלבד. אפשר לאפס את הדמו בכל עת.',read_at:null}];
+}
+resetDemo();
+export function selectRole(next:Role){role=next;}
+function workspace(){
+ const data=structuredClone(state);
+ const profileId=role==='professional'?'professional1':role;
+ if(role==='client'){
+  data.families=data.families.filter(f=>f.id==='f1').map(({internal_notes,...f})=>f);
+  for(const key of ['documents','familyServices','meetings','meetingItems','followUps','familyTasks'])data[key]=data[key].filter(x=>x.family_id==='f1');
+  data.followUps=data.followUps.filter(t=>t.visible_to_client);data.familyTasks=data.familyTasks.filter(t=>t.visible_to_client);
+  data.meetingItems=data.meetingItems.filter(i=>i.visible_to_client).map(({decision_note,execution_instructions,approved_actions,...i})=>i);
+  data.analysisTasks=[];data.executionTasks=[];data.timeline=[];data.familyContacts=[];data.topicChecks=[];data.topicChecksEnabled=false;
+ }
+ if(role==='professional'){
+  data.analysisTasks=data.analysisTasks.filter(t=>t.professional_id==='pro1');data.executionTasks=data.executionTasks.filter(t=>t.professional_id==='pro1');
+  data.families=[];data.familyServices=[];data.documents=[];data.meetings=[];data.meetingItems=[];data.followUps=[];data.familyTasks=[];data.familyContacts=[];data.timeline=[];
+ }
+ if(role!=='admin'){data.profiles=[];data.audit=[];}
+ return workspaceSchema.parse({...data,profile:{id:profileId,name:({client:'לקוח לדוגמה',representative:'נציג לדוגמה',professional:'מומחה א׳ לדוגמה',admin:'מנהל לדוגמה'})[role],role,active:true},permissions:role==='admin'?['*']:role==='representative'?state.representatives[0].permissions:[]});
+}
+export async function loadWorkspace(familyId?:string){const w=workspace();if(familyId&&w.families.some(f=>f.id===familyId))w.scopedFamilyId=familyId;return w;}
+export class WorkspaceNetworkError extends Error{}
+export const configError=null;
+const listeners=new Set<any>();
+const session=()=>({access_token:'demo-'+role,user:{id:role},expires_at:Math.floor(Date.now()/1000)+86400});
+const channel={on(){return channel;},subscribe(){return channel;}};
+const unavailable=async()=>({data:null,error:new Error('DEMO_UNAVAILABLE')});
+export const backend={auth:{getSession:async()=>({data:{session:session()},error:null}),onAuthStateChange:(cb)=>{listeners.add(cb);return {data:{subscription:{unsubscribe:()=>listeners.delete(cb)}}};},signOut:async()=>{location.reload();return {error:null};},signInWithPassword:unavailable,signUp:unavailable,resetPasswordForEmail:unavailable,updateUser:unavailable,mfa:{listFactors:unavailable,enroll:unavailable,challengeAndVerify:unavailable}},channel:()=>channel,removeChannel:()=>{}} as unknown as SupabaseClient;
+const find=(key:string,value:string)=>{const row=state[key].find(x=>x.id===value);if(!row)throw Error('VALIDATION');return row;};
+function update(key:string,identifier:string,patch:any,expected?:number){const old=state[key].find(x=>x.id===identifier);if(old&&expected!=null&&old.revision!==expected)throw Error('CONFLICT');const row={...old,...patch,id:identifier,revision:(old?.revision||0)+1,updated_at:now()};if(old)Object.assign(old,row);else state[key].push(row);return row;}
+function assign(serviceId:string,kind:string,professionalId:string){const fs=find('familyServices',serviceId);const task={id:id(),family_id:fs.family_id,family_service_id:fs.id,service_id:fs.service_id,professional_id:professionalId,task_number:'DEMO-'+(state.analysisTasks.length+state.executionTasks.length+1),status:kind==='analysis'?'assigned':'sent_execution',due_at:new Date(Date.now()+86400000*3).toISOString()};state[kind==='analysis'?'analysisTasks':'executionTasks'].push(task);fs[kind+'_task_id']=task.id;fs.status=kind==='analysis'?'in_analysis':'sent_execution';return task.id;}
+export async function rpc<T=unknown>(name:string,a:Record<string,any>={}):Promise<T>{
+ const run=()=>{
+ const staff=role==='admin'||role==='representative';
+ if(name==='rpc_search_families'){const q=String(a.p_query||'').trim().toLowerCase();return {items:workspace().families.filter(f=>[f.name,f.case_number,f.contact_name,f.phone,f.email].some(v=>v?.toLowerCase().includes(q))),next:null};}
+ if(name==='rpc_family_activity'){if(!staff)throw Error('PERMISSION_DENIED');const items=[...state.timeline.filter(r=>r.family_id===a.p_family_id).map(r=>({key:r.id,at:r.created_at,kind:'event',title:r.title,detail:'',author:'',target:'overview'})),...state.familyContacts.filter(r=>r.family_id===a.p_family_id).map(r=>({key:r.id,at:r.occurred_at,kind:'contact',title:'קשר עם המשפחה',detail:r.summary,author:r.author_name,target:'overview'})),...[...state.familyTasks,...state.followUps].filter(r=>r.family_id===a.p_family_id).map(r=>({key:r.id,at:r.updated_at,kind:'task',title:r.title,detail:r.details,author:r.owner_name,target:'followups'}))].filter(r=>a.p_kind==='all'||r.kind===a.p_kind).sort((a,b)=>b.at.localeCompare(a.at));return {items,next:null};}
+ if(name==='rpc_list_resources')return state.resources.filter(r=>a.p_manage&&role==='admin'||r.active&&r.verified_at);
+ if(name==='rpc_save_resource'){if(role!=='admin')throw Error('PERMISSION_DENIED');return update('resources',a.p_id,{...a.p_payload,verified_at:a.p_payload.verified?now():null},a.p_expected_revision);}
+ if(name==='rpc_list_professional_offers')return state.offers.filter(o=>role==='professional'?o.status==='open'&&o.candidates.includes('pro1'):!a.p_family_service_id||o.family_service_id===a.p_family_service_id).map(o=>role==='professional'?{id:o.id,kind:o.kind,service_name:o.service_name,status:o.status,created_at:o.created_at,expires_at:o.expires_at}:o);
+ if(name==='rpc_claim_professional_offer'){const o=find('offers',a.p_id);if(role!=='professional'||o.status!=='open'||!o.candidates.includes('pro1'))throw Error('CONFLICT');const task=assign(o.family_service_id,o.kind,'pro1');o.status='claimed';o.claimed_by='pro1';return task;}
+ if(name==='rpc_create_professional_offer'){if(!staff)throw Error('PERMISSION_DENIED');const fs=find('familyServices',a.p_family_service_id);if(state.offers.some(o=>o.family_service_id===fs.id&&o.status==='open'))throw Error('CONFLICT');const row={id:a.p_id,family_service_id:fs.id,kind:a.p_kind,candidates:a.p_candidates,service_name:find('services',fs.service_id).name,status:'open',created_at:now(),expires_at:new Date(Date.now()+86400000*2).toISOString()};state.offers.push(row);return row;}
+ if(name==='rpc_cancel_professional_offer'){if(!staff)throw Error('PERMISSION_DENIED');find('offers',a.p_id).status='cancelled';return null;}
+ if(name==='rpc_mark_notifications_read'){state.notifications.forEach(n=>n.read_at=now());return null;}
+ if(name==='rpc_save_family_task'){if(!staff)throw Error('PERMISSION_DENIED');return update('familyTasks',a.p_id,{...a.p_payload,family_id:a.p_family_id,status:'open',owner_name:a.p_payload.owner_role==='client'?'המשפחה':'נציג לדוגמה'},a.p_expected_revision);}
+ if(name==='rpc_record_family_contact'){if(!staff)throw Error('PERMISSION_DENIED');update('familyContacts',a.p_id,{family_id:a.p_family_id,kind:a.p_kind,summary:a.p_summary,occurred_at:a.p_occurred_at,author_name:'נציג לדוגמה',next_task_id:a.p_next_task_id||null});if(a.p_next_task)update('familyTasks',a.p_next_task_id,{...a.p_next_task,family_id:a.p_family_id,status:'open',owner_name:a.p_next_task.owner_role==='client'?'המשפחה':'נציג לדוגמה'});return null;}
+ if(name==='rpc_set_family_task_status'){const t=find('familyTasks',a.p_id);if(!staff&&!(role==='client'&&t.family_id==='f1'&&t.owner_role==='client'&&t.visible_to_client))throw Error('PERMISSION_DENIED');return update('familyTasks',a.p_id,{status:a.p_status},a.p_expected_revision);}
+ if(name==='rpc_complete_onboarding'){const f=find('families',a.p_family_id);Object.assign(f,{onboarding_pct:100,status:'waiting_docs'});if(!state.documents.some(d=>d.family_id===f.id))state.documents.push({id:id(),family_id:f.id,document_type_id:'dt1',name:'דוח פנסיה שנתי',key:'pension_report',type:'file',status:'missing'});return null;}
+ if(name==='rpc_review_document'){if(!staff)throw Error('PERMISSION_DENIED');Object.assign(find('documents',a.p_document_id),{status:a.p_approved?'approved':'rejected',reject_reason:a.p_reason||null});return null;}
+ if(name==='rpc_request_document'){if(!staff)throw Error('PERMISSION_DENIED');const type=find('documentTypes',a.p_type_id);state.documents.push({id:id(),family_id:a.p_family_id,document_type_id:type.id,name:type.name,key:type.key,type:type.type,status:'missing'});return null;}
+ if(name==='rpc_add_family_service'){if(!staff)throw Error('PERMISSION_DENIED');state.familyServices.push({id:id(),family_id:a.p_family_id,service_id:a.p_service_id,status:'waiting_analysis',analysis_task_id:null,execution_task_id:null});return null;}
+ if(name==='rpc_assign_analysis'||name==='rpc_assign_execution'){if(!staff)throw Error('PERMISSION_DENIED');return assign(a.p_family_service_id,name.endsWith('analysis')?'analysis':'execution',a.p_professional_id);}
+ if(name==='rpc_save_analysis_draft'||name==='rpc_submit_analysis'){const t=find('analysisTasks',a.p_task_id);Object.assign(t,a.p_payload,{status:name==='rpc_submit_analysis'?'submitted':'in_progress'});if(name==='rpc_submit_analysis')find('familyServices',t.family_service_id).status='analysis_received';return t;}
+ if(name==='rpc_manage_meeting'){if(!staff)throw Error('PERMISSION_DENIED');const m=find('meetings',a.p_meeting_id);if(m.scheduled_at!==a.p_expected_scheduled_at)throw Error('CONFLICT');if(a.p_action==='reschedule')m.scheduled_at=a.p_scheduled_at;else m.status='cancelled';return null;}
+ if(name==='rpc_save_decision_followup'){if(!staff)throw Error('PERMISSION_DENIED');const item=find('meetingItems',a.p_item_id);Object.assign(item,{client_decision:a.p_decision,decision_note:a.p_note,execution_instructions:a.p_instructions});return update('followUps',a.p_followup_id,{...a.p_followup,meeting_id:a.p_meeting_id,item_id:a.p_item_id,family_id:item.family_id,status:'open',owner_name:'נציג לדוגמה'},a.p_expected_revision);}
+ if(name==='rpc_list_agent_invitations')return [];
+ if(name==='rpc_execution_history')return {messages:[],updates:[]};
+ const legacy=meetingRpc('/rest/v1/rpc/'+name,a,state,role,workspace);if(legacy!==undefined)return legacy;
+ throw Error('DEMO_UNAVAILABLE');
+ };return structuredClone(run()) as T;
+}
+export async function uploadDocument(_familyId:string,_documentId:string,_file:File):Promise<void>{throw Error('DEMO_UNAVAILABLE');}
+export async function documentUrl(_path:string):Promise<string>{throw Error('DEMO_UNAVAILABLE');}

@@ -1,0 +1,25 @@
+// @ts-nocheck
+// Synthetic examples only. Never import production data.
+const now=new Date().toISOString();
+const family=(id,name,status,onboarding_pct)=>({id,name,case_number:`F-2026-00${id.slice(1)}`,status,onboarding_pct,phone:'0500000000',email:'family@example.invalid',contact_name:'משתמש לדוגמה',answers:{marital:'married',h_first:'ישראל',h_last:'לדוגמה'},updated_at:now,internal_notes:'הערה פנימית לדוגמה — אינה זמינה בחשבון הלקוח.'});
+const state={
+ families:[family('f1','משפחת לוי','meeting_done',100),family('f2','משפחת כהן','waiting_docs',100),family('f3','משפחת פרידמן','ready_meeting',100),family('f4','משפחת רוזן','in_analysis',100)],
+ services:[{id:'s1',key:'pension',name:'פנסיה וחסכונות',active:true,trigger_conditions:[],client_fields:[],professional_fields:[],required_documents:[]},{id:'s2',key:'bank',name:'חשבונות ועמלות בנק',active:true,trigger_conditions:[],client_fields:[],professional_fields:[],required_documents:[]}],
+ familyServices:[{id:'fs2',family_id:'f2',service_id:'s1',status:'waiting_analysis',analysis_task_id:null,execution_task_id:null},{id:'fs3',family_id:'f3',service_id:'s1',status:'approved_analysis',analysis_task_id:'a3',execution_task_id:null},{id:'fs4',family_id:'f4',service_id:'s2',status:'in_analysis',analysis_task_id:'a4',execution_task_id:null}],
+ documents:[{id:'d2',family_id:'f2',document_type_id:'dt1',name:'דוח פנסיה שנתי',key:'pension_report',status:'pending',type:'file',file_name:'דוח לדוגמה.pdf'}],
+ analysisTasks:[{id:'a4',family_id:'f4',family_service_id:'fs4',service_id:'s2',professional_id:'pro1',task_number:'A-004',status:'assigned',due_at:new Date(Date.now()-86400000).toISOString()}],executionTasks:[],
+ meetings:[{id:'m1',family_id:'f1',status:'completed',scheduled_at:now,type:'phone'},{id:'m3',family_id:'f3',status:'scheduled',scheduled_at:new Date(Date.now()+86400000).toISOString(),type:'phone'}],
+ meetingItems:[{id:'mi1',meeting_id:'m1',family_id:'f1',title:'ריכוז המסמכים והמשך הבדיקה',client_summary:'סיכמנו לרכז את הדוחות ולתאם שיחת מעקב עם הנציג.',client_decision:'progress',visible_to_client:true,sort_order:1},
+ {id:'mi3',meeting_id:'m3',family_id:'f3',family_service_id:'fs3',title:'מיפוי החסכונות הקיימים',client_summary:'נעבור יחד על מוצרי החיסכון ונחליט אילו נושאים נרצה לבדוק בהמשך.',current_situation:'קיימים מוצרי חיסכון ממקומות עבודה שונים. חסרה תמונה מרוכזת של המסלולים והעלויות.',recommendation:'לרכז את הדוחות העדכניים ולבקש מבעל מקצוע מוסמך לבדוק את המוצרים הקיימים.',decision_note:'המשפחה ביקשה הסבר פשוט לפני בחירת הצעד הבא.',execution_instructions:'ליצור קשר עם איש הקשר לאחר אישור המשפחה ושיוך לביצוע.',approved_actions:[],client_decision:'undecided',visible_to_client:true,sort_order:1},
+ {id:'mi4',meeting_id:'m3',family_id:'f3',title:'בדיקת עמלות בחשבון הבנק',client_summary:'נבדוק מה משלמים כיום ואילו אפשרויות כדאי להשוות מול הבנק.',current_situation:'המשפחה אינה יודעת כמה היא משלמת בעמלות בכל חודש.',recommendation:'להשוות את פירוט העמלות מול מסלולים שהבנק מציע, לפני קבלת החלטה.',decision_note:null,execution_instructions:null,approved_actions:[],client_decision:'undecided',visible_to_client:true,sort_order:2},
+ {id:'mi5',meeting_id:'m3',family_id:'f3',title:'תיאום פנימי לצוות',client_summary:'בדיקה פנימית של מסמכי ההכנה לשיחה.',current_situation:'יש לוודא שהמסמכים שסופקו עדכניים.',recommendation:'לתאם בדיקה עם בעל המקצוע.',decision_note:'תיעוד פנימי לדוגמה בלבד.',execution_instructions:null,approved_actions:[],client_decision:null,visible_to_client:false,sort_order:3}],
+ topicChecksEnabled:true,topicChecks:[],followUpsEnabled:true,followUpsTruncated:false,followUps:[
+ {id:'fu1',meeting_id:'m1',family_id:'f1',item_id:'mi1',title:'להעלות דוח חיסכון עדכני',details:'לצרף את הדוח האחרון ללשונית המסמכים בתיק, או לעדכן את הנציג אם נדרשת עזרה.',owner_role:'client',owner_name:'ישראל לוי',due_on:new Date(Date.now()+3*86400000).toISOString().slice(0,10),visible_to_client:true,status:'open',revision:1,updated_at:now},
+ {id:'fu2',meeting_id:'m1',family_id:'f1',item_id:'mi1',title:'לתאם שיחת מעקב עם המשפחה',details:'לבדוק שהדוחות התקבלו ולתאם מועד להסבר על השלב הבא.',owner_role:'representative',owner_name:'נציג לדוגמה',due_on:new Date(Date.now()-86400000).toISOString().slice(0,10),visible_to_client:true,status:'in_progress',revision:1,updated_at:now},
+ {id:'fu3',meeting_id:'m1',family_id:'f1',item_id:null,title:'בדיקת השלמות עם בעל המקצוע',details:'משימת תיאום פנימית לצוות, שאינה מוצגת למשפחה.',owner_role:'representative',owner_name:'נציג לדוגמה',due_on:new Date(Date.now()+2*86400000).toISOString().slice(0,10),visible_to_client:false,status:'open',revision:1,updated_at:now}],
+ professionals:[],professionalServices:[],representatives:[],profiles:[],notifications:[],audit:[],settings:{},automations:[],templates:[],
+ timeline:[{id:'t1',family_id:'f2',title:'התקבל מסמך חדש לבדיקה',created_at:now},{id:'t2',family_id:'f3',title:'נקבעה שיחת היכרות עם הממצאים',created_at:now},{id:'t3',family_id:'f4',title:'תחום הועבר לבדיקה מקצועית',created_at:now}],
+ documentTypes:[{id:'dt1',key:'pension_report',name:'דוח פנסיה שנתי',type:'file',active:true,description:null}],limit:500,
+};
+
+export default state;

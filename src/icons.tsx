@@ -1,0 +1,20 @@
+const paths:Record<string,string>={
+ followups:'M4 5h16v16H4z M8 3v4 M16 3v4 M8 15l3 3 5-6',
+ overview:'M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z',
+ family:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M16 3a4 4 0 0 1 0 8 M22 21v-2a4 4 0 0 0-3-3.87 M13 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0',
+ tasks:'M9 5H5v16h14V5h-4 M9 3h6v4H9z M8 13l2 2 5-5',
+ meetings:'M4 5h16v16H4z M16 3v4 M8 3v4 M4 11h16 M8 15h3',
+ notifications:'M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9 M10 21h4',
+ admin:'M12 3v3 M12 18v3 M3 12h3 M18 12h3 M5.6 5.6l2.1 2.1 M16.3 16.3l2.1 2.1 M5.6 18.4l2.1-2.1 M16.3 7.7l2.1-2.1 M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0',
+ documents:'M14 2H5v20h14V7z M14 2v5h5 M8 12h8 M8 16h6',
+ work:'M3 7h18v14H3z M8 7V3h8v4 M3 12h18 M10 12v3h4v-3',
+ housing:'M3 11l9-8 9 8 M5 9v12h14V9 M9 21v-8h6v8',
+ savings:'M3 18l6-6 4 3 8-11 M15 4h6v6 M3 22h18',
+ insurance:'M12 2l8 4v6c0 5-8 10-8 10S4 17 4 12V6z M8 12l3 3 5-6',
+ banks:'M3 9l9-6 9 6z M5 9v10 M10 9v10 M14 9v10 M19 9v10 M3 21h18',
+ check:'M5 12l4 4L19 6',
+ arrow:'M20 12H4 M10 6l-6 6 6 6',
+ help:'M9 9a3 3 0 1 1 5 2c-2 1-2 2-2 3 M12 18h.01 M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0',
+ clock:'M12 8v5l3 2 M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0',
+};
+export function Icon({name}:{name:string}){return <svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[name]||paths.documents}/></svg>;}
