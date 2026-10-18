@@ -8,7 +8,9 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1",
     "test": "vitest run",
-    "test:demo": "node scripts/check-demo.mjs"
+    "test:demo": "node scripts/check-demo.mjs",
+    "test:professional-admin": "node scripts/check-pro-admin.mjs",
+    "test:ux": "node scripts/check-mint.mjs && node scripts/check-mint-workflow.mjs"
   },
   "dependencies": {
     "@fontsource-variable/assistant": "5.3.0",

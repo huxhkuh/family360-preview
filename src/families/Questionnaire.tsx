@@ -1,3 +1,4 @@
+import {useRetainedState} from '../lib/draft-guard';
 import {ResourceLibrary} from '../resources/ResourceLibrary';
 import {ContactReuse} from './ContactReuse';
 import {PreparationTip} from './PreparationTip';
@@ -27,30 +28,29 @@ export function AnswerField({field,answers,onChange,advancedEmployment=false}:{f
 }
 function dynamic(field:DynamicField):LegacyField{return {k:field.key,l:field.label,type:field.type,req:field.required?1:0,opts:field.options?.map(x=>[x,x])};}
 export function Questionnaire({family,services,refresh,onDirtyChange,onComplete,advancedEmployment=false,resourceLibraryEnabled=false}:{family:Family;services:Service[];refresh:()=>Promise<void>;onDirtyChange:(dirty:boolean)=>void;onComplete:()=>void;advancedEmployment?:boolean;resourceLibraryEnabled?:boolean}){
- const [answers,setAnswers]=useState<Answers>(family.answers||{});
- const [saved,setSaved]=useState(JSON.stringify(family.answers||{}));
- const [revision,setRevision]=useState(family.updated_at);
- const [chapter,setChapter]=useState('family');const [showMissing,setShowMissing]=useState(false);
- const [busy,setBusy]=useState(false);
+ const [work,setWork]=useRetainedState<{answers:Answers;saved:string;revision:string|undefined}>('questionnaire:'+family.id,()=>({answers:family.answers||{},saved:JSON.stringify(family.answers||{}),revision:family.updated_at}),v=>JSON.stringify(v.answers)!==v.saved,'השאלון המשפחתי');
+ const {answers,saved,revision}=work;
+ const setAnswers=(next:Answers|((a:Answers)=>Answers))=>setWork(prev=>({...prev,answers:typeof next==='function'?next(prev.answers):next}));
+ const [chapter,setChapter]=useRetainedState('questionnaire-view:'+family.id,()=> 'family');const [showMissing,setShowMissing]=useState(false);
+ const [busy,setBusy]=useState(false);const [discard,setDiscard]=useState(false);
  const dirty=JSON.stringify(answers)!==saved;
- function loadLatest(){setAnswers(family.answers||{});setSaved(JSON.stringify(family.answers||{}));setRevision(family.updated_at);}
- // A refresh must not advance the optimistic-lock revision under a local draft.
+ function loadLatest(){setWork({answers:family.answers||{},saved:JSON.stringify(family.answers||{}),revision:family.updated_at});setDiscard(false);}
  useEffect(()=>{if(!dirty)loadLatest();},[family.updated_at]);
- useEffect(()=>{onDirtyChange(dirty);return()=>onDirtyChange(false);},[dirty,onDirtyChange]);
- useEffect(()=>{if(!dirty)return;const warn=(e:BeforeUnloadEvent)=>{e.preventDefault();e.returnValue='';};window.addEventListener('beforeunload',warn);return()=>window.removeEventListener('beforeunload',warn);},[dirty]);
+ useEffect(()=>{onDirtyChange(false);},[onDirtyChange]);
  const visible=CHAPTERS.filter(c=>!c.cond||c.cond(answers));
  const current=visible.find(c=>c.key===chapter)||visible[0];const index=visible.indexOf(current);
  const set=(k:string,v:unknown)=>setAnswers(prev=>({...prev,[k]:v}));
  const custom=services.filter(s=>s.active&&s.trigger_conditions.every(r=>conditionMatches(answers,r)));
  const missing=missingAnswers(answers,services);
- const persistDraft=async()=>{const result=await rpc<Family>('rpc_save_family',{p_family_id:family.id,p_patch:{answers},p_expected_updated_at:revision});setSaved(JSON.stringify(answers));setRevision(result.updated_at);await refresh();};
+ const persistDraft=async()=>{const result=await rpc<Family>('rpc_save_family',{p_family_id:family.id,p_patch:{answers},p_expected_updated_at:revision});setWork(prev=>({...prev,saved:JSON.stringify(answers),revision:result.updated_at}));await refresh();};
  const saveDraft=async()=>{setBusy(true);try{await persistDraft();}finally{setBusy(false);}};
  const submitted=family.onboarding_pct===100;
  function jump(key:string,chapterKey:string){setChapter(chapterKey==='custom'?current.key:chapterKey);requestAnimationFrame(()=>{const field=Array.from(document.querySelectorAll<HTMLElement>('[data-answer-key]')).find(el=>el.dataset.answerKey===key);if(field){const details=field.closest('details');if(details)details.open=true;field.focus();field.scrollIntoView({block:'center',behavior:'auto'});}});}
  return <Panel title="השאלון המשפחתי"><fieldset disabled={busy} aria-busy={busy}>
  <p className="section-intro">ממלאים את מה שידוע לכם, שומרים טיוטה וממשיכים בקצב שלכם. לחצו על סימן השאלה לצד השדות להסבר ולדוגמה. שדות המסומנים בכוכבית (*) נדרשים לשליחה לבדיקה. המידע נשמר רק בלחיצה על שמירה.</p>
- {family.updated_at!==revision&&<p className="hint" role="status">התיק עודכן בזמן העריכה. הטיוטה שלכם נשארה במסך כדי שלא תאבד. <button className="text-button" onClick={()=>{if(!dirty||window.confirm('לטעון את התשובות המעודכנות ולוותר על השינויים שלא נשמרו?'))loadLatest();}}>טעינת התשובות המעודכנות</button></p>}
- <div className="questionnaire-status"><span><Icon name="tasks"/> פרק {index+1} מתוך {visible.length}</span><span role="status">{dirty?'יש שינויים שטרם נשמרו':submitted?'השאלון כבר נשלח לבדיקה':'הטיוטה תישמר בתיק המשפחה'}</span></div>
+ {family.updated_at!==revision&&<p className="hint" role="status">התיק עודכן בזמן העריכה. הטיוטה שלכם נשארה במסך כדי שלא תאבד. <button className="text-button" onClick={()=>{if(dirty)setDiscard(true);else loadLatest();}}>טעינת התשובות המעודכנות</button></p>}
+ {discard&&<div className="hint"><p>להחליף את טיוטת השאלון בתשובות השמורות בתיק?</p><button type="button" onClick={loadLatest}>כן, טעינת התשובות</button><button type="button" onClick={()=>setDiscard(false)}>המשך עריכת הטיוטה</button></div>}
+ <div className="questionnaire-status"><span><Icon name="tasks"/> פרק {index+1} מתוך {visible.length}</span><span role="status">{dirty?'טיוטה זמינה במעבר בין מסכים · טרם נשמרה בתיק':submitted?'השאלון כבר נשלח לבדיקה':'הטיוטה תישמר בתיק המשפחה'}</span></div>
  <nav className="tabs chapter-tabs" aria-label="פרקי השאלון">{visible.map(c=><button key={c.key} aria-current={c.key===current.key?'step':undefined} className={c.key===current.key?'selected':'ghost'} onClick={()=>setChapter(c.key)}><Icon name={c.key}/>{c.title}</button>)}</nav>
  <SaveForm protectDraft={false} noValidate label="שמירת טיוטה" successMessage="הטיוטה נשמרה. אפשר להמשיך לפרק הבא או לחזור אליה בהמשך." save={saveDraft}>
  <PreparationTip chapter={current.key}/>

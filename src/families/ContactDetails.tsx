@@ -2,25 +2,31 @@ import {useEffect,useState} from 'react';
 import type {Family} from '../lib/model';
 import {rpc} from '../lib/backend';
 import {Field,Panel,SaveForm} from '../ui';
-
+import {useRetainedState} from '../lib/draft-guard';
 const values=(family:Family)=>({contact_name:family.contact_name||'',phone:family.phone||'',email:family.email||'',internal_notes:family.internal_notes||''});
-export function ContactDetails({family,staff,refresh,onDirtyChange}:{family:Family;staff:boolean;refresh:()=>Promise<void>;onDirtyChange:(dirty:boolean)=>void}){
- const [draft,setDraft]=useState(()=>values(family));const [saved,setSaved]=useState(()=>values(family));const [revision,setRevision]=useState(family.updated_at);
- const dirty=JSON.stringify(draft)!==JSON.stringify(saved);
- const updatedElsewhere=family.updated_at!==revision;
- function reset(){const next=values(family);setDraft(next);setSaved(next);setRevision(family.updated_at);}
- // Accept fresh server data only when the form is clean. Keep the original
- // revision while editing so the server can reject a concurrent overwrite.
+type Contact=ReturnType<typeof values>;
+const labels:Record<keyof Contact,string>={contact_name:'איש קשר',phone:'טלפון',email:'דוא״ל',internal_notes:'הערות פנימיות — לצוות בלבד'};
+export function ContactDetails({family,staff,refresh,onDirtyChange,compact=false}:{family:Family;staff:boolean;refresh:()=>Promise<void>;onDirtyChange?:(dirty:boolean)=>void;compact?:boolean}){
+ const [work,setWork]=useRetainedState(`contact:${family.id}`,()=>({draft:values(family),saved:values(family),revision:family.updated_at}),v=>JSON.stringify(v.draft)!==JSON.stringify(v.saved),'פרטי קשר');
+ const {draft,saved,revision}=work;const dirty=JSON.stringify(draft)!==JSON.stringify(saved);
+ const [editing,setEditing]=useState<keyof Contact|'all'|null>(()=>dirty?'all':null);
+ const [discard,setDiscard]=useState(false);
+ const reset=()=>{const v=values(family);setWork({draft:v,saved:v,revision:family.updated_at});setDiscard(false);};
  useEffect(()=>{if(!dirty)reset();},[family.updated_at]);
- useEffect(()=>{onDirtyChange(dirty);return()=>onDirtyChange(false);},[dirty,onDirtyChange]);
- useEffect(()=>{if(!dirty)return;const warn=(e:BeforeUnloadEvent)=>{e.preventDefault();e.returnValue='';};addEventListener('beforeunload',warn);return()=>removeEventListener('beforeunload',warn);},[dirty]);
- return <Panel title="פרטי קשר"><p className="muted">הפרטים מאפשרים לנציג לתאם איתכם את המשך הטיפול. שינויים נשמרים בלחיצה על שמירה.</p>
- {updatedElsewhere&&<p className="hint" role="status">התיק עודכן בזמן העריכה. הטיוטה שלכם נשמרה במסך. <button className="text-button" onClick={()=>{if(!dirty||window.confirm('לטעון את הנתונים המעודכנים ולוותר על השינויים שלא נשמרו?'))reset();}}>טעינת הפרטים המעודכנים</button></p>}
- <SaveForm protectDraft={false} save={async()=>{
-  const {internal_notes,...contact}=draft;
-  const result=await rpc<Family>('rpc_save_family',{p_family_id:family.id,p_patch:{...contact,...(staff?{internal_notes}:{})},p_expected_updated_at:revision});
-  setSaved(draft);setRevision(result.updated_at);await refresh();
- }}><div className="fields"><Field label="איש קשר"><input value={draft.contact_name} onChange={e=>setDraft({...draft,contact_name:e.target.value})} required maxLength={150}/></Field><Field label="טלפון"><input value={draft.phone} onChange={e=>setDraft({...draft,phone:e.target.value})} type="tel" required maxLength={30}/></Field><Field label="דוא״ל"><input value={draft.email} onChange={e=>setDraft({...draft,email:e.target.value})} type="email"/></Field></div>
- {staff&&<Field label="הערות פנימיות — לצוות בלבד"><textarea value={draft.internal_notes} onChange={e=>setDraft({...draft,internal_notes:e.target.value})} maxLength={10000}/></Field>}
- <p className="muted" role="status">{dirty?'יש שינויים שלא נשמרו':'מוצגים הפרטים שנשמרו בתיק'}</p></SaveForm></Panel>;
+ // This form retains its draft, so route changes do not require confirmation.
+ useEffect(()=>{onDirtyChange?.(false);},[onDirtyChange]);
+ const fields=(Object.keys(labels) as (keyof Contact)[]).filter(k=>staff||k!=='internal_notes');
+ const content=<><p className="muted">{compact?'פרטים מהתיק, זמינים גם במהלך השיחה.':'אפשר לעדכן כל פרט במקום. רק שמירה מעדכנת את התיק.'}</p>
+ <dl className="contact-inline">{fields.map(k=><div key={k}><dt>{labels[k]}</dt><dd><span dir={k==='phone'||k==='email'?'ltr':undefined}>{(dirty?draft:saved)[k]||'טרם הוזן'}</span><button type="button" className="text-button" onClick={()=>setEditing(k)}>עריכת {labels[k]}</button></dd></div>)}</dl>
+ <button type="button" className="ghost" onClick={()=>setEditing(editing==='all'?null:'all')}>{editing==='all'?'קיפול פרטי הקשר':'עריכת כל פרטי הקשר'}</button>
+ {dirty&&<p className="draft-notice" role="status">טיוטת פרטי קשר נשמרת במעבר בין מסכים. התיק יעודכן רק בלחיצה על שמירה.</p>}
+ {editing&&<div className="inline-editor"><SaveForm key={editing} protectDraft={false} label={editing==='all'?'שמירת פרטי הקשר':`שמירת ${labels[editing]}`} successMessage="פרטי הקשר נשמרו בתיק. לא נשלחה הודעה." save={async()=>{
+ const keys=editing==='all'?fields:[editing];const patch=Object.fromEntries(keys.map(k=>[k,draft[k]]));
+ const result=await rpc<Family>('rpc_save_family',{p_family_id:family.id,p_patch:patch,p_expected_updated_at:revision});
+ const nextSaved={...saved,...patch};setWork({...work,saved:nextSaved,revision:result.updated_at});await refresh();
+ }}><div className="fields">{fields.filter(k=>editing==='all'||editing===k).map(k=><Field key={k} label={labels[k]}>{k==='internal_notes'?<textarea value={draft[k]} maxLength={10000} onChange={e=>setWork({...work,draft:{...draft,[k]:e.target.value}})}/>:<input value={draft[k]} required={k==='contact_name'||k==='phone'} type={k==='phone'?'tel':k==='email'?'email':'text'} maxLength={k==='phone'?30:k==='contact_name'?150:undefined} onChange={e=>setWork({...work,draft:{...draft,[k]:e.target.value}})}/>}</Field>)}</div>
+ {family.updated_at!==revision&&<p className="hint">התיק עודכן מאז תחילת העריכה. הטיוטה נשמרה; אפשר לטעון את הפרטים המעודכנים לפני ניסיון נוסף.</p>}
+ </SaveForm><div className="inline-actions"><button type="button" className="ghost" onClick={()=>setEditing(null)}>קיפול העריכה</button><button type="button" className="ghost" onClick={()=>dirty?setDiscard(true):reset()}>טעינת הפרטים המעודכנים</button></div>
+ {discard&&<div className="hint"><p>להחליף את טיוטת הקשר בפרטים השמורים בתיק?</p><button type="button" onClick={reset}>כן, טעינת הפרטים</button><button type="button" className="ghost" onClick={()=>setDiscard(false)}>המשך עריכה</button></div>}</div>}</>;
+ return compact?<section aria-label="פרטי קשר בזמן השיחה"><h3>פרטי קשר</h3>{content}</section>:<Panel title="פרטי קשר">{content}</Panel>;
 }

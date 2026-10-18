@@ -6,6 +6,9 @@ export function useNavigation(leave:()=>boolean){
  const [route,setRoute]=useState(()=>readRoute(location.hash));
  const current=useRef({hash:location.hash,index:Number(history.state?.f360?.index)||0});
  const leaveRef=useRef(leave);leaveRef.current=leave;
+ const lists=useRef(new Map<string,RouteState>());const positions=useRef(new Map<string,number>());
+ const scrollAttempt=useRef(0);
+ const restoreScroll=(y:number)=>{const attempt=++scrollAttempt.current;const deadline=performance.now()+1600;const apply=()=>{if(scrollAttempt.current!==attempt)return;if(document.documentElement.scrollHeight>=y+innerHeight||performance.now()>deadline){window.scrollTo(0,y);return;}requestAnimationFrame(apply);};requestAnimationFrame(()=>requestAnimationFrame(apply));};
  const restoring=useRef(false);const bypass=useRef(false);
  useEffect(()=>{
   history.replaceState({...history.state,f360:{index:current.current.index,scroll:history.state?.f360?.scroll||0}},'');
@@ -20,19 +23,23 @@ export function useNavigation(leave:()=>boolean){
     return;
    }
    bypass.current=false;current.current={hash:location.hash,index};setRoute(readRoute(location.hash));
-   const scroll=history.state?.f360?.scroll||0;requestAnimationFrame(()=>requestAnimationFrame(()=>window.scrollTo(0,scroll)));
+   const scroll=history.state?.f360?.scroll||0;restoreScroll(scroll);
   };
-  const remember=()=>history.replaceState({...history.state,f360:{index:current.current.index,scroll:window.scrollY}},'');
+  const remember=()=>{positions.current.set(current.current.hash,window.scrollY);history.replaceState({...history.state,f360:{index:current.current.index,scroll:window.scrollY}},'');};
+  const cancelScroll=()=>{scrollAttempt.current++;};window.addEventListener('wheel',cancelScroll,{passive:true});window.addEventListener('touchstart',cancelScroll,{passive:true});
   window.addEventListener('popstate',changed);window.addEventListener('scroll',remember,{passive:true});
-  return()=>{window.removeEventListener('popstate',changed);window.removeEventListener('scroll',remember);history.scrollRestoration=oldRestoration;};
+  return()=>{scrollAttempt.current++;window.removeEventListener('wheel',cancelScroll);window.removeEventListener('touchstart',cancelScroll);window.removeEventListener('popstate',changed);window.removeEventListener('scroll',remember);history.scrollRestoration=oldRestoration;};
  },[]);
  function go(next:RouteState,{replace=false,guard=true,scroll=true}={}){
+  const previous=readRoute(current.current.hash);if(!previous.id)lists.current.set(previous.page,previous);
+  positions.current.set(current.current.hash,window.scrollY);
+  if(Object.keys(next).length===1&&lists.current.has(next.page))next=lists.current.get(next.page)!;
   const hash=routeHash(next);if(hash===current.current.hash)return false;
   if(guard&&!leaveRef.current())return false;
   history.replaceState({...history.state,f360:{index:current.current.index,scroll:window.scrollY}},'');
-  const index=current.current.index+(replace?0:1);
-  history[replace?'replaceState':'pushState']({f360:{index,scroll:scroll?0:window.scrollY}},'',hash);
-  current.current={hash,index};setRoute(next);if(scroll)requestAnimationFrame(()=>window.scrollTo(0,0));return true;
+  const index=current.current.index+(replace?0:1);const destinationScroll=scroll?(positions.current.get(hash)||0):window.scrollY;
+  history[replace?'replaceState':'pushState']({f360:{index,scroll:destinationScroll}},'',hash);
+  current.current={hash,index};setRoute(next);if(scroll)restoreScroll(destinationScroll);return true;
  }
  function back(fallback:RouteState){
   if(!leaveRef.current())return;

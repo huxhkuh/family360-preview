@@ -48,6 +48,7 @@ export async function validateUpload(file:File) {
 export function safeMessage(error:unknown) {
   const raw=error&&typeof error==='object'&&'message' in error?String(error.message):'';
   const messages:Record<string,string>={
+    UNSAVED_EXECUTION_UPDATE:'יש טיוטת עדכון שלא נשמרה. חזרו ללשונית העדכון ושמרו או בטלו אותה לפני דיווח הסיום.',
  DEMO_UNAVAILABLE:'פעולה זו אינה מופעלת בדמו. אין משלוח הודעות, שינוי חשבונות, חיוב או העברת קבצים לשרת.',
     INVITE_INVALID:'קישור ההזמנה אינו תקף, פג תוקפו, בוטל או כבר נוצל. יש לפנות למנהל לקבלת קישור חדש.',
     INVITE_ACCOUNT_CONFLICT:'לחשבון הזה כבר משויך תפקיד או תיק לקוח. יש לפנות למנהל לפני שינוי התפקיד.',
