@@ -2,7 +2,7 @@ import {chromium} from '@playwright/test';
 import assert from 'node:assert/strict';
 import {mkdirSync,writeFileSync} from 'node:fs';
 mkdirSync('test-results',{recursive:true});
-const base=process.env.DEMO_URL||'http://127.0.0.1:5248';
+const base=process.env.DEMO_URL||'http://127.0.0.1:5248/family360-preview/';
 const browser=await chromium.launch({headless:true});
 const results=[];
 for(const [device,width,height] of [['desktop',1440,1000],['mobile',390,844]]){

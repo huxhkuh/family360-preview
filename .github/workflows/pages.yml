@@ -1,0 +1,58 @@
+name: Test and publish demo
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - name: Check built demo on desktop and mobile
+        env:
+          DEMO_URL: http://127.0.0.1:5248/family360-preview/
+        run: |
+          npm run preview -- --port 5248 > /tmp/family360-preview.log 2>&1 &
+          for attempt in {1..30}; do
+            if curl --fail --silent "$DEMO_URL" > /dev/null; then break; fi
+            sleep 1
+          done
+          curl --fail --silent "$DEMO_URL" > /dev/null
+          npm run test:demo
+          node scripts/check-journey.mjs
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
