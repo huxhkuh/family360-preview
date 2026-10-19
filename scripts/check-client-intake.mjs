@@ -1,0 +1,41 @@
+import {chromium,expect} from '@playwright/test';
+import {mkdirSync,writeFileSync} from 'node:fs';
+const base=process.env.DEMO_URL||'http://127.0.0.1:5250/family360-preview/';
+mkdirSync('test-results/client-intake',{recursive:true});
+const browser=await chromium.launch();const results=[];
+try{for(const [device,width,height] of [['desktop',1440,1000],['tablet',820,900],['mobile',390,844]]){
+ const page=await browser.newPage({viewport:{width,height}});const errors=[],external=[];
+ page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());page.on('request',r=>{if(!r.url().startsWith(base)&&!r.url().startsWith('data:'))external.push(r.url());});
+ await page.goto(base);await page.getByRole('button',{name:'התחלת דמו של לקוח חדש',exact:true}).click();
+ const journey=page.getByRole('region',{name:'המסלול שלכם, צעד אחר צעד'});
+ await expect(journey.getByRole('list',{name:'שלבי התהליך'}).getByRole('listitem')).toHaveCount(4);await expect(journey.getByRole('heading',{name:'ממלאים ושולחים את השאלון',exact:true})).toBeVisible();
+ await journey.getByText('מה לגבי התשלום בדמו?',{exact:true}).click();await expect(journey).toContainText('אין כאן חיוב או אישור תשלום');
+ await page.screenshot({path:`test-results/client-intake/${device}-start.png`,fullPage:true});
+ await journey.getByRole('button',{name:'המשך לשאלון',exact:true}).click();
+ await page.getByRole('button',{name:'סיום ושליחת השאלון לבדיקה',exact:true}).click();await expect(page.locator('.validation-summary')).toContainText('נותרו');
+ const chapter=page.getByRole('navigation',{name:'פרקי השאלון'});
+ await chapter.getByRole('button',{name:'פרטי משפחה',exact:true}).click();
+ await page.locator('[data-answer-key=marital]').selectOption('single');
+ for(const [key,value] of Object.entries({city:'עיר לדוגמה',address:'רחוב הדוגמה 1',h_first:'ישראל',h_last:'לדוגמה',h_id:'000000018',h_dob:'1990-01-01',h_phone:'0500000000',h_email:'demo@example.invalid'}))await page.locator(`[data-answer-key=${key}]`).fill(value);
+ await chapter.getByRole('button',{name:'עבודה והכנסות',exact:true}).click();await page.getByRole('checkbox',{name:'לא עובד',exact:true}).check();
+ await chapter.getByRole('button',{name:'מגורים',exact:true}).click();await page.locator('[data-answer-key=housing]').selectOption('family');
+ await chapter.getByRole('button',{name:'ביטוחים',exact:true}).click();await page.locator('[data-answer-key=has_car]').selectOption('no');
+ await chapter.getByRole('button',{name:'בנקים ואשראי',exact:true}).click();await page.locator('[data-answer-key=bank_count]').fill('1');
+ await page.getByRole('button',{name:'שמירת טיוטה',exact:true}).click();await expect(page.getByText('הטיוטה נשמרה. אפשר להמשיך לפרק הבא או לחזור אליה בהמשך.')).toBeVisible();
+ await expect(journey).toContainText('למילוי ושליחה');
+ await page.getByRole('button',{name:'סיום ושליחת השאלון לבדיקה',exact:true}).click();
+ await expect(page.getByRole('region',{name:'מה צריך לצרף'})).toBeVisible();await expect(journey.getByText('נשלח לבדיקה',{exact:true})).toBeVisible();
+ const guide=page.getByRole('region',{name:'מה צריך לצרף'});await guide.locator('summary').click();await expect(guide).toContainText('זו אינה רשימת חובה אישית');
+ const doc=page.locator('article.document');await expect(doc).toHaveCount(1);
+ await page.screenshot({path:`test-results/client-intake/${device}-documents.png`,fullPage:true});
+ await doc.getByRole('button',{name:'צירוף קובץ דוגמה בלבד',exact:true}).click();
+ await expect(journey.getByRole('heading',{name:'המסמכים אצל הנציג לבדיקה',exact:true})).toBeVisible();await expect(doc).toContainText('לא הועלה קובץ');await expect(page.getByRole('status',{name:'סיום הפעולות הנדרשות כרגע'})).toBeVisible();await expect(doc.getByRole('button',{name:'צירוף קובץ דוגמה בלבד'})).toHaveCount(0);
+ await page.screenshot({path:`test-results/client-intake/${device}-waiting.png`,fullPage:true});
+ // A representative may request a correction; the client sees why and can retry the example.
+ await page.getByLabel('צפייה בתפקיד',{exact:true}).selectOption('representative');await page.goto(base+'#/families/f1/documents');await doc.getByLabel('סיבת הדחייה').fill('הדוגמה חסרה עמוד');await doc.getByRole('button',{name:'דחיית מסמך',exact:true}).click();await expect(doc).toContainText('הדוגמה חסרה עמוד');
+ await page.getByLabel('צפייה בתפקיד',{exact:true}).selectOption('client');await page.goto(base+'#/families/f1/documents');await expect(journey).toContainText('נותר מסמך או הרשאה להשלמה');await expect(doc).toContainText('הדוגמה חסרה עמוד');await expect(page.getByRole('status',{name:'סיום הפעולות הנדרשות כרגע'})).toHaveCount(0);await expect(doc.getByRole('button',{name:'אישור מסמך',exact:true})).toHaveCount(0);
+ await doc.getByRole('button',{name:'צירוף קובץ דוגמה בלבד',exact:true}).click();await expect(doc).not.toContainText('הדוגמה חסרה עמוד');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1)).toBe(false);expect(errors).toEqual([]);expect(external).toEqual([]);
+ results.push({device,passed:true,checks:['four steps','no fake payment','required fields','draft is not submission','submit to documents','sample only','wait for representative','rejection and retry','client cannot approve','no external requests or overflow']});await page.close();
+}}finally{await browser.close();}
+writeFileSync('test-results/client-intake/qa.json',JSON.stringify(results,null,2));console.log(JSON.stringify(results,null,2));

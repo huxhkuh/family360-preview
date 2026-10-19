@@ -10,7 +10,11 @@
     "test": "vitest run",
     "test:demo": "node scripts/check-demo.mjs",
     "test:professional-admin": "node scripts/check-pro-admin.mjs",
-    "test:ux": "node scripts/check-mint.mjs && node scripts/check-mint-workflow.mjs"
+    "test:ux": "node scripts/check-mint.mjs && node scripts/check-mint-workflow.mjs",
+    "test:client-intake": "node scripts/check-client-intake.mjs",
+    "test:chapter-process": "node scripts/check-chapter-process.mjs",
+    "test:client-workspace": "node scripts/check-client-workspace.mjs && node scripts/check-client-document-request.mjs",
+    "test:client-folio": "node scripts/check-client-folio.mjs"
   },
   "dependencies": {
     "@fontsource-variable/assistant": "5.3.0",

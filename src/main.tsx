@@ -5,6 +5,7 @@ import '@fontsource-variable/assistant';
 import './styles.css';
 import './design.css';
 import './mint.css';
+import './mint-client.css';
 class Boundary extends React.Component<{children:React.ReactNode},{failed:boolean}>{
  state={failed:false};
  static getDerivedStateFromError(){return {failed:true};}

@@ -40,6 +40,10 @@ jobs:
           node scripts/check-journey.mjs
           npm run test:ux
           npm run test:professional-admin
+          npm run test:client-intake
+          npm run test:chapter-process
+          npm run test:client-workspace
+          npm run test:client-folio
       - uses: actions/upload-pages-artifact@v4
         with:
           path: dist

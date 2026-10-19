@@ -2,7 +2,7 @@ import {describe,it,expect} from 'vitest';
 import {readRoute,routeHash,type RouteState} from './navigation';
 describe('record routes',()=>{
  it.each<RouteState>([
-  {page:'families',id:'family 1',tab:'documents'},
+  {page:'families',id:'family 1',tab:'documents',focus:'doc 1'},
   {page:'tasks',kind:'execution',id:'task-1',family:'f1'},
   {page:'meetings',id:'m1',stage:'discussion',topic:'item-1'},
   {page:'families',q:'משפחת בדיקה'},

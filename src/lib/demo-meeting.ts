@@ -43,22 +43,25 @@ const staff=role==='representative'||role==='admin';const randomUUID=()=>crypto.
     const meeting=state.meetings.find(m=>m.id===args.p_meeting_id);const p=args.p_payload;const old=state.followUps.find(t=>t.id===args.p_id);
     if(!staff||!meeting)return send({message:'PERMISSION_DENIED'},403);
     if(!['in_progress','completed'].includes(meeting.status))return send({message:'INVALID_STATE'},400);
+    if(p?.document_id&&!state.documents.some(d=>d.id===p.document_id&&d.family_id===meeting.family_id))return send({message:'VALIDATION'},400);
     if(!p||typeof p.title!=='string'||p.title.trim().length<3||!p.due_on||!['client','representative'].includes(p.owner_role)||(p.owner_role==='client'&&!p.visible_to_client)||p.item_id&&!state.meetingItems.some(i=>i.id===p.item_id&&i.meeting_id===meeting.id&&(!p.visible_to_client||i.visible_to_client)))return send({message:'VALIDATION'},400);
     if(old&&old.revision!==args.p_expected_revision)return send({message:'CONFLICT'},409);
-    const row={id:args.p_id,meeting_id:meeting.id,family_id:meeting.family_id,item_id:p.item_id||null,title:p.title.trim(),details:p.details||'',owner_role:p.owner_role,owner_name:p.owner_staff?'נציג לדוגמה':meeting.family_id==='f1'?'ישראל לוי':'המשפחה',due_on:p.due_on,visible_to_client:p.visible_to_client,status:old?.status||'open',revision:(old?.revision||0)+1,updated_at:new Date().toISOString()};
+    const row={document_id:p.document_id||null,id:args.p_id,meeting_id:meeting.id,family_id:meeting.family_id,item_id:p.item_id||null,title:p.title.trim(),details:p.details||'',owner_role:p.owner_role,owner_name:p.owner_role==='representative'?'נציג לדוגמה':meeting.family_id==='f1'?'ישראל לוי':'המשפחה',due_on:p.due_on,visible_to_client:p.visible_to_client,status:old?.status||'open',revision:(old?.revision||0)+1,updated_at:new Date().toISOString()};
     if(old)Object.assign(old,row);else state.followUps.push(row);return send(row);
    }
    if(path==='/rest/v1/rpc/rpc_set_followup_status'){
     const task=state.followUps.find(t=>t.id===args.p_id);
-    if(!task||!staff&&!(task.family_id==='f1'&&task.visible_to_client&&task.owner_role==='client'))return send({message:'PERMISSION_DENIED'},403);
+    if(!task||!staff&&!(role==='client'&&task.family_id==='f1'&&task.visible_to_client&&task.owner_role==='client'))return send({message:'PERMISSION_DENIED'},403);
     if(!['open','in_progress','completed','cancelled'].includes(args.p_status)||role==='client'&&args.p_status==='cancelled')return send({message:'VALIDATION'},400);
+    if(!staff&&(!['open','in_progress'].includes(task.status)||!['in_progress','completed'].includes(args.p_status)))return send({message:'PERMISSION_DENIED'},403);
+    if(args.p_status==='completed'&&task.document_id&&!state.documents.some(d=>d.id===task.document_id&&d.family_id===task.family_id&&['pending','approved','signed'].includes(d.status)))return send({message:'VALIDATION'},400);
     if(task.revision!==args.p_expected_revision)return send({message:'CONFLICT'},409);
     task.status=args.p_status;task.revision++;task.updated_at=new Date().toISOString();return send(null);
    }
    // Local draft/contact editing. Other mutations fail closed.
 
    if(path==='/rest/v1/rpc/rpc_save_family'){
-    const f=state.families.find(f=>f.id===args.p_family_id&&(staff||f.id==='f1'));
+    const f=state.families.find(f=>f.id===args.p_family_id&&(staff||role==='client'&&f.id==='f1'));
     if(!f)return send({message:'PERMISSION_DENIED'},403);
     if(args.p_expected_updated_at!==f.updated_at)return send({message:'CONFLICT'},409);
     const allowed=staff?['answers','contact_name','phone','email','internal_notes']:['answers','contact_name','phone','email'];

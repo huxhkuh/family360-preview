@@ -3,6 +3,7 @@
 // No network, persistence, credentials or production service initialization.
 import type {SupabaseClient} from '@supabase/supabase-js';
 import seed from './demo-seed';
+import {questionnaireIssues} from '../families/questionnaire-validation';
 import {operationRpc} from './demo-operations';
 import {meetingRpc} from './demo-meeting';
 import {workspaceSchema,type Role} from './model';
@@ -20,6 +21,8 @@ export function resetDemo(){
  state.representatives=[{id:'rep1',profile_id:'representative',name:'נציג לדוגמה',active:true,permissions:['families.edit','documents.manage','analysis.send','analysis.approve','execution.send','execution.approve']}];
  state.profiles=[{id:'admin',name:'מנהל לדוגמה',role:'admin',active:true},{id:'client',name:'לקוח לדוגמה',role:'client',active:true},{id:'representative',name:'נציג לדוגמה',role:'representative',active:true},...state.professionals.map(p=>({id:p.profile_id,name:p.name,role:'professional',active:true}))];
  state.familyTasks=[{id:'ft1',family_id:'f1',title:'להכין רשימת הוצאות חודשית',details:'דוגמה למשימה בתיק שאינה תלויה בפגישה.',owner_role:'client',owner_name:'המשפחה',due_on:new Date(Date.now()+86400000*4).toISOString().slice(0,10),visible_to_client:true,status:'open',revision:1,updated_at:now()}];
+ state.documents.push({id:'d1',family_id:'f1',document_type_id:'dt1',name:'דוח חיסכון עדכני — דוגמה בלבד',key:'pension_report',type:'file',status:'missing',purpose:'להכין את בירור החסכונות שסוכם בשיחה לדוגמה.',subject:'בעל החיסכון שעליו דובר בשיחה',period:'הדוח העדכני הזמין',source_hint:'באזור האישי של הגוף שמנהל את החיסכון. בדמו מצרפים דוגמה מדומה בלבד.'});
+ state.followUps.find(t=>t.id==='fu1').document_id='d1';
  state.familyContacts=[{id:'fc1',family_id:'f1',kind:'phone',summary:'שיחת היכרות לדוגמה: תואם איסוף מסמכים לקראת המשך הבדיקה.',occurred_at:now(),author_name:'נציג לדוגמה',next_task_id:'ft1'}];
  state.resources=[{id:'resource1',title:'פריט לדוגמה בספרייה',description:'טיוטה להמחשת עריכת פרטי קשר. אין כאן המלצה או מקור שנבדק.',url:'https://example.com',phone:'',chapter:'general',active:false,verified_at:null,revision:1}];
  state.offers=[{id:'offer1',family_service_id:'fs2',kind:'analysis',service_name:'פנסיה וחסכונות',candidates:['pro1','pro2'],status:'open',created_at:now(),expires_at:new Date(Date.now()+86400000*2).toISOString(),claimed_by:null}];
@@ -31,10 +34,16 @@ export function resetDemo(){
  state.notifications=[{id:'notice1',title:'ברוכים הבאים לדמו',body:'הנתונים והפעולות כאן הם להמחשה בלבד. אפשר לאפס את הדמו בכל עת.',read_at:null}];
 }
 resetDemo();
+export function startClientIntake(){
+ resetDemo();
+ Object.assign(state.families.find(f=>f.id==='f1'),{status:'new',onboarding_pct:0,answers:{},contact_name:'לקוח לדוגמה',phone:'0500000000'});
+ for(const key of ['familyServices','documents','meetings','meetingItems','followUps','familyTasks','familyContacts','executionTasks'])state[key]=state[key].filter(x=>x.family_id!=='f1');
+}
 export function selectRole(next:Role){role=next;}
 function workspace(){
  const data=structuredClone(state);
  const profileId=role==='professional'?'professional1':role;
+ data.notifications=data.notifications.filter(n=>!n.audience||n.audience===role||role==='admin'&&n.audience==='representative').filter(n=>role!=='client'||!n.family_id||n.family_id==='f1');
  if(role==='client'){
   data.families=data.families.filter(f=>f.id==='f1').map(({internal_notes,...f})=>f);
   for(const key of ['documents','familyServices','meetings','meetingItems','followUps','familyTasks'])data[key]=data[key].filter(x=>x.family_id==='f1');
@@ -72,13 +81,28 @@ export async function rpc<T=unknown>(name:string,a:Record<string,any>={}):Promis
  if(name==='rpc_claim_professional_offer'){const o=find('offers',a.p_id);if(role!=='professional'||o.status!=='open'||!o.candidates.includes('pro1'))throw Error('CONFLICT');const task=assign(o.family_service_id,o.kind,'pro1');o.status='claimed';o.claimed_by='pro1';return task;}
  if(name==='rpc_create_professional_offer'){if(!staff)throw Error('PERMISSION_DENIED');const fs=find('familyServices',a.p_family_service_id);if(state.offers.some(o=>o.family_service_id===fs.id&&o.status==='open'))throw Error('CONFLICT');const row={id:a.p_id,family_service_id:fs.id,kind:a.p_kind,candidates:a.p_candidates,service_name:find('services',fs.service_id).name,status:'open',created_at:now(),expires_at:new Date(Date.now()+86400000*2).toISOString()};state.offers.push(row);return row;}
  if(name==='rpc_cancel_professional_offer'){if(!staff)throw Error('PERMISSION_DENIED');find('offers',a.p_id).status='cancelled';return null;}
- if(name==='rpc_mark_notifications_read'){state.notifications.forEach(n=>n.read_at=now());return null;}
- if(name==='rpc_save_family_task'){if(!staff)throw Error('PERMISSION_DENIED');return update('familyTasks',a.p_id,{...a.p_payload,family_id:a.p_family_id,status:state.familyTasks.find(t=>t.id===a.p_id)?.status||'open',owner_name:a.p_payload.owner_role==='client'?'המשפחה':'נציג לדוגמה'},a.p_expected_revision);}
+ if(name==='rpc_mark_notifications_read'){const visible=new Set(workspace().notifications.map(n=>n.id));state.notifications.filter(n=>visible.has(n.id)).forEach(n=>n.read_at=now());return null;}
+ if(name==='rpc_save_family_task'){if(!staff)throw Error('PERMISSION_DENIED');if(a.p_payload.document_id&&!state.documents.some(d=>d.id===a.p_payload.document_id&&d.family_id===a.p_family_id))throw Error('VALIDATION');return update('familyTasks',a.p_id,{...a.p_payload,family_id:a.p_family_id,status:state.familyTasks.find(t=>t.id===a.p_id)?.status||'open',owner_name:a.p_payload.owner_role==='client'?'המשפחה':'נציג לדוגמה'},a.p_expected_revision);}
  if(name==='rpc_record_family_contact'){if(!staff)throw Error('PERMISSION_DENIED');update('familyContacts',a.p_id,{family_id:a.p_family_id,kind:a.p_kind,summary:a.p_summary,occurred_at:a.p_occurred_at,author_name:'נציג לדוגמה',next_task_id:a.p_next_task_id||null});if(a.p_next_task)update('familyTasks',a.p_next_task_id,{...a.p_next_task,family_id:a.p_family_id,status:'open',owner_name:a.p_next_task.owner_role==='client'?'המשפחה':'נציג לדוגמה'});return null;}
- if(name==='rpc_set_family_task_status'){const t=find('familyTasks',a.p_id);if(!staff&&!(role==='client'&&t.family_id==='f1'&&t.owner_role==='client'&&t.visible_to_client))throw Error('PERMISSION_DENIED');return update('familyTasks',a.p_id,{status:a.p_status},a.p_expected_revision);}
- if(name==='rpc_complete_onboarding'){const f=find('families',a.p_family_id);Object.assign(f,{onboarding_pct:100,status:'waiting_docs'});if(!state.documents.some(d=>d.family_id===f.id))state.documents.push({id:id(),family_id:f.id,document_type_id:'dt1',name:'דוח פנסיה שנתי',key:'pension_report',type:'file',status:'missing'});return null;}
- if(name==='rpc_review_document'){if(!staff)throw Error('PERMISSION_DENIED');Object.assign(find('documents',a.p_document_id),{status:a.p_approved?'approved':'rejected',reject_reason:a.p_reason||null});return null;}
- if(name==='rpc_request_document'){if(!staff)throw Error('PERMISSION_DENIED');const type=find('documentTypes',a.p_type_id);state.documents.push({id:id(),family_id:a.p_family_id,document_type_id:type.id,name:type.name,key:type.key,type:type.type,status:'missing'});return null;}
+ if(name==='rpc_set_family_task_status'){const t=find('familyTasks',a.p_id);if(!staff&&!(role==='client'&&t.family_id==='f1'&&t.owner_role==='client'&&t.visible_to_client))throw Error('PERMISSION_DENIED');if(!['open','in_progress','completed','cancelled'].includes(a.p_status))throw Error('VALIDATION');if(!staff&&(!['open','in_progress'].includes(t.status)||!['in_progress','completed'].includes(a.p_status)))throw Error('PERMISSION_DENIED');if(a.p_status==='completed'&&t.document_id&&!state.documents.some(d=>d.id===t.document_id&&d.family_id===t.family_id&&['pending','approved','signed'].includes(d.status)))throw Error('VALIDATION');return update('familyTasks',a.p_id,{status:a.p_status},a.p_expected_revision);}
+ if(name==='rpc_client_request'){
+  if(role!=='client'||a.p_family_id!=='f1')throw Error('PERMISSION_DENIED');
+  const f=find('families',a.p_family_id);if(!['help','correction'].includes(a.p_kind))throw Error('VALIDATION');
+  let source;const details=String(a.p_details||'').trim();
+  if(a.p_kind==='correction'){
+   if(!['familyTask','followUp'].includes(a.p_source_kind))throw Error('VALIDATION');
+   source=find(a.p_source_kind==='familyTask'?'familyTasks':'followUps',a.p_source_id);
+   if(source.family_id!==f.id||source.owner_role!=='client'||!source.visible_to_client||source.item_id&&!state.meetingItems.some(i=>i.id===source.item_id&&i.visible_to_client))throw Error('PERMISSION_DENIED');
+   if(source.revision!==a.p_expected_revision)throw Error('CONFLICT');
+   if(source.status!=='completed')throw Error('VALIDATION');
+  }else if(details.length<3||details.length>1000)throw Error('VALIDATION');
+  const existing=state.familyTasks.find(t=>t.family_id===f.id&&t.request_kind===a.p_kind&&t.source_id===source?.id&&['open','in_progress'].includes(t.status));if(existing)return existing;
+  const request=update('familyTasks',id(),{family_id:f.id,title:source?'בקשה לתיקון: '+source.title:'בקשת עזרה מהמשפחה',details:source?'המשפחה ביקשה לבדוק סימון כהושלם. יש לברר לפני פתיחת המשימה מחדש.':details,owner_role:'representative',owner_name:state.representatives.find(r=>r.id===f.representative_id)?.name||'הנציג המטפל',visible_to_client:true,due_on:'',status:'open',request_kind:a.p_kind,source_id:source?.id,source_kind:source?a.p_source_kind:undefined});state.notifications.push({id:id(),title:request.title,body:'נרשמה בקשה מהמשפחה במעקב הדמו.',read_at:null,audience:'representative',family_id:f.id,target_kind:'familyTask',target_id:request.id});return request;
+ }
+ if(name==='rpc_complete_onboarding'){if(!staff&&!(role==='client'&&a.p_family_id==='f1'))throw Error('PERMISSION_DENIED');const f=find('families',a.p_family_id);if(f.onboarding_pct===100)return null;if(questionnaireIssues(f.answers||{},state.services).length)throw Error('VALIDATION');Object.assign(f,{onboarding_pct:100,status:'waiting_docs'});if(!state.documents.some(d=>d.family_id===f.id))state.documents.push({id:id(),family_id:f.id,document_type_id:'dt1',name:'דוח פנסיה שנתי — דוגמה בלבד',key:'pension_report',type:'file',status:'missing',purpose:'בקשה מדומה כדי להתנסות בצירוף ובבדיקת מסמך. הדרישה האישית תיקבע עם הנציג.',subject:'בעל החיסכון שאליו מתייחסת הבקשה; בדמו אין לצרף מידע אישי.',period:'הדוח השנתי האחרון הזמין — לצורך הדגמה בלבד.',source_hint:'במערכת אמיתית: באזור האישי של הגוף המנהל, תחת דוחות שנתיים. כאן משתמשים בכפתור הדוגמה בלבד.'});return null;}
+ if(name==='rpc_demo_attach_example'){const doc=find('documents',a.p_document_id);if(!staff&&!(role==='client'&&doc.family_id==='f1'))throw Error('PERMISSION_DENIED');if(doc.type!=='file'||!['missing','rejected'].includes(doc.status))throw Error('VALIDATION');Object.assign(doc,{status:'pending',file_name:'דוגמה מדומה — לא הועלה קובץ',reject_reason:null});return null;}
+ if(name==='rpc_review_document'){if(!staff)throw Error('PERMISSION_DENIED');const doc=find('documents',a.p_document_id);if(doc.status!=='pending')throw Error('VALIDATION');if(!a.p_approved&&!String(a.p_reason||'').trim())throw Error('VALIDATION');Object.assign(doc,{status:a.p_approved?'approved':'rejected',reject_reason:a.p_reason||null});state.notifications.push({id:id(),title:a.p_approved?'המסמך אושר':'נדרש תיקון במסמך',body:doc.name,read_at:null,audience:'client',family_id:doc.family_id,target_kind:'document',target_id:doc.id});return null;}
+ if(name==='rpc_request_document'){if(!staff)throw Error('PERMISSION_DENIED');const type=find('documentTypes',a.p_type_id);state.documents.push({id:id(),family_id:a.p_family_id,document_type_id:type.id,name:type.name,key:type.key,type:type.type,status:'missing',...Object.fromEntries(['purpose','subject','period','source_hint'].map(key=>[key,String(a['p_'+key]||'').trim().slice(0,500)]))});return null;}
  if(name==='rpc_add_family_service'){if(!staff)throw Error('PERMISSION_DENIED');state.familyServices.push({id:id(),family_id:a.p_family_id,service_id:a.p_service_id,status:'waiting_analysis',analysis_task_id:null,execution_task_id:null});return null;}
  if(name==='rpc_assign_analysis'||name==='rpc_assign_execution'){if(!staff)throw Error('PERMISSION_DENIED');return assign(a.p_family_service_id,name.endsWith('analysis')?'analysis':'execution',a.p_professional_id);}
  if(name==='rpc_manage_meeting'){if(!staff)throw Error('PERMISSION_DENIED');const m=find('meetings',a.p_meeting_id);if(m.scheduled_at!==a.p_expected_scheduled_at)throw Error('CONFLICT');if(a.p_action==='reschedule')m.scheduled_at=a.p_scheduled_at;else m.status='cancelled';return null;}

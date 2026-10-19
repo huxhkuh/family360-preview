@@ -3,8 +3,8 @@ import {DraftContext} from './lib/draft-guard';
 import {safeMessage,statusLabels} from './lib/core';
 const ValidationContext=createContext<Record<string,string>>({});
 export function Badge({status}:{status:string}){return <span className={`badge ${status}`}>{statusLabels[status]||status}</span>;}
-export function Field({label,children,help}:{label:string;children:ReactNode;help?:ReactNode}){
- const id=useId();const errors=useContext(ValidationContext);const error=errors[id];
+export function Field({label,children,help,error:explicitError}:{label:string;children:ReactNode;help?:ReactNode;error?:string}){
+ const id=useId();const errors=useContext(ValidationContext);const error=explicitError||errors[id];
  const child=children as ReactElement<{id:string;'aria-invalid'?:boolean;'aria-describedby'?:string}>;
  return <div className="field">{help?<div className="question-heading"><label htmlFor={id}>{label}</label>{help}</div>:<label htmlFor={id}>{label}</label>}{isValidElement(children)?cloneElement(child,{id,...(error?{'aria-invalid':true,'aria-describedby':[child.props['aria-describedby'],id+'-error'].filter(Boolean).join(' ')}:{})}):children}{error&&<p className="field-error" id={id+'-error'}>{error}</p>}</div>;
 }

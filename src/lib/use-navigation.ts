@@ -8,7 +8,7 @@ export function useNavigation(leave:()=>boolean){
  const leaveRef=useRef(leave);leaveRef.current=leave;
  const lists=useRef(new Map<string,RouteState>());const positions=useRef(new Map<string,number>());
  const scrollAttempt=useRef(0);
- const restoreScroll=(y:number)=>{const attempt=++scrollAttempt.current;const deadline=performance.now()+1600;const apply=()=>{if(scrollAttempt.current!==attempt)return;if(document.documentElement.scrollHeight>=y+innerHeight||performance.now()>deadline){window.scrollTo(0,y);return;}requestAnimationFrame(apply);};requestAnimationFrame(()=>requestAnimationFrame(apply));};
+ const restoreScroll=(y:number)=>{const attempt=++scrollAttempt.current;const deadline=performance.now()+1600;const apply=()=>{if(scrollAttempt.current!==attempt)return;if(document.documentElement.scrollHeight>=y+innerHeight||performance.now()>deadline){const focus=readRoute(location.hash).focus;const target=focus?Array.from(document.querySelectorAll<HTMLElement>('[data-record-id]')).find(el=>el.dataset.recordId===focus):undefined;if(target){target.focus({preventScroll:true});target.scrollIntoView({block:'center'});}else window.scrollTo(0,y);return;}requestAnimationFrame(apply);};requestAnimationFrame(()=>requestAnimationFrame(apply));};
  const restoring=useRef(false);const bypass=useRef(false);
  useEffect(()=>{
   history.replaceState({...history.state,f360:{index:current.current.index,scroll:history.state?.f360?.scroll||0}},'');
