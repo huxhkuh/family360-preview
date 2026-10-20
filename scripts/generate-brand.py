@@ -1,4 +1,4 @@
-"""Build original Mesudarim 360 SVG concepts with self-contained outlined type.
+"""Build four vector concepts and wrappers preserving the approved logo artwork.
 
 Run from repository root with Python + fontTools. Runtime uses only generated SVGs.
 Assistant is distributed under the SIL Open Font License (copied beside exports).
@@ -9,6 +9,7 @@ from fontTools.varLib.instancer import instantiateVariableFont
 from fontTools.pens.svgPathPen import SVGPathPen
 from xml.sax.saxutils import escape
 import shutil
+import base64
 from functools import lru_cache
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -67,22 +68,31 @@ for i, (mark, name) in enumerate(zip(MARKS, NAMES), 1):
         ("dark", "#F9ECE0", "#D8A16E"),
         ("mono", "#031E1A", "#031E1A"),
     ]:
+        if i == 5:
+            # Preserve the approved artwork byte-for-byte. SVG only selects the
+            # relevant region of the supplied presentation; it does not redraw,
+            # retouch, remove texture, recolour, or regenerate its typography.
+            source = base64.b64encode((OUT / "approved-logo-board.png").read_bytes()).decode("ascii")
+            crops = {
+                "dark": ("55 92 250 190", "125 98 112 112"),
+                "light": ("343 44 166 126.16", "394 54 66 66"),
+                "mono": ("343 235 166 126.16", "397 246 62 62"),
+            }
+            for mark_only in [False, True]:
+                viewbox = crops[mode][int(mark_only)]
+                suffix = "-mark" if mark_only else ""
+                title = "מסודרים 360 — עושים לך סדר בכסף."
+                (OUT / f"concept-5-{mode}{suffix}.svg").write_text(
+                    f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{viewbox}" role="img">'
+                    f'<title>{title}</title><image width="512" height="384" href="data:image/png;base64,{source}"/></svg>',
+                    encoding="utf-8")
+            continue
         symbol = mark.format(p=primary, a=accent)
-        if i == 5 and mode != "mono":
-            symbol = '<defs><linearGradient id="copper" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#E6AC72"/><stop offset="1" stop-color="#A9582F"/></linearGradient></defs>' + mark.format(p=primary, a="url(#copper)")
         title = escape(f"מסודרים 360 — {name}")
         (OUT / f"concept-{i}-{mode}-mark.svg").write_text(
             f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img"><title>{title}</title>{symbol}</svg>', encoding="utf-8")
         name_paths = word("מסודרים"[::-1], "hebrew", 78, 12, 157, 40, primary)
         number_paths = word("360", "latin", 0, 12, 65, 40, primary)
-        if i == 5:
-            name_paths = word("מסודרים"[::-1], "hebrew", 104, 140, 200, 45, primary)
-            number_paths = word("360", "latin", 16, 140, 75, 45, primary)
-            tagline = word("עושים לך סדר בכסף."[::-1], "hebrew", 54, 200, 212, 22, accent, 600)
-            (OUT / f"concept-{i}-{mode}.svg").write_text(
-                f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 242" role="img"><title>{title} — עושים לך סדר בכסף.</title>'
-                f'<g transform="translate(96 4) scale(2)">{symbol}</g>{name_paths}{number_paths}{tagline}</svg>', encoding="utf-8")
-            continue
         (OUT / f"concept-{i}-{mode}.svg").write_text(
             f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 76" role="img"><title>{title}</title>'
             f'{name_paths}{number_paths}<path d="M78 65h157" stroke="{accent}" stroke-width="2"/>'

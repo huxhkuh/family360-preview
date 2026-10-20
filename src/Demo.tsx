@@ -1,4 +1,4 @@
-import {useState,useRef} from 'react';
+import {useState,useRef,useLayoutEffect} from 'react';
 import {BrandProvider,BrandLogo,BrandControls,BrandLab,useBrand} from './branding/Brand';
 import {App} from './App';
 import {selectRole,resetDemo,startClientIntake} from './lib/backend';
@@ -8,7 +8,9 @@ const roles:[Role,string,string][]=[['representative','נציג','תיקי מש�
 export function Demo(){return <BrandProvider><DemoContent/></BrandProvider>;}
 function DemoContent(){
  const {select}=useBrand();const [lab,setLab]=useState(()=>new URLSearchParams(location.search).get('brandlab')==='1');const scroll=useRef(0);
- const toggleLab=(open:boolean)=>{if(open)scroll.current=window.scrollY;setLab(open);requestAnimationFrame(()=>{if(open){window.scrollTo(0,0);document.getElementById('brand-lab')?.focus();}else{window.scrollTo(0,scroll.current);document.querySelector<HTMLButtonElement>('.brand-lab-toggle')?.focus({preventScroll:true});}});};
+ const restoreLabFocus=useRef(false);
+ const toggleLab=(open:boolean)=>{if(open)scroll.current=window.scrollY;restoreLabFocus.current=true;setLab(open);};
+ useLayoutEffect(()=>{if(!restoreLabFocus.current)return;restoreLabFocus.current=false;if(lab){window.scrollTo(0,0);document.getElementById('brand-lab')?.focus();}else{window.scrollTo(0,scroll.current);document.querySelector<HTMLButtonElement>('.brand-lab-toggle')?.focus({preventScroll:true});}},[lab]);
  const [role,setRole]=useState<Role|null>(null);const [version,setVersion]=useState(0);
  const choose=(next:Role)=>{selectRole(next);location.hash='/overview';setRole(next);setVersion(v=>v+1);};
  const preview=(variant:number,page:'home'|'questionnaire')=>{if(role&&role!=='client'&&!confirm('לעבור לתצוגת לקוח? שינויים בטופס שלא נשמרו יאבדו.'))return;select(variant);if(!role){startClientIntake();choose('client');}else if(role!=='client')choose('client');location.hash=page==='home'?'/overview':'/families/f1/questionnaire';setLab(false);requestAnimationFrame(()=>window.scrollTo(0,0));};

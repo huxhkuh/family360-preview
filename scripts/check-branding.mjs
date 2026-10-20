@@ -1,10 +1,19 @@
 import {chromium,expect} from '@playwright/test';
-import {mkdirSync,writeFileSync} from 'node:fs';
+import {mkdirSync,writeFileSync,readFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
 const base=process.env.DEMO_URL||'http://127.0.0.1:5250/family360-preview/';
 const output='test-results/branding';
 mkdirSync(output,{recursive:true});
 const browser=await chromium.launch();const results=[];
 try{
+ const approved=readFileSync('public/brand/approved-logo-board.png');
+ expect(createHash('sha256').update(approved).digest('hex')).toBe('66b8d92983e426c3953cf98f02686264099b1a690b9126b85f10566df9241be1');
+ for(const mode of ['light','dark','mono'])for(const suffix of ['','-mark']){
+  const svg=readFileSync(`public/brand/concept-5-${mode}${suffix}.svg`,'utf8');
+  const embedded=svg.match(/data:image\/png;base64,([^"]+)/)?.[1];
+  expect(embedded).toBeTruthy();expect(Buffer.from(embedded,'base64').equals(approved)).toBe(true);
+ }
+ results.push({passed:true,checks:['approved source SHA-256 unchanged','all six selected-logo assets preserve original pixels, typography, gradient and texture']});
  for(const [device,width,height] of [['desktop',1440,1000],['mobile',390,844],['narrow',320,740]]){
   const page=await browser.newPage({viewport:{width,height},reducedMotion:'reduce'});
   const errors=[],external=[];page.on('pageerror',e=>errors.push(e.message));
