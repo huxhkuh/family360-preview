@@ -1,4 +1,5 @@
 // @ts-nocheck
+import {contactPatch} from "../families/questionnaire-decisions";
 export function meetingRpc(path,args,state,role,workspace){
 const staff=role==='representative'||role==='admin';const randomUUID=()=>crypto.randomUUID();const send=(value,status=200)=>{if(status>=400)throw new Error(value.message);return value;};
    if(path==='/rest/v1/rpc/rpc_meeting_action'||path==='/rest/v1/rpc/rpc_finish_meeting'){
@@ -65,8 +66,9 @@ const staff=role==='representative'||role==='admin';const randomUUID=()=>crypto.
     if(!f)return send({message:'PERMISSION_DENIED'},403);
     if(args.p_expected_updated_at!==f.updated_at)return send({message:'CONFLICT'},409);
     const allowed=staff?['answers','contact_name','phone','email','internal_notes']:['answers','contact_name','phone','email'];
-    for(const key of allowed)if(Object.hasOwn(args.p_patch,key))f[key]=args.p_patch[key];
-    f.updated_at=new Date().toISOString();return send(workspace(role).families.find(row=>row.id===f.id));
+    const patch=contactPatch(f,args.p_patch);
+    for(const key of allowed)if(Object.hasOwn(patch,key))f[key]=patch[key];
+    f.updated_at=new Date(Math.max(Date.now(),Date.parse(f.updated_at||0)+1)).toISOString();return send(workspace(role).families.find(row=>row.id===f.id));
    }
 
 return undefined;

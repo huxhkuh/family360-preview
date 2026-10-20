@@ -19,7 +19,7 @@ describe('household conditions',()=>{
   expect(documentPreparation(answers).map(d=>d.key)).toEqual(expect.arrayContaining(['payslips_h','payslips_w','tax_assessment_h','mortgage_balance']));
   const rows=questionnaireReview(answers,[]).flatMap(c=>c.items);
   expect(rows.filter(r=>r.value.includes('להשלמה'))).toHaveLength(4);
-  expect(questionnaireReview({...answers,h_gross:0},[]).flatMap(c=>c.items).some(r=>r.label==='שכר ברוטו (₪)'&&r.value==='0')).toBe(true);
+  expect(questionnaireReview({...answers,h_gross:0},[]).flatMap(c=>c.items).some(r=>r.label==='שכר חודשי ברוטו (₪)'&&r.value==='0')).toBe(true);
   for(const key of ['w_id','w_dob','w_emp'])expect(questionnaireIssues({...answers,[key]:''},[]).map(f=>f.key)).toContain(key);
   expect(questionnaireIssues({...answers,mort_monthly:-1},[]).map(f=>f.key)).toContain('mort_monthly');
  });

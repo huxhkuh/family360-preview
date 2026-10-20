@@ -1,5 +1,10 @@
 .questionnaire-paper .chapter-end-label{margin:22px 0 0;color:#76634f;font-size:13px;letter-spacing:.02em}
 .questionnaire-paper .chapter-actions{margin-bottom:0;border-bottom:0}
+.questionnaire-contact{margin-block:18px;overflow-wrap:anywhere}
+.submission-notice{padding:18px 22px;border:1px solid #c6d9ce;border-radius:14px;margin-block:16px}
+.submission-notice h2{margin:0 0 8px;font-size:22px}
+.submission-notice p{margin:0}
+.preparation-kind{display:block;margin-block:4px;color:#526d60}
 .questionnaire-paper>.questionnaire-after{margin:0;padding:0;border:0;min-width:0}
 .questionnaire-paper .questionnaire-support-card,
 .questionnaire-paper>.resource-library{margin:32px 0 0;padding:24px 28px;background:#fffdf9;border:1px solid #dfd5c7;border-radius:18px;box-shadow:0 4px 18px #38291805}

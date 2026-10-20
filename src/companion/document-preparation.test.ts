@@ -14,12 +14,12 @@ describe('contextual document preparation',()=>{
  });
  it('supports simultaneous occupations but never uses stale spouse or mortgage answers',()=>{
   const rules=documentPreparation({h_emp:['emp','self'],w_emp:'emp',marital:'single',housing:'rent',has_mortgage:'yes'});
-  expect(rules.map(r=>r.key)).toEqual(['payslips_h','tax_assessment_h','rental_contract']);
+  expect(rules.map(r=>r.key)).toEqual(['payslips_h','tax_assessment_h','rental_contract','municipal_bill','electricity_bill']);
   expect(documentPreparation({marital:'married',w_emp:'emp'}).map(r=>r.key)).toEqual(['payslips_w']);
  });
  it('removes preparation prompts when the relevant answer changes',()=>{
-  expect(documentPreparation({housing:'rent'})).toHaveLength(1);
-  expect(documentPreparation({housing:'family',has_mortgage:'yes'})).toHaveLength(0);
+  expect(documentPreparation({housing:'rent'})).toHaveLength(3);
+  expect(documentPreparation({housing:'family',has_mortgage:'yes'}).map(p=>p.key)).toEqual(['municipal_bill','electricity_bill']);
   expect(documentPreparation({loans:[{balance:0}]}).map(r=>r.key)).toEqual(['loan_statements']);
  });
  it('creates one pending sample from saved answers, without a file upload',async()=>{

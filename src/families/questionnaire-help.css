@@ -14,6 +14,8 @@
 .question-help-body>strong{font-size:16px;color:#185241}
 .question-help-body p{margin:9px 0 0;font-size:inherit;line-height:inherit;color:inherit}
 .question-help-body .question-help-example{padding-top:10px;margin-top:12px;border-top:1px solid #dcd3c9}
+.question-help-more{margin-top:12px}
+.question-help-more>summary{cursor:pointer;min-height:44px;align-content:center;font-weight:600}
 .question-help-body.question-help-with-companion{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;padding:0;background:none;border:0}
 .question-help-with-companion>.companion-portrait{width:44px;height:60px}
 .question-help-with-companion>.speech-bubble{padding:12px;min-width:0}

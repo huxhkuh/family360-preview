@@ -1,3 +1,4 @@
+import {validApproxDate} from './questionnaire-decisions';
 import {CHAPTERS,type Answers,type LegacyField} from './questionnaire-definition';
 import {conditionMatches} from '../lib/core';
 import type {Service} from '../lib/model';
@@ -22,7 +23,8 @@ export function questionnaireIssues(answers:Answers,services:Service[],today=new
    value.forEach((row,index)=>{if(!row||typeof row!=='object'||Array.isArray(row)){add('יש לבדוק את הרשימה.');return;}field.sub?.forEach(sub=>check(sub,row,chapter,`${key}.${index}.`,`${label} ${index+1} · `));});return;
   }
   const text=String(value).trim();
-  if(field.opts){const selected=Array.isArray(value)?value:[value];if(selected.some(v=>!field.opts!.some(([key])=>key===v)))add('יש לבחור אפשרות מהרשימה.');return;}
+  if(field.type==='approx-date'&&!validApproxDate(text,today))add('אפשר להזין שנה (2018), חודש ושנה (2018-06) או תאריך מלא בעבר.');
+  if(field.opts){const selected=Array.isArray(value)?value:[value];if(selected.length>1&&selected.some(v=>field.exclusive?.includes(v)))add('אין לשלב ״אין״ או ״לא יודעים״ עם תשובות אחרות.');if(selected.some(v=>!field.opts!.some(([key])=>key===v)))add('יש לבחור אפשרות מהרשימה.');return;}
   if(field.type==='email'&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text))add('יש להזין כתובת דוא״ל תקינה, למשל name@example.com.');
   if(field.type==='id'&&!/^\d{9}$/.test(text))add('יש להזין 9 ספרות, כולל אפסים בתחילת המספר אם יש.');
   if(field.type==='tel'&&!/^\+?\d{7,15}$/.test(text.replace(/[\s()-]/g,'')))add('יש להזין מספר טלפון תקין, כולל קידומת.');

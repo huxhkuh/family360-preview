@@ -5,8 +5,8 @@ const phase=process.env.AUDIT_PHASE||'before';const folder=`test-results/client-
 const browser=await chromium.launch();const results=[];
 try{for(const [device,width,height] of [['desktop',1440,1000],['mobile',390,844]]){
  const page=await browser.newPage({viewport:{width,height}});const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
- await page.goto(base);await page.getByRole('button',{name:'התחלת דמו של לקוח חדש',exact:true}).click();
- await page.getByRole('button',{name:'המשך לשאלון',exact:true}).click();await page.locator('[data-answer-key=city]').waitFor();await page.evaluate(()=>scrollTo(0,0));
+ await page.goto(base);await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();
+ await page.getByRole('button',{name:'התחלת השאלון',exact:true}).click();await page.locator('[data-answer-key=city]').waitFor();await page.evaluate(()=>scrollTo(0,0));
  const before=await page.locator('[data-answer-key=city]').evaluate(el=>Math.round(el.getBoundingClientRect().top+scrollY));
  await page.screenshot({path:`${folder}/${device}-questionnaire.png`,fullPage:true});
  await page.getByRole('navigation',{name:'פרקי השאלון'}).getByRole('button',{name:'בנקים ואשראי',exact:true}).click();

@@ -1,0 +1,53 @@
+/* Focused client tasks keep every route and field, with less chrome on small screens. */
+.mobile-task-menu{display:none}
+.focus-case-context{margin:0 0 12px;padding:0;border:0;background:transparent}
+.focus-case-context>summary{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-height:44px;cursor:pointer}
+.focus-case-context>summary>span:first-child{font-size:21px;font-weight:700}
+.focus-case-context>summary>small{margin-inline-start:auto;color:#53695e;font-size:13px;text-decoration:underline;text-underline-offset:3px}
+.focus-case-context>p{font-size:14px;line-height:1.6;margin:8px 0}
+.focus-case-context[open]{border-bottom:1px solid #ded5c9;padding-bottom:12px}
+.employment-details,.document-preparation-more{border:1px solid #ded5c9;border-radius:12px;background:#fcfaf6;padding:0 16px;margin:16px 0}
+.employment-details>summary,.document-preparation-more>summary{min-height:48px;align-content:center;cursor:pointer;font-weight:600;padding:10px 0;line-height:1.5}
+.employment-details>summary small{display:block;color:#52695e;font-weight:400}
+.employment-details>p,.document-preparation-more>p{font-size:14px;line-height:1.65;color:#52695e;margin:0 0 12px}
+.document-preparation-more .document-companion{margin:0 0 16px}
+.focus-case-context>summary:focus-visible,.employment-details>summary:focus-visible,.document-preparation-more>summary:focus-visible{outline:3px solid #206d56;outline-offset:3px;border-radius:6px}
+@media(max-width:800px){
+ .client-shell.client-focus-mode .mobile-task-menu{display:flex;grid-column:2;grid-row:1;align-self:center;align-items:center;gap:8px;min-height:44px;background:transparent;color:#f9ece0;border:1px solid #f9ece066;font-size:14px;padding:8px 12px}
+ .client-shell.client-focus-mode .client-account{grid-column:1/-1;grid-row:auto;max-width:none}
+ .client-shell.client-focus-mode:not(.task-menu-open) .sidebar nav,
+ .client-shell.client-focus-mode:not(.task-menu-open) .client-account,
+ .client-shell.client-focus-mode:not(.task-menu-open) .topbar,
+ .client-shell.client-focus-mode:not(.task-menu-open) .focus-case-context,
+ .client-shell.client-focus-mode:not(.task-menu-open) .family-focused>.tabs{display:none}
+ .client-shell.client-focus-mode .sidebar{padding:6px 14px;gap:0 8px}
+ .client-shell.client-focus-mode .sidebar .brand .brand-stacked{width:76px;margin:0}
+ .client-shell.client-focus-mode .sidebar nav{margin-top:4px}
+ .client-shell.client-focus-mode .sidebar nav button{min-height:44px}
+ .client-shell.client-focus-mode .content{padding-top:8px}
+ .client-shell.client-focus-mode .focus-case-context{margin-bottom:4px}
+ .client-shell.client-focus-mode .focus-case-context>summary{gap:6px}
+ .client-shell.client-focus-mode .focus-case-context>summary>span:first-child{font-size:18px}
+ .client-shell.client-focus-mode .focus-case-context>summary>small{font-size:12px}
+ .client-shell.client-focus-mode .family-focused>.tabs{margin-bottom:6px}
+ .client-shell.client-focus-mode .family-focused>.tabs button{min-height:44px}
+ .client-shell.questionnaire-mode .questionnaire-signature,
+ .client-shell.questionnaire-mode .questionnaire-stamp{display:none}
+ .client-shell.questionnaire-mode .questionnaire-paper>.card{padding:10px 14px 18px}
+ .client-shell.questionnaire-mode .questionnaire-paper>.card>h2{font-size:23px;padding:0;min-height:0;margin:0 0 4px}
+ .client-shell.questionnaire-mode .questionnaire-introduction>summary{min-height:44px}
+ .client-shell.questionnaire-mode .chapter-process{margin:4px 0 0}
+ .client-shell.questionnaire-mode .chapter-process button{min-height:74px;gap:2px}
+ .client-shell.questionnaire-mode .chapter-process ol{padding-bottom:4px}
+ .client-shell.questionnaire-mode .chapter-process-mobile{margin:0}
+ .client-shell.questionnaire-mode .chapter-heading{margin-top:4px}
+ .client-shell.questionnaire-mode .employment-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 8px;padding:10px}
+ .client-shell.questionnaire-mode .employment-options>.question-heading{grid-column:1/-1}
+ .client-shell.questionnaire-mode .employment-options>label{border:1px solid #ded5c9;border-radius:8px;padding:8px;min-height:46px;gap:6px;align-items:center}
+ .client-shell.questionnaire-mode .employment-options>label:has(:checked){background:#efe8df;border-color:#567d6b}
+ .client-shell.questionnaire-mode .employment-options>label:last-of-type{border-bottom:1px solid #ded5c9}
+ .client-shell.questionnaire-mode .employment-options input{min-height:0;flex-shrink:0}
+ .client-shell.client-focus-mode .document-guide h2{font-size:24px}
+ .client-shell.client-focus-mode .document-guide{padding-top:8px}
+ .client-shell.client-focus-mode .document-preparation-more{margin-top:24px;padding-inline:12px}
+}

@@ -1,0 +1,23 @@
+.meeting-launch{margin:0 0 28px;border:1px solid #c5d4c8;border-inline-start:4px solid var(--green);border-radius:8px;background:#fff;overflow:hidden}
+.meeting-launch-main{display:grid;grid-template-columns:minmax(0,1fr) minmax(230px,.8fr);align-items:center;gap:32px;padding:26px 28px}
+.meeting-launch .eyebrow{display:flex;align-items:center;gap:9px;color:var(--green);margin-bottom:12px}
+.meeting-launch h2{font-size:28px;margin-bottom:12px}
+.meeting-launch-contact{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:17px;overflow-wrap:anywhere}
+.meeting-launch-contact bdi{font-variant-numeric:tabular-nums}
+.meeting-launch-date{color:var(--muted);font-size:14px;margin:8px 0 0}
+.meeting-launch-action{display:flex;flex-direction:column;align-items:flex-start;gap:10px;border-inline-start:1px solid var(--border);padding-inline-start:28px}
+.meeting-launch-action p{margin:0;font-weight:600}
+.meeting-launch-action>span{font-size:14px;color:var(--muted)}
+.meeting-launch-action>button{min-height:48px}
+.meeting-launch-more{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px;padding:12px 28px;background:#f6f8f4;border-top:1px solid var(--border)}
+.meeting-launch-more>span{font-size:14px;color:var(--muted)}
+.meeting-launch-more>button{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:12px;row-gap:3px;text-align:start;min-width:0}
+.meeting-launch-more>button strong{font-size:15px}
+.meeting-launch-more>button small{font-size:13px;font-weight:400;color:var(--muted);grid-row:2}
+.meeting-launch-more>button .icon{grid-column:2;grid-row:1/3}
+.meeting-launch-empty{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:24px 28px}
+.meeting-launch-empty h2{font-size:23px}
+.meeting-launch-empty p:last-child{margin:0;color:var(--muted)}
+.meeting-launch-empty>button{flex-shrink:0}
+@media(max-width:1100px){.meeting-launch-main{grid-template-columns:1fr;gap:20px}.meeting-launch-action{padding:18px 0 0;border-inline-start:0;border-top:1px solid var(--border)}}
+@media(max-width:600px){.meeting-launch-main,.meeting-launch-empty{padding:20px}.meeting-launch h2{font-size:25px}.meeting-launch-action>button{width:100%}.meeting-launch-more{padding:12px 16px;align-items:stretch;flex-direction:column;gap:5px}.meeting-launch-more>span{padding:4px}.meeting-launch-more>button{width:100%}.meeting-launch-empty{align-items:stretch;flex-direction:column}}

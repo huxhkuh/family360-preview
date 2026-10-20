@@ -1,8 +1,18 @@
 import {describe,it,expect} from 'vitest';
-import {clientSummary,meetingProgress,decisionNext} from './meeting-flow';
+import {clientSummary,meetingProgress,decisionNext,nextOpenTopic} from './meeting-flow';
 import type {MeetingItem} from '../lib/model';
 const item:MeetingItem={id:'one',meeting_id:'m1',family_id:'f1',title:'Public title',client_summary:'Public summary',client_decision:null,visible_to_client:true,decision_note:'PRIVATE',execution_instructions:'INSTRUCTIONS',approved_actions:[{private:'ACTION'}],current_situation:'INTERNAL FINDING'};
 describe('meeting preparation and public summary',()=>{
+ it('advances past decided and internal items, wrapping to earlier open topics',()=>{
+  const items=[item,{...item,id:'saved',client_decision:'progress'},{...item,id:'internal',visible_to_client:false},{...item,id:'last'}];
+  expect(nextOpenTopic(items,'one')?.id).toBe('last');
+  expect(nextOpenTopic(items,'last')?.id).toBe('one');
+  expect(nextOpenTopic(items,'unknown')?.id).toBe('one');
+ });
+ it('finishes when only the just-saved topic or internal topics remain',()=>{
+  expect(nextOpenTopic([item,{...item,id:'internal',visible_to_client:false}],'one')).toBeUndefined();
+  expect(nextOpenTopic([],'one')).toBeUndefined();
+ });
  it('never includes private fields or hidden topics in the preview',()=>{
   const result=clientSummary([item,{...item,id:'hidden',title:'HIDDEN',visible_to_client:false}]);
   expect(result).toEqual([{id:'one',title:'Public title',client_summary:'Public summary',client_decision:null}]);

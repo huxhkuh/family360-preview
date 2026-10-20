@@ -15,7 +15,7 @@ describe('client intake guidance and demo boundaries',()=>{
   const flow=clientIntake(w.families[0],w);expect(flow.documents).toHaveLength(0);expect(flow.action.title).toBe('הנציג בודק מה נדרש להמשך');
  });
  it('moves an example through request, review, rejection and resubmission without uploading',async()=>{
-  startClientIntake();const initial=await loadWorkspace();await rpc('rpc_save_family',{p_family_id:'f1',p_expected_updated_at:initial.families[0].updated_at,p_patch:{answers:validDemoAnswers}});await rpc('rpc_complete_onboarding',{p_family_id:'f1'});let w=await loadWorkspace();
+  startClientIntake();const initial=await loadWorkspace();await rpc('rpc_save_family',{p_family_id:'f1',p_expected_updated_at:initial.families[0].updated_at,p_patch:{answers:validDemoAnswers}});await rpc('rpc_complete_onboarding',{p_family_id:'f1'});selectRole('representative');await rpc('rpc_request_document',{p_family_id:'f1',p_type_id:'dt1'});selectRole('client');let w=await loadWorkspace();
   expect(clientIntake(w.families[0],w).stage).toBe(2);const doc=w.documents[0];
   await rpc('rpc_demo_attach_example',{p_document_id:doc.id});w=await loadWorkspace();
   expect(clientIntake(w.families[0],w).action.title).toBe('המסמכים אצל הנציג לבדיקה');expect(w.documents[0].storage_path).toBeUndefined();

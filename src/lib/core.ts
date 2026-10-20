@@ -29,9 +29,9 @@ export function conditionMatches(answers: Record<string,unknown>, rule: Rule): b
     default: return false;
   }
 }
-export function priority(tasks: {status:string;due_at?:string|null}[], docs:{status:string}[], now=Date.now()) {
+export function priority(tasks: {status:string;due_at?:string|null}[], docs:{status:string;optional?:boolean}[], now=Date.now()) {
   const overdue=tasks.filter(t=>['assigned','in_progress','needs_info','sent_execution','execution_in_progress','waiting_client'].includes(t.status)&&t.due_at&&Date.parse(t.due_at)<now).length;
-  const missing=docs.filter(d=>['missing','rejected'].includes(d.status)).length;
+  const missing=docs.filter(d=>!d.optional&&['missing','rejected'].includes(d.status)).length;
   return {score:overdue*10+missing*2, reasons:[...(overdue?[`${overdue} משימות חרגו מזמן הטיפול`]:[]),...(missing?[`${missing} מסמכים חסרים או נדחו`]:[])]};
 }
 export async function validateUpload(file:File) {
@@ -54,16 +54,17 @@ export function safeMessage(error:unknown) {
     INVITE_ACCOUNT_CONFLICT:'לחשבון הזה כבר משויך תפקיד או תיק לקוח. יש לפנות למנהל לפני שינוי התפקיד.',
     EMAIL_NOT_VERIFIED:'יש לאמת תחילה את כתובת הדוא״ל דרך ההודעה שנשלחה אליך.',
     INVITE_LIMIT:'הגעת למכסת ההזמנות היומית. אפשר לנסות שוב מאוחר יותר.',
-    CONFLICT:'הנתונים עודכנו בידי משתמש אחר. יש לרענן לפני שמירה.',
+    CONFLICT:'הנתונים השתנו מאז תחילת העריכה. בדקו את העדכון לפני שמירה נוספת.',
     PERMISSION_DENIED:'אין הרשאה לפעולה זו. ייתכן שהגישה לחשבון השתנתה.',
     MFA_REQUIRED:'נדרש אימות דו־שלבי לחשבון המנהל.',
     UNDECIDED_ITEMS:'יש לתעד החלטה בכל התחומים לפני סיום הפגישה.',
     INVALID_STATE:'הפעולה אינה מתאימה למצב הנוכחי. יש לרענן ולנסות שוב.',
-    VALIDATION:'יש לבדוק את שדות החובה ואת סוגי הערכים.',
+    QUESTIONNAIRE_INCOMPLETE:'השאלון עדיין לא נשלח. השלימו או תקנו את השדות המסומנים.',
+      VALIDATION:'יש לבדוק את שדות החובה ואת סוגי הערכים.',
     FILE_SIZE:'יש לבחור קובץ שאינו ריק ועד 20MB.', FILE_TYPE:'הקובץ אינו נתמך או שתוכנו אינו תואם לסוג שלו.',
     'Invalid login credentials':'פרטי הכניסה שגויים.',
     CONFIG_INVALID:'הגדרות החיבור אינן תקינות. יש לפנות למנהל המערכת.',
   };
   return Object.entries(messages).find(([key])=>raw.includes(key))?.[1]||'הפעולה לא הושלמה. יש לבדוק את החיבור ולנסות שוב.';
 }
-export const statusLabels:Record<string,string>={open:'לביצוע',new:'חדש',waiting_docs:'ממתין למסמכים',waiting_analysis:'ממתין לניתוח',in_analysis:'בניתוח',ready_meeting:'מוכן לפגישה',meeting_set:'פגישה נקבעה',meeting_done:'התקיימה פגישה',in_execution:'בביצוע',archived:'ארכיון',missing:'חסר',pending:'ממתין לבדיקה',approved:'אושר',rejected:'נדחה',signed:'הסכמה תועדה',assigned:'הוקצה',in_progress:'בטיפול',needs_info:'נדרשת השלמה',submitted:'הוגש',returned:'הוחזר',analysis_received:'ניתוח התקבל',approved_analysis:'ניתוח אושר',client_approved_execution:'לקוח אישר ביצוע',client_declined:'לקוח דחה',client_thinking:'בהתלבטות',no_execution_needed:'לא נדרש ביצוע',sent_execution:'נשלח לביצוע',execution_in_progress:'בביצוע',waiting_client:'ממתין ללקוח',execution_needs_info:'נדרשת השלמה',execution_reported_complete:'ממתין לאישור סיום',completed:'הושלם',not_completed:'לא הושלם',cancelled:'בוטל',reassigned:'הוקצה מחדש',scheduled:'מתוכננת',undecided:'לא הוחלט',progress:'להתקדם',thinking:'לחשוב',declined:'לא להתקדם',no_action:'אין צורך בפעולה'};
+export const statusLabels:Record<string,string>={open:'לביצוע',new:'חדש',waiting_review:'ממתין לבדיקת נציג',waiting_docs:'ממתין למסמכים',waiting_analysis:'ממתין לניתוח',in_analysis:'בניתוח',ready_meeting:'מוכן לפגישה',meeting_set:'פגישה נקבעה',meeting_done:'התקיימה פגישה',in_execution:'בביצוע',archived:'ארכיון',missing:'חסר',pending:'ממתין לבדיקה',approved:'אושר',rejected:'נדחה',signed:'הסכמה תועדה',assigned:'הוקצה',in_progress:'בטיפול',needs_info:'נדרשת השלמה',submitted:'הוגש',returned:'הוחזר',analysis_received:'ניתוח התקבל',approved_analysis:'ניתוח אושר',client_approved_execution:'לקוח אישר ביצוע',client_declined:'לקוח דחה',client_thinking:'בהתלבטות',no_execution_needed:'לא נדרש ביצוע',sent_execution:'נשלח לביצוע',execution_in_progress:'בביצוע',waiting_client:'ממתין ללקוח',execution_needs_info:'נדרשת השלמה',execution_reported_complete:'ממתין לאישור סיום',completed:'הושלם',not_completed:'לא הושלם',cancelled:'בוטל',reassigned:'הוקצה מחדש',scheduled:'מתוכננת',undecided:'לא הוחלט',progress:'להתקדם',thinking:'לחשוב',declined:'לא להתקדם',no_action:'אין צורך בפעולה'};

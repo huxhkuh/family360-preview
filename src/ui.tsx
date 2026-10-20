@@ -13,7 +13,7 @@ export function AsyncButton({action,children,className='',disabled=false}:{actio
  const [busy,setBusy]=useState(false);const [error,setError]=useState('');
  return <span className="action"><button className={className} disabled={busy||disabled} onClick={async()=>{setBusy(true);setError('');try{await action();}catch(e){setError(safeMessage(e));}finally{setBusy(false);}}}>{busy?'בתהליך…':children}</button>{error&&<span role="alert" className="error">{error}</span>}</span>;
 }
-export function SaveForm({save,children,label='שמירה',noValidate=false,successMessage='הפעולה נשמרה בהצלחה',protectDraft=true,submitActions}:{save:(data:FormData,action?:string)=>Promise<unknown>;children:ReactNode;label?:string;noValidate?:boolean;successMessage?:string;protectDraft?:boolean;submitActions?:ReactNode}){
+export function SaveForm({save,children,label='שמירה',noValidate=false,busyLabel='שומר…',successMessage='הפעולה נשמרה בהצלחה',protectDraft=true,submitActions}:{save:(data:FormData,action?:string)=>Promise<unknown>;children:ReactNode;label?:string;noValidate?:boolean;busyLabel?:string;successMessage?:string;protectDraft?:boolean;submitActions?:ReactNode}){
  const registry=useContext(DraftContext);const id=useId();const [edited,setEdited]=useState(false);
  const mark=(dirty:boolean)=>{if(protectDraft){registry?.set(id,dirty);setEdited(dirty);}};
  useEffect(()=>()=>registry?.set(id,false),[registry,id]);
@@ -27,7 +27,7 @@ export function SaveForm({save,children,label='שמירה',noValidate=false,succ
   }
   setFields({});const data=new FormData(form);mark(true);setBusy(true);try{await save(data,submitter?.value);mark(false);setMessage(successMessage);}catch(e){setError(safeMessage(e));}finally{setBusy(false);}
  }
- return <ValidationContext.Provider value={fields}><form onSubmit={submit} noValidate onChange={e=>{mark(true);setMessage('');const target=e.target as HTMLElement;if(target instanceof HTMLInputElement||target instanceof HTMLTextAreaElement)target.setCustomValidity('');if(target.id)setFields(old=>{const next={...old};delete next[target.id];return next;});}}><fieldset disabled={busy}>{children}{submitActions||<button className="primary" type="submit">{busy?'שומר…':label}</button>}</fieldset>{registry&&edited&&<p className="muted" role="status">{busy?'השמירה בתהליך…':'יש שינויים שלא נשמרו'}</p>}{error&&<p className="error" role="alert">{error}</p>}{message&&<p role="status" className="success">{message}</p>}</form></ValidationContext.Provider>;
+ return <ValidationContext.Provider value={fields}><form onSubmit={submit} noValidate onChange={e=>{mark(true);setMessage('');const target=e.target as HTMLElement;if(target instanceof HTMLInputElement||target instanceof HTMLTextAreaElement)target.setCustomValidity('');if(target.id)setFields(old=>{const next={...old};delete next[target.id];return next;});}}><fieldset disabled={busy}>{children}{submitActions||<button className="primary" type="submit">{busy?busyLabel:label}</button>}</fieldset>{registry&&edited&&<p className="muted" role="status">{busy?'השמירה בתהליך…':'יש שינויים שלא נשמרו'}</p>}{error&&<p className="error" role="alert">{error}</p>}{message&&<p role="status" className="success">{message}</p>}</form></ValidationContext.Provider>;
 }
 export const textValue=(data:FormData,key:string)=>String(data.get(key)||'').trim();
 export function Empty({children='אין פריטים להצגה'}:{children?:ReactNode}){return <p className="empty">{children}</p>;}

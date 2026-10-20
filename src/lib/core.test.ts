@@ -26,5 +26,5 @@ describe('untrusted files',()=>{
  });
  it('rejects content that is not actually a PDF',async()=>{await expect(validateUpload(new File(['<script>'],'x.pdf',{type:'application/pdf'}))).rejects.toThrow();});
  it('accepts a PDF signature',async()=>{await expect(validateUpload(new File(['%PDF-1.7\n'],'x.pdf',{type:'application/pdf'}))).resolves.toBeUndefined();});
- it('does not expose raw server details',()=>{expect(safeMessage(new Error('secret password and SQL stack'))).not.toContain('secret');expect(safeMessage({message:'CONFLICT: revision'})).toContain('עודכנו');});
+ it('does not expose raw server details',()=>{expect(safeMessage(new Error('secret password and SQL stack'))).not.toContain('secret');expect(safeMessage({message:'CONFLICT: revision'})).toContain('הנתונים השתנו');});
 });

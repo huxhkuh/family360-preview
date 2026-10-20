@@ -52,13 +52,25 @@ try{
   await expect(page.getByRole('button',{name:'חמש חלופות למיתוג',exact:true})).toHaveCount(0);
   await expect(page.locator('.welcome-logo')).toHaveAttribute('src',/concept-5-light.svg$/);
   await expect(page.locator('link[rel=icon]')).toHaveAttribute('href',/concept-5-light-mark.svg$/);
-  await page.getByRole('button',{name:'התחלת דמו של לקוח חדש',exact:true}).click();
+  await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();
   await expect(page.locator('.sidebar .mesudarim-logo')).toHaveAttribute('src',/concept-5-dark.svg$/);
   await expect.poll(()=>page.locator('.sidebar .mesudarim-logo').evaluate(el=>el.complete&&el.naturalWidth>0)).toBe(true);
   await page.screenshot({path:`${output}/${device}-fixed-home.png`});
-  await page.getByRole('button',{name:'המשך לשאלון',exact:true}).click();
+  await page.getByRole('button',{name:'התחלת השאלון',exact:true}).click();
   await expect(page.locator('.questionnaire-signature')).toHaveAttribute('src',/concept-5-light.svg$/);
-  await expect(page.locator(width<=360?'.questionnaire-stamp':'.questionnaire-signature')).toBeVisible();
+  await expect(page.locator('.questionnaire-signature')).toHaveAttribute('alt','מסודרים 360° — עושים לך סדר בכסף.');
+  if(width<=800){
+   // The focused mobile questionnaire uses the compact sidebar logo once.
+   await expect(page.locator('.client-shell.client-focus-mode')).toBeVisible();
+   const compactBrand=page.locator('.sidebar .mesudarim-logo');
+   await expect(compactBrand).toBeVisible();
+   await expect(compactBrand).toHaveAttribute('src',/concept-5-dark.svg$/);
+   await expect(compactBrand).toHaveAttribute('alt','מסודרים 360° — עושים לך סדר בכסף.');
+   await expect(compactBrand).toHaveCSS('width','76px');
+   await expect.poll(()=>compactBrand.evaluate(el=>el.complete&&el.naturalWidth>0)).toBe(true);
+   await expect(page.locator('.questionnaire-signature')).toBeHidden();
+   await expect(page.locator('.questionnaire-stamp')).toBeHidden();
+  }else await expect(page.locator('.questionnaire-signature')).toBeVisible();
   const city=page.locator('[data-answer-key=city]');await city.fill('טיוטה עם הלוגו הקבוע');
   const nav=page.getByRole('navigation',{name:'פרקי השאלון'});
   await nav.getByRole('button',{name:'עבודה והכנסות',exact:true}).click();

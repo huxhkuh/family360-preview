@@ -11,7 +11,7 @@ export function ClientHome({family:f,w,open,refresh}:{family:Family;w:Workspace;
  const submitted=f.onboarding_pct===100;
  const tasks=[...w.familyTasks,...w.followUps.filter(t=>!t.item_id||w.meetingItems.some(i=>i.id===t.item_id&&i.visible_to_client))].filter(t=>t.family_id===f.id&&t.visible_to_client&&['open','in_progress'].includes(t.status)).sort((a,b)=>(a.due_on||'9999').localeCompare(b.due_on||'9999')||a.id.localeCompare(b.id));
  const mine=tasks.filter(t=>t.owner_role==='client'),care=tasks.filter(t=>t.owner_role==='representative');
- const docs=w.documents.filter(d=>d.family_id===f.id),missing=docs.filter(d=>['missing','rejected'].includes(d.status)&&!mine.some(t=>t.document_id===d.id));
+ const docs=w.documents.filter(d=>d.family_id===f.id),missing=docs.filter(d=>!d.optional&&['missing','rejected'].includes(d.status)&&!mine.some(t=>t.document_id===d.id));
  const pending=docs.filter(d=>d.status==='pending');
  const meetings=w.meetings.filter(m=>m.family_id===f.id&&m.status!=='cancelled').sort((a,b)=>(b.scheduled_at||'').localeCompare(a.scheduled_at||''));
  const upcoming=meetings.filter(m=>['scheduled','in_progress'].includes(m.status)).sort((a,b)=>(a.scheduled_at||'9999').localeCompare(b.scheduled_at||'9999'));

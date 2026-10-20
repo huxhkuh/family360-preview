@@ -1,0 +1,104 @@
+/* A quiet workspace for a representative who is speaking and documenting. */
+.call-session .call-title{margin:12px 0 18px;align-items:center}
+.call-session .call-title h1{font-size:32px;margin:0}
+.call-session .call-title .eyebrow{margin-bottom:6px}
+.call-session .call-contact-bar{position:sticky;top:0;z-index:5;display:flex;justify-content:space-between;align-items:center;gap:18px;padding:14px 20px;background:#f6f8f3;border:1px solid #cdd8c8;border-radius:8px;box-shadow:0 4px 12px #19382d08}
+.call-contact-bar>div:first-child{display:flex;align-items:center;gap:16px;flex-wrap:wrap;min-width:0}
+.call-contact-bar strong{overflow-wrap:anywhere}
+.call-contact-bar .call-person{display:flex;flex-direction:column;gap:1px}
+.call-person small{font-size:13px;color:var(--muted)}
+.call-contact-bar a{font-size:19px;letter-spacing:.02em;white-space:nowrap}
+.call-session .call-progress{display:grid;grid-template-columns:auto 90px;gap:2px 14px;align-items:center;font-size:14px;flex-shrink:0}
+.call-progress progress{width:90px;height:6px;accent-color:var(--green)}
+.call-progress small{grid-column:1/-1;color:var(--muted);font-size:13px}
+.call-session .meeting-steps{padding:12px 0;margin-bottom:16px;gap:5px}
+.call-session .meeting-steps button{padding:10px 12px;font-size:15px;gap:8px;min-width:0}
+.call-session .meeting-steps small{font-weight:400;margin-inline-start:auto}
+.call-session .call-guidance{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px 20px;border-inline-start:3px solid var(--green);background:#eff3e9;margin-bottom:12px}
+.call-guidance .eyebrow{margin-bottom:4px;color:var(--green);font-size:13px}
+.call-session .call-guidance h2{font-size:22px;margin-bottom:5px}
+.call-guidance p:last-child{margin:0;color:#526459;font-size:16px}
+.call-guidance>button{flex-shrink:0}
+.call-saved-notice{padding:10px 16px;background:#f0f5ed;border-radius:5px}
+.call-session .meeting-agenda{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin:16px 0;max-height:210px;overflow-y:auto;padding:3px}
+.call-session .meeting-agenda button{padding:11px 14px;gap:10px;border-radius:6px}
+.call-session .meeting-agenda strong{font-size:16px}
+.call-session .meeting-agenda small{display:inline-block;margin:4px 0 0 8px;font-size:12px}
+.call-session .meeting-agenda .badge{font-size:12px;padding:2px 8px}
+.call-session .call-topic{margin-block:24px;min-width:0}
+.call-topic-heading .eyebrow{margin-bottom:4px;font-size:13px;color:var(--muted)}
+.call-session .call-topic-heading h2{font-size:27px;margin:0 0 18px;scroll-margin-top:110px}
+.call-topic-columns{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:22px;align-items:start}
+.call-explanation{min-width:0}
+.call-question{padding:12px 16px;border-inline-start:2px solid #b7c6ac;margin:0;background:#f5f7f0;font-size:16px}
+.call-decision-shortcut{display:none}
+.call-session .call-decision{position:sticky;top:104px;padding:20px;background:#fff;border:1px solid #bdcdb5;border-radius:8px;max-height:calc(100dvh - 125px);overflow-y:auto;scrollbar-width:thin}
+.call-decision h3{font-size:22px;margin-bottom:10px}
+.call-decision-topic{color:var(--muted);font-size:14px;margin:-4px 0 16px;overflow-wrap:anywhere}
+.call-decision form{margin:0}
+.call-decision .internal-fields{padding:0;border:0;margin:18px 0 8px}
+.call-decision .internal-fields .eyebrow{font-size:12px;margin:0 0 8px}
+.call-decision .hint{font-size:14px;line-height:1.6;margin:8px 0 14px}
+.call-decision textarea{min-height:76px}
+.call-decision .call-execution-notes{margin:12px 0;font-size:14px}
+.call-execution-notes .field{margin-top:12px}
+.call-decision .fields{grid-template-columns:1fr;gap:0}
+.call-decision .followup-editor{padding:14px;margin:16px 0}
+.call-session .call-save-actions{display:flex;flex-direction:column;gap:4px;border-top:1px solid var(--border);padding-top:10px}
+.call-save-actions small{font-size:13px;color:var(--muted);line-height:1.5}
+.call-session .call-save-actions button{margin-top:4px;min-height:44px}
+.call-save-actions .ghost{font-size:14px}
+.call-session .call-decision form>fieldset>p[role=status]{font-size:13px;margin:8px 0}
+.call-session .comparison-view{margin:16px 0}
+.call-session .comparison-columns{gap:12px}
+.call-session .comparison-columns article{padding:18px;border-radius:6px}
+.call-session .comparison-view h3{font-size:17px;margin:4px 0 12px}
+.call-session .comparison-amount{font-size:27px}
+.call-session .comparison-impact,.call-session .comparison-explanation{padding:18px;border-radius:6px}
+.call-session .comparison-impact strong{font-size:20px}
+.call-session .comparison-warning{border-radius:5px}
+.call-session .call-stage-actions{display:flex;flex-wrap:wrap;gap:10px;padding-block:16px;border-top:1px solid var(--border)}
+.call-session .meeting-preparation{max-width:none}
+.call-opening{padding:16px 20px;background:#f5f7f0;border-radius:6px;font-size:19px;line-height:1.7}
+.call-preparation-action{display:flex;justify-content:space-between;gap:20px;align-items:center;margin:24px 0;padding:20px 0;border-block:1px solid var(--border)}
+.call-preparation-action strong{font-size:22px}
+.call-preparation-action p{margin:4px 0 0}
+@media(max-width:1180px){
+ .call-topic-columns{grid-template-columns:minmax(0,1fr)}
+ .call-session .call-decision{position:static;max-height:none;overflow:visible}
+ .call-session .call-progress{grid-template-columns:1fr}
+ .call-progress progress{display:none}
+ .call-session .call-decision{scroll-margin-top:140px}
+ .call-decision-shortcut{display:inline-flex;margin-top:12px}
+}
+@media(max-width:800px){
+ .call-session .call-title h1{font-size:28px}
+ .call-session .call-contact-bar{gap:10px;padding:12px;align-items:flex-start}
+ .call-contact-bar>div:first-child{gap:3px 10px}
+ .call-contact-bar>div:first-child strong{flex-basis:100%}
+ .call-session .call-progress{font-size:12px;flex-shrink:1;min-width:100px}
+ .call-progress small{font-size:12px}
+ .call-contact-bar a{font-size:16px}
+ .call-session .meeting-steps{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+ .call-session .meeting-steps button{flex-direction:row;justify-content:flex-start;text-align:start;font-size:13px;padding:10px 8px;gap:6px}
+ .call-session .meeting-steps button>span{width:22px;height:22px}
+ .call-session .call-guidance{padding:14px;align-items:stretch;flex-direction:column;gap:12px}
+ .call-session .call-guidance h2{font-size:21px}
+ .call-session .meeting-agenda{grid-template-columns:repeat(2,minmax(0,1fr));max-height:200px;gap:6px}
+ .call-session .meeting-agenda button{padding:10px;gap:6px}
+ .call-session .meeting-agenda strong{font-size:15px}
+ .call-session .meeting-agenda .topic-number{font-size:13px}
+ .call-session .call-topic-heading h2{scroll-margin-top:140px;font-size:24px}
+ .call-preparation-action{align-items:stretch;flex-direction:column;gap:12px}
+ .call-preparation-action .action{margin:0}
+ .call-opening{padding:14px;font-size:17px}
+ .call-session .call-stage-actions{flex-direction:column}
+ .call-session .call-decision{padding:18px}
+}
+
+/* Keep family tools nearby while the contact and progress bar stays visible. */
+.call-session .call-context-summary{display:none}
+.call-session .call-context{margin-block:12px}
+.call-session .call-phone{font-size:19px;white-space:nowrap}
+.call-session .topic-evidence{margin-top:16px}
+.call-session .topic-evidence>summary{font-weight:600}

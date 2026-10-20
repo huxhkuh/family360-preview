@@ -1,6 +1,12 @@
 import {describe,expect,it} from 'vitest';
-import {chapterProgress} from './chapter-progress';
+import {chapterProgress,hasQuestionnaireAnswers} from './chapter-progress';
 describe('questionnaire chapter progress',()=>{
+ it('distinguishes an untouched or cleared questionnaire from actual answers, including zero',()=>{
+  expect(hasQuestionnaireAnswers({})).toBe(false);
+  expect(hasQuestionnaireAnswers({city:'  ',children:[{}],h_emp:[]})).toBe(false);
+  expect(hasQuestionnaireAnswers({bank_count:0})).toBe(true);
+  expect(hasQuestionnaireAnswers({children:[{name:'דוגמה'}]})).toBe(true);
+ });
  it('does not mark optional or empty chapters completed',()=>{
   const steps=chapterProgress({});expect(steps.find(s=>s.chapter.key==='family')?.remaining).toBeGreaterThan(0);
   expect(steps.find(s=>s.chapter.key==='rights')).toMatchObject({required:0,filled:0,remaining:0});

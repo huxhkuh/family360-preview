@@ -1,4 +1,5 @@
 // @ts-nocheck
+import {questionnaireDiscussion} from "../families/questionnaire-discussion";
 // This module intentionally replaces the production backend in the demo repository.
 // No network, persistence, credentials or production service initialization.
 import type {SupabaseClient} from '@supabase/supabase-js';
@@ -46,7 +47,7 @@ function workspace(){
  const profileId=role==='professional'?'professional1':role;
  data.notifications=data.notifications.filter(n=>!n.audience||n.audience===role||role==='admin'&&n.audience==='representative').filter(n=>role!=='client'||!n.family_id||n.family_id==='f1');
  if(role==='client'){
-  data.families=data.families.filter(f=>f.id==='f1').map(({internal_notes,...f})=>f);
+  data.families=data.families.filter(f=>f.id==='f1').map(({internal_notes,questionnaire_reviews,...f})=>f);
   for(const key of ['documents','familyServices','meetings','meetingItems','followUps','familyTasks'])data[key]=data[key].filter(x=>x.family_id==='f1');
   data.followUps=data.followUps.filter(t=>t.visible_to_client);data.familyTasks=data.familyTasks.filter(t=>t.visible_to_client);
   data.meetingItems=data.meetingItems.filter(i=>i.visible_to_client).map(({decision_note,execution_instructions,approved_actions,...i})=>i);
@@ -74,15 +75,25 @@ export async function rpc<T=unknown>(name:string,a:Record<string,any>={}):Promis
  const run=()=>{
  const operation=operationRpc(name,a,state,role);if(operation!==undefined)return operation;
  const staff=role==='admin'||role==='representative';
+ if(name==='rpc_review_questionnaire_topic'){
+  if(!staff)throw Error('PERMISSION_DENIED');
+  const f=find('families',a.p_family_id);
+  if(a.p_expected_updated_at!==f.updated_at)throw Error('CONFLICT');
+  const topic=questionnaireDiscussion(f.answers||{}).find(t=>t.key===a.p_key);
+  if(!topic||topic.token!==a.p_token)throw Error('CONFLICT');
+  const note=String(a.p_note||'').trim();if(note.length<3||note.length>1000)throw Error('VALIDATION');
+  f.questionnaire_reviews={...f.questionnaire_reviews,[topic.key]:{token:topic.token,note}};
+  f.updated_at=new Date(Math.max(Date.now(),Date.parse(f.updated_at||0)+1)).toISOString();return null;
+ }
  if(name==='rpc_demo_prepare_document'){
   if(!staff&&!(role==='client'&&a.p_family_id==='f1'))throw Error('PERMISSION_DENIED');
   const family=find('families',a.p_family_id);
   const preparation=documentPreparation(family.answers||{}).find(p=>p.key===a.p_key);
   if(!preparation)throw Error('VALIDATION');
   let doc=state.documents.find(d=>d.family_id===family.id&&d.key===preparation.key);
-  if(doc&&doc.type!=='file')throw Error('VALIDATION');
-  if(!doc){doc={id:id(),family_id:family.id,name:preparation.name+' — דוגמה בלבד',key:preparation.key,type:'file',status:'missing',purpose:preparation.reason,source_hint:preparation.source,period:preparation.period};state.documents.push(doc);}
-  if(['missing','rejected'].includes(doc.status))Object.assign(doc,{status:'pending',file_name:'דוגמה מדומה — לא הועלה קובץ',reject_reason:null});
+  if(doc&&doc.type!==(preparation.type||'file'))throw Error('VALIDATION');
+  if(!doc){doc={id:id(),family_id:family.id,name:preparation.name+' — דוגמה בלבד',key:preparation.key,type:preparation.type||'file',optional:true,status:'missing',purpose:preparation.reason,source_hint:preparation.source,period:preparation.period};state.documents.push(doc);}
+  if(doc.type==='file'&&['missing','rejected'].includes(doc.status))Object.assign(doc,{status:'pending',file_name:'דוגמה מדומה — לא הועלה קובץ',reject_reason:null});
   return doc;
  }
  if(name==='rpc_search_families'){const q=String(a.p_query||'').trim().toLowerCase();return {items:workspace().families.filter(f=>[f.name,f.case_number,f.contact_name,f.phone,f.email].some(v=>v?.toLowerCase().includes(q))),next:null};}
@@ -111,7 +122,7 @@ export async function rpc<T=unknown>(name:string,a:Record<string,any>={}):Promis
   const existing=state.familyTasks.find(t=>t.family_id===f.id&&t.request_kind===a.p_kind&&t.source_id===source?.id&&['open','in_progress'].includes(t.status));if(existing)return existing;
   const request=update('familyTasks',id(),{family_id:f.id,title:source?'בקשה לתיקון: '+source.title:'בקשת עזרה מהמשפחה',details:source?'המשפחה ביקשה לבדוק סימון כהושלם. יש לברר לפני פתיחת המשימה מחדש.':details,owner_role:'representative',owner_name:state.representatives.find(r=>r.id===f.representative_id)?.name||'הנציג המטפל',visible_to_client:true,due_on:'',status:'open',request_kind:a.p_kind,source_id:source?.id,source_kind:source?a.p_source_kind:undefined});state.notifications.push({id:id(),title:request.title,body:'נרשמה בקשה מהמשפחה במעקב הדמו.',read_at:null,audience:'representative',family_id:f.id,target_kind:'familyTask',target_id:request.id});return request;
  }
- if(name==='rpc_complete_onboarding'){if(!staff&&!(role==='client'&&a.p_family_id==='f1'))throw Error('PERMISSION_DENIED');const f=find('families',a.p_family_id);if(f.onboarding_pct===100)return null;if(questionnaireIssues(f.answers||{},state.services).length)throw Error('VALIDATION');Object.assign(f,{onboarding_pct:100,status:'waiting_docs'});if(!state.documents.some(d=>d.family_id===f.id))state.documents.push({id:id(),family_id:f.id,document_type_id:'dt1',name:'דוח פנסיה שנתי — דוגמה בלבד',key:'pension_report',type:'file',status:'missing',purpose:'בקשה מדומה כדי להתנסות בצירוף ובבדיקת מסמך. הדרישה האישית תיקבע עם הנציג.',subject:'בעל החיסכון שאליו מתייחסת הבקשה; בדמו אין לצרף מידע אישי.',period:'הדוח השנתי האחרון הזמין — לצורך הדגמה בלבד.',source_hint:'במערכת אמיתית: באזור האישי של הגוף המנהל, תחת דוחות שנתיים. כאן משתמשים בכפתור הדוגמה בלבד.'});return null;}
+ if(name==='rpc_complete_onboarding'){if(!staff&&!(role==='client'&&a.p_family_id==='f1'))throw Error('PERMISSION_DENIED');const f=find('families',a.p_family_id);if(f.onboarding_pct===100)return null;if(questionnaireIssues(f.answers||{},state.services).length)throw Error('VALIDATION');Object.assign(f,{onboarding_pct:100,status:'waiting_review'});return null;}
  if(name==='rpc_demo_attach_example'){const doc=find('documents',a.p_document_id);if(!staff&&!(role==='client'&&doc.family_id==='f1'))throw Error('PERMISSION_DENIED');if(doc.type!=='file'||!['missing','rejected'].includes(doc.status))throw Error('VALIDATION');Object.assign(doc,{status:'pending',file_name:'דוגמה מדומה — לא הועלה קובץ',reject_reason:null});return null;}
  if(name==='rpc_review_document'){if(!staff)throw Error('PERMISSION_DENIED');const doc=find('documents',a.p_document_id);if(doc.status!=='pending')throw Error('VALIDATION');if(!a.p_approved&&!String(a.p_reason||'').trim())throw Error('VALIDATION');Object.assign(doc,{status:a.p_approved?'approved':'rejected',reject_reason:a.p_reason||null});state.notifications.push({id:id(),title:a.p_approved?'המסמך אושר':'נדרש תיקון במסמך',body:doc.name,read_at:null,audience:'client',family_id:doc.family_id,target_kind:'document',target_id:doc.id});return null;}
  if(name==='rpc_request_document'){if(!staff)throw Error('PERMISSION_DENIED');const type=find('documentTypes',a.p_type_id);state.documents.push({id:id(),family_id:a.p_family_id,document_type_id:type.id,name:type.name,key:type.key,type:type.type,status:'missing',...Object.fromEntries(['purpose','subject','period','source_hint'].map(key=>[key,String(a['p_'+key]||'').trim().slice(0,500)]))});return null;}

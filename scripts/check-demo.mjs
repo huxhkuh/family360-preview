@@ -1,4 +1,5 @@
 import {chromium} from '@playwright/test';
+import {openClientNavigation} from './client-navigation.mjs';
 import assert from 'node:assert/strict';
 import {mkdirSync,writeFileSync} from 'node:fs';
 mkdirSync('test-results',{recursive:true});
@@ -8,13 +9,14 @@ const results=[];
 for(const [device,width,height] of [['desktop',1440,1000],['mobile',390,844]]){
  const page=await browser.newPage({viewport:{width,height}});const errors=[],requests=[];
  page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>requests.push(r.url()));page.on('dialog',d=>d.accept());
- await page.goto(base);await page.getByRole('heading',{name:/תמונה אחת/}).waitFor();
+ await page.goto(base);await page.getByRole('heading',{name:'התנסות במסודרים 360°',exact:true}).waitFor();
  await page.screenshot({path:`test-results/${device}-welcome.png`,fullPage:true});
  for(const [role,label] of [['representative','נציג'],['client','לקוח'],['professional','בעל מקצוע'],['admin','מנהל']]){
   await page.goto(base);await page.getByRole('button',{name:new RegExp('^0[1-4] '+label+' ')}).click();
+  if(role==='client')await openClientNavigation(page);
   await page.getByRole('navigation',{name:'ניווט ראשי'}).waitFor();await page.getByRole('button',{name:'רענון נתונים',exact:true}).click();
   const nav=page.getByRole('navigation',{name:'ניווט ראשי'});const names=await nav.getByRole('button').allTextContents();
-  for(const name of names){await nav.getByRole('button',{name,exact:true}).click();await page.waitForTimeout(350);assert.equal(await page.getByText('אירעה תקלה בתצוגה',{exact:true}).count(),0);assert.equal(await page.locator('[role=alert]').count(),0,`${role}/${name} alert: ${await page.locator('[role=alert]').allTextContents()}`);}
+  for(const name of names){if(role==='client')await openClientNavigation(page);await nav.getByRole('button',{name,exact:true}).click();await page.waitForTimeout(350);assert.equal(await page.getByText('אירעה תקלה בתצוגה',{exact:true}).count(),0);assert.equal(await page.locator('[role=alert]').count(),0,`${role}/${name} alert: ${await page.locator('[role=alert]').allTextContents()}`);}
   if(role==='representative'){
    await nav.getByRole('button',{name:'משפחות',exact:true}).click();await page.getByLabel('חיפוש משפחה',{exact:true}).fill('פרידמן');
    await page.getByRole('button',{name:'פתיחת התיק של משפחת פרידמן'}).click();await page.getByRole('heading',{name:'משפחת פרידמן',exact:true}).waitFor();

@@ -19,7 +19,7 @@ export function workQueue(w:Workspace,now=new Date()):WorkItem[]{
   if(staff){
    if((f.onboarding_pct??0)<100&&f.status==='new')add({id:'onboarding:'+f.id,title:'השלמת השאלון',owner:'המשפחה',mine:false,waiting:true,approval:false,target:familyTarget('questionnaire'),label:'לשאלון המשפחה'});
    for(const d of w.documents.filter(d=>d.family_id===f.id&&['pending','missing','rejected'].includes(d.status))){
-    const review=d.status==='pending';add({id:'document:'+d.id,title:`${review?'בדיקת מסמך':'השלמת מסמך'} — ${d.name}`,owner:review?rep?.name||'הנציג המטפל':'המשפחה',mine:review&&mine&&can('documents.manage'),waiting:!review||!can('documents.manage'),approval:review,target:familyTarget('documents'),label:review?'בדיקת המסמכים':'למסמכים המבוקשים'});
+    const review=d.status==='pending';add({id:'document:'+d.id,title:`${review?'בדיקת מסמך':d.optional?'בירור מסמך רשות':'השלמת מסמך'} — ${d.name}`,owner:review||d.optional?rep?.name||'הנציג המטפל':'המשפחה',mine:review&&mine&&can('documents.manage'),waiting:!review||!can('documents.manage'),approval:review,target:familyTarget('documents'),label:review?'בדיקת המסמכים':'למסמכים המבוקשים'});
    }
    for(const s of w.familyServices.filter(s=>s.family_id===f.id&&['waiting_analysis','client_approved_execution'].includes(s.status))){
     const execution=s.status==='client_approved_execution';add({id:'assign:'+s.id,title:`${execution?'שיוך לביצוע':'שיוך לניתוח'} — ${w.services.find(x=>x.id===s.service_id)?.name||'תחום'}`,owner:rep?.name||'הנציג המטפל',mine:mine&&can(execution?'execution.send':'analysis.send'),waiting:!can(execution?'execution.send':'analysis.send'),approval:false,target:familyTarget('services'),label:execution?'שיוך לביצוע':'שיוך לבדיקה'});
