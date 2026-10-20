@@ -1,0 +1,182 @@
+/* Mesudarim 360 · local identity study. All five marks share one usable palette. */
+:root,.client-shell{
+ --green:#12483d;--dark:#031e1a;--muted:#625e55;--border:#ded5c9;
+ --soft:#f7f0e7;--mint:#f3e8db;--shadow:0 5px 22px #38291808;
+ --forest:#031e1a;--copper:#d8a16e;--paper:#faf7f2;
+ --forest-surface:linear-gradient(148deg,transparent 34%,#19483d48 34.2%,#092a2340 64%,transparent 64.2%),radial-gradient(ellipse at 12% 0%,#16483c 0%,transparent 65%),linear-gradient(125deg,#061c18,#082d25 54%,#020e0d);
+ color:var(--dark);background:var(--paper)
+}
+body{background:var(--paper);color:var(--dark)}
+[hidden]{display:none!important}
+.mesudarim-logo{display:block;width:100%;height:auto;max-width:320px;object-fit:contain}
+.brand-mark{width:64px;height:64px}
+.app-shell .sidebar{background:var(--forest-surface);color:#f9ece0;border-inline-end:0}
+.app-shell .sidebar .brand{padding:0 0 24px;border-bottom:1px solid #f9ece02e;letter-spacing:0}
+.app-shell .sidebar .brand .mesudarim-logo{margin:0 0 13px;max-width:210px}
+.app-shell .sidebar .brand>span{font-size:12px;line-height:1.5;font-weight:400;color:#ddcfc0;letter-spacing:0}
+.app-shell .sidebar .brand .brand-stacked{width:164px;max-width:100%;margin:0 auto}
+.app-shell .sidebar .brand:has(.brand-stacked)>span{display:none}
+.app-shell .sidebar nav button{color:#e4d8cb;background:transparent;border:1px solid transparent}
+.app-shell .sidebar nav button:hover{background:#ffffff0d;color:#fff}
+.app-shell .sidebar nav button.active{background:#f9ece0;color:#031e1a;border:1px solid #f9ece0;border-inline-start:4px solid #d8a16e;box-shadow:none}
+.app-shell .sidebar footer,.app-shell .client-account{border-color:#f9ece02e;color:#f9ece0}
+.app-shell .sidebar footer span{color:#ddcfc0}
+.app-shell .sidebar footer button{background:transparent;color:#f9ece0;border-color:#f9ece04d}
+.app-shell .topbar{background:#faf7f2;border-color:var(--border);color:#625e55}
+.client-shell .content,.app-shell{background:var(--paper)}
+.client-shell .client-welcome .eyebrow,.eyebrow{color:#85522f;letter-spacing:.04em}
+.client-shell .intake-home .intake-next{background:#f3e8db;border-inline-start-color:#a7653b}
+.client-shell .intake-preparation{background:#f8f3ec;border-color:#ded5c9}
+.client-shell .family-period{color:#a7653b}
+.primary,button.primary{background:#12483d;border-color:#12483d;color:#fff;box-shadow:0 3px 7px #031e1a12}
+.primary:hover,button.primary:hover{background:#031e1a;border-color:#031e1a}
+.app-shell button:focus-visible,.demo-bar button:focus-visible,.demo-welcome button:focus-visible,.brand-lab button:focus-visible,select:focus-visible{outline:3px solid #a7653b;outline-offset:3px}
+.client-shell .chapter-number{color:#9a6038}
+.client-shell .chapter-process .current .process-node{box-shadow:0 0 0 4px #f4e7d8}
+.client-shell .chapter-process .filled .process-node{border-color:#a7653b}
+.client-shell .questionnaire-paper>.card{border-top-color:#a7653b}
+input:focus,select:focus,textarea:focus{border-color:#a7653b;outline-color:#a7653b}
+.questionnaire-paper{position:relative}
+.questionnaire-signature{position:absolute;inset-inline-end:26px;top:24px;width:145px;max-height:38px;pointer-events:none}
+.questionnaire-stamp{display:none}
+.questionnaire-signature.brand-stacked{width:70px;max-height:none;top:12px}
+.questionnaire-paper:has(.brand-stacked)>.card>h2{min-height:45px;padding-inline-end:88px;align-content:center}
+.questionnaire-paper>.card>h2{padding-inline-end:160px}
+.overview-mark{margin:0 24px;opacity:.85}
+.demo-bar,.demo-bar.client-demo-bar{background:#efe7dc;color:#514d43;border-bottom:1px solid #d9cdbd;display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:7px 20px}
+.demo-bar>strong{font-weight:750;font-size:13px}
+.demo-bar>span{font-size:11px}
+.demo-bar button,.demo-bar select{min-height:32px;padding:4px 9px;border:1px solid #c8b9a7;background:#faf7f2;color:#343c32;border-radius:6px;font-size:12px}
+.demo-bar>label{font-size:12px}
+.brand-controls{display:flex;gap:7px;align-items:center;margin-inline-start:auto}
+.brand-controls label{display:flex!important;align-items:center;gap:6px;font-size:12px!important;max-width:none!important}
+.brand-controls select{max-width:185px!important;width:auto}
+.brand-lab-toggle{white-space:nowrap}
+.demo-welcome{position:relative;max-width:1160px;padding-top:52px}
+.welcome-logo{max-width:290px;margin-bottom:42px}
+.demo-welcome h1{font-weight:700;letter-spacing:-.045em;line-height:1.05;color:#031e1a}
+.demo-welcome .demo-lead{color:#625e55}
+.demo-intake-entry{background:#f3e8db;border:1px solid #dcc8b2;border-inline-start:4px solid #a7653b;box-shadow:none}
+.demo-roles>button{background:#fffdf9;border:1px solid #ded5c9;box-shadow:none}
+.demo-roles>button:hover{border-color:#a7653b;box-shadow:0 8px 22px #3829180b}
+.demo-number,.demo-roles b{color:#8a5431}
+.demo-explain{background:transparent;border-top:1px solid #d4c6b5;border-radius:0}
+
+/* A comparison desk, separate from the customer's daily workflow. */
+.brand-lab{max-width:1280px;padding:64px 44px;margin:auto;outline:none}
+.brand-lab-heading{display:grid;grid-template-columns:1.4fr 1fr;gap:80px;align-items:end;margin-bottom:38px}
+.brand-lab-heading h1{font-size:clamp(48px,5.5vw,80px);font-weight:650;letter-spacing:-.05em;line-height:1.02;margin:20px 0 24px}
+.brand-lab-heading h1 em{font-style:normal;color:#9a6038}
+.brand-lab-heading p{max-width:480px;font-size:19px;line-height:1.65;color:#625e55}
+.brand-lab-heading .eyebrow{font-size:13px;color:#85522f}
+.brand-lab-note{padding:20px 0 8px;border-top:1px solid #bfa991}
+.brand-lab-note>span{font-size:44px;font-weight:300;direction:ltr;display:block;text-align:right;color:#a7653b}
+.brand-lab-note p{font-size:16px}
+.brand-palette{display:flex;flex-wrap:wrap;align-items:center;gap:24px;padding:20px 0;margin-bottom:32px;border-block:1px solid #ded5c9}
+.brand-palette>span{display:flex;align-items:center;gap:8px;font-size:14px}
+.brand-palette i{width:24px;height:24px;border-radius:50%;border:1px solid #031e1a1a}
+.brand-palette code{direction:ltr;font-size:11px;color:#625e55}
+.brand-palette p{font-size:13px;color:#625e55;margin:0}
+.brand-concepts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:26px}
+.brand-concept{background:#fffdf9;border:1px solid #ded5c9;border-radius:12px;overflow:hidden}
+.brand-concept.is-selected{border-color:#a7653b;box-shadow:0 0 0 1px #a7653b}
+.brand-concept>header{display:flex;gap:12px;align-items:center;padding:18px 22px;border-bottom:1px solid #eee4d7}
+.concept-number{font-weight:400;color:#9a6038;font-size:22px}
+.brand-concept h2{font-size:19px;margin:0}
+.brand-recommendation{font-size:11px;color:#754620;border:1px solid #dec5a8;border-radius:20px;padding:3px 8px;margin-inline-start:auto;white-space:nowrap}
+.concept-primary{min-height:184px;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:32px 40px;background:#f7f0e7}
+.concept-primary .mesudarim-logo{max-width:340px}
+.concept-primary p{font-size:13px;letter-spacing:.07em;color:#625e55;margin:18px 0 0}
+.concept-applications{display:grid;grid-template-columns:1.6fr 1fr;min-height:100px}
+.concept-applications>div{display:flex;justify-content:center;align-items:center;padding:22px}
+.on-forest{background:var(--forest-surface)}
+.on-forest .mesudarim-logo{max-width:220px}
+.on-paper{background:#ede4d8;gap:14px}
+.on-paper .brand-mark{width:38px;height:38px}
+.on-paper small{font-size:12px;max-width:50px;color:#625e55}
+.concept-copy{padding:24px}
+.concept-copy h3{font-size:20px;margin:0 0 8px;font-weight:650}
+.concept-copy>p{font-size:16px;line-height:1.65;color:#625e55;min-height:53px;margin:0 0 24px}
+.concept-actions{display:flex;gap:8px;flex-wrap:wrap}
+.concept-actions button{font-size:13px;padding:8px 11px;min-height:40px}
+.brand-lab-footer{display:flex;align-items:center;gap:40px;padding-top:36px;margin-top:34px;border-top:1px solid #d4c6b5}
+.brand-lab-footer p{max-width:760px;color:#625e55}
+.brand-lab-footer button{flex-shrink:0}
+.chosen-brand{display:grid;grid-template-columns:1fr 1fr;border:1px solid #d9c7b1;border-radius:14px;overflow:hidden;margin-bottom:36px;background:#f3e8db}
+.chosen-brand-art{background:var(--forest-surface);min-height:360px;display:grid;place-items:center;padding:48px}
+.chosen-brand-art .brand-stacked{width:280px;max-width:100%}
+.chosen-brand-description{padding:40px;align-content:center}
+.chosen-brand-description h2{font-size:34px;line-height:1.2;margin:14px 0}
+.chosen-brand-description>p:not(.eyebrow){font-size:18px;line-height:1.7;color:var(--muted)}
+.concept-primary .brand-stacked{width:260px}
+.on-forest .brand-stacked{width:150px}
+@media(min-width:801px){
+ .demo-bar>span{order:3}
+ .demo-bar>label,.demo-bar>button{order:2}
+}
+@media(max-width:800px){
+ .app-shell .sidebar .brand{padding:0;border:0}
+ .app-shell .sidebar .brand .mesudarim-logo{width:176px;margin:0}
+ .app-shell .sidebar .brand .brand-stacked{width:128px;margin:0 auto}
+ .client-shell:has(.sidebar .brand-stacked) .client-home{gap:10px}
+ .client-shell:has(.sidebar .brand-stacked) .client-welcome{margin-bottom:8px}
+ .client-shell:has(.sidebar .brand-stacked) .intake-home .intake-next{padding-block:14px}
+ .app-shell .sidebar .brand>span:last-child{display:none}
+ .app-shell .sidebar .client-account{border-color:#f9ece02e}
+ .demo-bar,.demo-bar.client-demo-bar{padding:6px 10px;gap:4px 8px}
+ .demo-bar>strong{font-size:11px}
+ .demo-bar>span{font-size:10px;width:100%;order:4}
+ .brand-controls{gap:5px}
+ .brand-controls label>span{display:none}
+ .brand-controls select{max-width:115px!important;font-size:11px}
+ .brand-controls button{font-size:11px;padding:4px 6px}
+ .demo-bar>label{font-size:0;max-width:110px}
+ .demo-bar>label select{width:105px}
+ .questionnaire-signature{width:112px;top:19px;inset-inline-end:20px}
+ .questionnaire-paper>.card>h2{padding-inline-end:122px}
+ .brand-lab{padding:32px 20px}
+ .brand-lab-heading{gap:24px;grid-template-columns:1fr}
+ .brand-lab-heading h1{font-size:58px}
+ .brand-lab-heading p{font-size:17px}
+ .brand-lab-note{display:none}
+ .brand-concepts{grid-template-columns:1fr;gap:24px}
+ .brand-palette{gap:12px}
+ .brand-palette>span{font-size:12px}
+ .brand-palette code{font-size:10px}
+ .brand-lab-footer{display:block}
+ .brand-concept>header{padding:14px}
+ .brand-concept h2{font-size:17px}
+ .concept-primary{padding:28px;min-height:160px}
+ .concept-copy{padding:20px}
+ .concept-copy>p{min-height:0}
+ .welcome-logo{max-width:230px;margin-bottom:30px}
+ .welcome-logo.brand-stacked{width:200px}
+ .chosen-brand{grid-template-columns:1fr}
+ .chosen-brand-art{min-height:280px;padding:32px}
+ .chosen-brand-art .brand-stacked{width:240px}
+ .chosen-brand-description{padding:24px}
+ .chosen-brand-description h2{font-size:28px}
+}
+@media(max-width:400px){
+ .demo-bar>strong{width:100%}
+ .brand-controls{margin-inline-start:0;width:100%}
+ .brand-controls label{flex:1}
+ .brand-controls select{max-width:100%!important;width:100%}
+ .brand-controls button{min-width:120px}
+ .brand-lab{padding:28px 14px}
+ .brand-recommendation{font-size:10px;padding:2px 5px}
+ .concept-applications>div{padding:18px 14px}
+ .concept-primary p{font-size:11px}
+ .questionnaire-signature{width:96px}
+ .questionnaire-paper>.card>h2{padding-inline-end:100px}
+}
+@media print{
+ .demo-bar,.brand-lab{display:none}
+ .questionnaire-signature{position:static;width:180px;margin-bottom:20px}
+}
+@media screen and (max-width:360px){
+ .questionnaire-signature{display:none}
+ .questionnaire-stamp{display:block;position:absolute;inset-inline-end:16px;top:20px;width:28px;height:28px}
+ .questionnaire-paper>.card>h2{padding-inline-end:38px}
+ .questionnaire-paper:has(.brand-stacked)>.card>h2{padding-inline-end:38px;min-height:0}
+}

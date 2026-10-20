@@ -28,7 +28,7 @@ export function resetDemo(){
  state.offers=[{id:'offer1',family_service_id:'fs2',kind:'analysis',service_name:'פנסיה וחסכונות',candidates:['pro1','pro2'],status:'open',created_at:now(),expires_at:new Date(Date.now()+86400000*2).toISOString(),claimed_by:null}];
  state.executionTasks=[{id:'e1',family_id:'f1',family_service_id:'fs1',service_id:'s2',professional_id:'pro1',task_number:'E-001',status:'sent_execution',instructions:'לבדוק את פרטי המסלול שאושר ולתעד את תוצאות הטיפול. דוגמה בלבד.',client_name:'לקוח לדוגמה',client_phone:'0500000000',due_at:new Date(Date.now()+86400000*3).toISOString()}];
  state.familyServices.push({id:'fs1',family_id:'f1',service_id:'s2',status:'sent_execution',analysis_task_id:null,execution_task_id:'e1'});
- state.executionHistory={};state.settings={system_name:'אבחון כלכלי 360°'};
+ state.executionHistory={};state.settings={system_name:'מסודרים 360'};
  state.templates=[{id:'template1',key:'demo_update',name:'עדכון טיפול לדוגמה',subject:'עדכון בתיק המשפחה',body:'שלום, התקבל עדכון בתיק. זהו נוסח לדוגמה בלבד.',active:true}];
  state.automations=[{id:'automation1',key:'demo_reminder',name:'תזכורת מעקב לדוגמה',active:false,channel:'in_app'}];
  state.notifications=[{id:'notice1',title:'ברוכים הבאים לדמו',body:'הנתונים והפעולות כאן הם להמחשה בלבד. אפשר לאפס את הדמו בכל עת.',read_at:null}];

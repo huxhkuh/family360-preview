@@ -44,6 +44,7 @@ jobs:
           npm run test:chapter-process
           npm run test:client-workspace
           npm run test:client-folio
+          npm run test:branding
       - uses: actions/upload-pages-artifact@v4
         with:
           path: dist

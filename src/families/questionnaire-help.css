@@ -2,18 +2,18 @@
 .question-heading{position:relative;min-height:44px;padding-inline-end:48px;margin-bottom:6px;min-width:0}
 .question-heading>label,.question-heading>h4,.question-heading>span{display:block;margin:0;padding-top:10px;font-weight:600;line-height:1.5}
 .question-help{margin:0;min-width:0;text-align:start;font-weight:400}
-.question-help>summary{display:grid;place-items:center;width:44px;height:44px;padding:0;cursor:pointer;list-style:none;border-radius:50%;color:#17664c;background:transparent}
+.question-help>summary{display:grid;place-items:center;width:44px;height:44px;padding:0;cursor:pointer;list-style:none;border-radius:50%;color:#1c614c;background:transparent}
 .question-help>summary::-webkit-details-marker{display:none}
 .question-help>summary::marker{content:''}
 .question-help>summary>span{display:grid;place-items:center;width:24px;height:24px;border:1.5px solid currentColor;border-radius:50%;font:700 16px/1 Arial,sans-serif}
-.question-help>summary:hover,.question-help[open]>summary{background:#e4f2e9}
-.question-help>summary:focus-visible{outline:3px solid #17815e;outline-offset:2px}
+.question-help>summary:hover,.question-help[open]>summary{background:#f0ece6}
+.question-help>summary:focus-visible{outline:3px solid #22765d;outline-offset:2px}
 .question-heading>.question-help>summary{position:absolute;top:0;inset-inline-end:0}
-.question-help-body{margin:4px 0 12px;padding:16px;background:#f0f8f3;border:1px solid #c6dfd0;border-radius:12px;color:#203f33;font-size:15px;line-height:1.8;overflow-wrap:anywhere}
+.question-help-body{margin:4px 0 12px;padding:16px;background:#f7f4f1;border:1px solid #dcd3c9;border-radius:12px;color:#203f36;font-size:15px;line-height:1.8;overflow-wrap:anywhere}
 .question-heading .question-help-body{margin-inline-end:-48px}
-.question-help-body>strong{font-size:16px;color:#15553e}
+.question-help-body>strong{font-size:16px;color:#185241}
 .question-help-body p{margin:9px 0 0;font-size:inherit;line-height:inherit;color:inherit}
-.question-help-body .question-help-example{padding-top:10px;margin-top:12px;border-top:1px solid #c6dfd0}
+.question-help-body .question-help-example{padding-top:10px;margin-top:12px;border-top:1px solid #dcd3c9}
 .question-group-help{grid-column:1/-1;width:100%}
 .complete-check-option,.check-option{position:relative;padding-inline-end:44px;align-items:start!important;flex-wrap:wrap}
 .complete-check-option>.question-help,.check-option>.question-help{flex-basis:100%;width:100%}

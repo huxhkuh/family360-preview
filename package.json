@@ -14,7 +14,8 @@
     "test:client-intake": "node scripts/check-client-intake.mjs",
     "test:chapter-process": "node scripts/check-chapter-process.mjs",
     "test:client-workspace": "node scripts/check-client-workspace.mjs && node scripts/check-client-document-request.mjs",
-    "test:client-folio": "node scripts/check-client-folio.mjs"
+    "test:client-folio": "node scripts/check-client-folio.mjs",
+    "test:branding": "node scripts/check-branding.mjs"
   },
   "dependencies": {
     "@fontsource-variable/assistant": "5.3.0",

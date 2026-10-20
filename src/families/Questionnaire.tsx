@@ -1,3 +1,4 @@
+import {BrandLogo} from '../branding/Brand';
 import {questionnaireReview} from './questionnaire-review';
 import {ChapterProgress} from './ChapterProgress';
 import {chapterProgress} from './chapter-progress';
@@ -54,7 +55,7 @@ export function Questionnaire({family,services,refresh,onDirtyChange,onComplete,
  const saveDraft=async()=>{setBusy(true);try{await persistDraft();}finally{setBusy(false);}};
  const submitted=family.onboarding_pct===100;
  function jump(key:string,chapterKey:string){setChapter(chapterKey==='custom'?current.key:chapterKey);requestAnimationFrame(()=>{const field=Array.from(document.querySelectorAll<HTMLElement>('[data-answer-key]')).find(el=>el.dataset.answerKey===key);if(field){const details=field.closest('details');if(details)details.open=true;field.focus();field.scrollIntoView({block:'center',behavior:'auto'});}});}
- return <div className="questionnaire-paper"><Panel title="השאלון המשפחתי"><AnswerErrors.Provider value={errors}><fieldset disabled={busy} aria-busy={busy}>
+ return <div className="questionnaire-paper"><BrandLogo className="questionnaire-signature"/><BrandLogo mark className="questionnaire-stamp"/><Panel title="השאלון המשפחתי"><AnswerErrors.Provider value={errors}><fieldset disabled={busy} aria-busy={busy}>
  <details className="questionnaire-introduction"><summary>לפני שמתחילים · מה ממלאים ואיך שומרים?</summary><p className="section-intro">ממלאים את מה שידוע לכם, שומרים טיוטה וממשיכים בקצב שלכם. לחצו על סימן השאלה לצד השדות להסבר ולדוגמה. שדות המסומנים בכוכבית (*) נדרשים לשליחה לבדיקה. המידע נשמר רק בלחיצה על שמירה.</p><p>פרטי הזיהוי משייכים את התשובות לאדם הנכון במשפחה. מלאו רק את מה ששייך לכם; תשובות שאינן רלוונטיות לא יוצגו בפרקים הבאים. בדמו משתמשים בפרטים מדומים בלבד.</p><p>אפשר לחזור לכל פרק ולתקן. שדות שמולאו עדיין דורשים שמירה; אפשר להשאיר פרקי רשות ריקים; תשובות שהוזנו נבדקות לפני השליחה.</p><div className="chapter-assistance"><PreparationTip chapter={current.key}/>{current.key==='family'&&<ContactReuse family={family} answers={answers} apply={patch=>setAnswers(a=>({...a,...patch}))}/>}</div></details>
  {family.updated_at!==revision&&<p className="hint" role="status">התיק עודכן בזמן העריכה. הטיוטה שלכם נשארה במסך כדי שלא תאבד. <button className="text-button" onClick={()=>{if(dirty)setDiscard(true);else loadLatest();}}>טעינת התשובות המעודכנות</button></p>}
  {discard&&<div className="hint"><p>להחליף את טיוטת השאלון בתשובות השמורות בתיק?</p><button type="button" onClick={loadLatest}>כן, טעינת התשובות</button><button type="button" onClick={()=>setDiscard(false)}>המשך עריכת הטיוטה</button></div>}
