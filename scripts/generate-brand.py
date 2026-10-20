@@ -51,14 +51,14 @@ MARKS = [
     # Two interlocked open arches: a human partnership, shelter and continuity.
     '<path d="M7 51V25a17 17 0 0 1 34 0v14H29V25a5 5 0 0 0-10 0v26z" fill="{p}"/>'
     '<path d="M57 13v26a17 17 0 0 1-34 0V25h12v14a5 5 0 0 0 10 0V13z" fill="{a}"/>',
-    # Chosen direction: open ring and three stepped tiles, refined from the
-    # supplied reference. Separate rounded copper segment at the upper right.
-    '<path d="M23.4495 8.5077 A25 25 0 1 0 55.4923 40.5505" fill="none" stroke="{p}" stroke-width="10" stroke-linecap="round"/>'
-    '<path d="M40.5505 8.5077 A25 25 0 0 1 55.4923 23.4495" fill="none" stroke="{a}" stroke-width="10" stroke-linecap="round"/>'
-    # Group bounds [20,44] × [20.5,43.5] share the ring centre (32,32).
-    '<g fill="{p}"><rect x="34" y="20.5" width="10" height="10" rx="1.8"/>'
-    '<rect x="34" y="33.5" width="10" height="10" rx="1.8"/>'
-    '<rect x="20" y="33.5" width="10" height="10" rx="1.8"/></g>',
+    # Final user reference: four offset corner tiles around a circular opening.
+    # The hole is transparent, so it takes on the actual page background.
+    '<defs><mask id="centre" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64">'
+    '<rect width="64" height="64" fill="white"/><circle cx="32" cy="32" r="18" fill="black"/></mask></defs>'
+    '<g mask="url(#centre)">'
+    '<path d="M3 34V18Q3 11 10 11H28V34Z M61 30V46Q61 53 54 53H36V30Z" fill="{p}"/>'
+    '<path d="M31 3H50Q57 3 57 10V28H31Z M33 61H14Q7 61 7 54V36H33Z" fill="{a}"/>'
+    '</g>',
 ]
 NAMES = ["מדרגות לתמונה מלאה", "התמונה השלמה", "דרך של ביטחון", "חיבור משפחתי", "מבט 360"]
 for i, (mark, name) in enumerate(zip(MARKS, NAMES), 1):
@@ -68,6 +68,8 @@ for i, (mark, name) in enumerate(zip(MARKS, NAMES), 1):
         ("mono", "#031E1A", "#031E1A"),
     ]:
         symbol = mark.format(p=primary, a=accent)
+        if i == 5 and mode != "mono":
+            symbol = '<defs><linearGradient id="copper" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#E6AC72"/><stop offset="1" stop-color="#A9582F"/></linearGradient></defs>' + mark.format(p=primary, a="url(#copper)")
         title = escape(f"מסודרים 360 — {name}")
         (OUT / f"concept-{i}-{mode}-mark.svg").write_text(
             f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img"><title>{title}</title>{symbol}</svg>', encoding="utf-8")

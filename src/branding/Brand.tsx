@@ -5,7 +5,7 @@ export const concepts=[
  {id:2,name:'התמונה השלמה',idea:'מקום אחד לכל חלקי החיים הכלכליים.',detail:'ארבע פינות אוספות את המבט אל מרכז נחושתי. סימן מדויק ושקט שמלווה את המעבר מהפרטים לתמונה המלאה.'},
  {id:3,name:'דרך של ביטחון',idea:'מתקדמים יחד, שלב אחרי שלב.',detail:'קו אדריכלי רציף בשלושה מפלסים. תחושה של תהליך מסודר ובסיס יציב, עם נוכחות חזקה גם בגודל קטן.'},
  {id:4,name:'חיבור משפחתי',idea:'המשפחה והליווי המקצועי, בחיבור אחד.',detail:'שתי קשתות משתלבות ומחזיקות זו את זו. החלופה הרכה והאנושית ביותר, שמתאימה לשירות אישי לאורך זמן.'},
- {id:5,name:'מבט 360 · הכיוון הנבחר',idea:'עושים לך סדר בכסף.',detail:'הסמל שבחרתם, בגרסה מדויקת: מעגל פתוח, מקטע נחושת ושלושה ריבועים מדורגים. הסמל מעל השם והסלוגן מתחתיו.',recommended:true},
+ {id:5,name:'מסודרים 360 · הלוגו הנבחר',idea:'עושים לך סדר בכסף.',detail:'ארבעה חלקים משתלבים סביב מרכז עגול פתוח, בשמנת וירוק עם נחושת בפינות הנגדיות. הסמל מעל השם והסלוגן מתחתיו.',recommended:true},
 ] as const;
 const valid=(value:unknown)=>[1,2,3,4,5].includes(Number(value))?Number(value):1;
 const initial=()=>{
@@ -39,7 +39,7 @@ export function BrandLab({onPreview,onClose}:{onPreview:(variant:number,page:'ho
   <header className="brand-lab-heading"><div><p className="eyebrow">מסודרים 360 / מחקר זהות / חמש חלופות</p><h1>אותו בית.<br/><em>חמש חתימות.</em></h1><p>ירוק יער עמוק, נחושת ושמנת. חמש דרכים לתת למערכת אופי משלה, בתוך המשפחה של מסודרים.</p></div><div className="brand-lab-note"><span>01 — 05</span><p>בחרו חתימה וראו אותה בתוך מסך הבית והשאלון הפעילים. החלפת הלוגו שומרת על התשובות ועל מקום העבודה.</p><button onClick={onClose}>להמשך ההתנסות ←</button></div></header>
   <section className="chosen-brand" aria-label="הלוגו המעודכן">
    <div className="chosen-brand-art"><BrandLogo variant={5} mode="dark"/></div>
-   <div className="chosen-brand-description"><p className="eyebrow">הכיוון שבחרתם / גרסה מעודכנת</p><h2>עושים לך סדר בכסף.</h2><p>המעגל הפתוח ושלושת הריבועים, עם הסמל מעל השם. ירוק עמוק בכמה גוונים, נחושת חמה ומרווח לנשום.</p><div className="concept-actions"><button className="primary" onClick={()=>onPreview(5,'home')}>פתיחת הבית עם הלוגו החדש ←</button><button onClick={()=>onPreview(5,'questionnaire')}>פתיחת השאלון עם הלוגו החדש ←</button></div></div>
+   <div className="chosen-brand-description"><p className="eyebrow">הלוגו שבחרתם / מסודרים 360</p><h2>עושים לך סדר בכסף.</h2><p>ארבעה חלקים שיוצרים תמונה אחת, עם הסמל מעל השם. ירוק עמוק בכמה גוונים, נחושת חמה ומרווח לנשום.</p><div className="concept-actions"><button className="primary" onClick={()=>onPreview(5,'home')}>פתיחת הבית עם הלוגו החדש ←</button><button onClick={()=>onPreview(5,'questionnaire')}>פתיחת השאלון עם הלוגו החדש ←</button></div></div>
   </section>
   <section className="brand-palette" aria-label="צבעי המותג"><span><i style={{background:'#031E1A'}}/>יער עמוק <code>#031E1A</code></span><span><i style={{background:'#D8A16E'}}/>נחושת <code>#D8A16E</code></span><span><i style={{background:'#F9ECE0'}}/>שמנת <code>#F9ECE0</code></span><p>נחושת להדגשה; ירוק עמוק לטקסט ולפעולות.</p></section>
   <div className="brand-concepts">{concepts.map(c=><article key={c.id} className={`brand-concept${variant===c.id?' is-selected':''}`}>
