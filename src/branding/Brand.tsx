@@ -5,7 +5,7 @@ export const concepts=[
  {id:2,name:'התמונה השלמה',idea:'מקום אחד לכל חלקי החיים הכלכליים.',detail:'ארבע פינות אוספות את המבט אל מרכז נחושתי. סימן מדויק ושקט שמלווה את המעבר מהפרטים לתמונה המלאה.'},
  {id:3,name:'דרך של ביטחון',idea:'מתקדמים יחד, שלב אחרי שלב.',detail:'קו אדריכלי רציף בשלושה מפלסים. תחושה של תהליך מסודר ובסיס יציב, עם נוכחות חזקה גם בגודל קטן.'},
  {id:4,name:'חיבור משפחתי',idea:'המשפחה והליווי המקצועי, בחיבור אחד.',detail:'שתי קשתות משתלבות ומחזיקות זו את זו. החלופה הרכה והאנושית ביותר, שמתאימה לשירות אישי לאורך זמן.'},
- {id:5,name:'מסודרים 360 · הלוגו הנבחר',idea:'עושים לך סדר בכסף.',detail:'הגרפיקה המקורית שבחרתם, כולל הטיפוגרפיה, הגרדיאנט והמרקם. הסמל מעל השם והסלוגן מתחתיו.',recommended:true},
+ {id:5,name:'מסודרים 360 · הלוגו הנבחר',idea:'עושים לך סדר בכסף.',detail:'שחזור וקטורי של הלוגו שבחרתם, עם רקע שקוף, גרדיאנט ומרקם עדין. הסמל מעל השם והסלוגן מתחתיו.',recommended:true},
 ] as const;
 const valid=(value:unknown)=>[1,2,3,4,5].includes(Number(value))?Number(value):1;
 const initial=()=>{
@@ -48,6 +48,6 @@ export function BrandLab({onPreview,onClose}:{onPreview:(variant:number,page:'ho
    <div className="concept-applications"><div className="on-forest"><BrandLogo variant={c.id} mode="dark"/></div><div className="on-paper"><BrandLogo variant={c.id} mode="mono" mark/><small>סמל בצבע אחד</small></div></div>
    <div className="concept-copy"><h3>{c.idea}</h3><p>{c.detail}</p><div className="concept-actions"><button className={variant===c.id?'primary':''} aria-pressed={variant===c.id} onClick={()=>select(c.id)}>{variant===c.id?'הלוגו הנבחר ✓':'בחירת הלוגו'}</button><button onClick={()=>onPreview(c.id,'home')}>במסך הבית ←</button><button onClick={()=>onPreview(c.id,'questionnaire')}>בשאלון ←</button></div></div>
   </article>)}</div>
-  <footer className="brand-lab-footer"><p>הלוגו הנבחר מוצג מתוך התמונה המקורית, עם הגרדיאנט והמרקם שלה. ארבע החלופות הקודמות הן וקטוריות. נתוני הדמו נשארים מדומים.</p><button onClick={onClose}>חזרה לדמו עם הלוגו הנבחר ←</button></footer>
+  <footer className="brand-lab-footer"><p>הלוגו הנבחר שוחזר כ־SVG שקוף עם קווי מתאר, גרדיאנטים ומרקם וקטורי. השחזור מבוסס על התמונה שסופקה. <a href={`${import.meta.env.BASE_URL}brand/mesudarim-360-svg-kit.zip`} download>הורדת ערכת הלוגו — 8 קובצי SVG</a>. נתוני הדמו נשארים מדומים.</p><button onClick={onClose}>חזרה לדמו עם הלוגו הנבחר ←</button></footer>
  </main>;
 }

@@ -1,4 +1,4 @@
-"""Build four vector concepts and wrappers preserving the approved logo artwork.
+"""Build the four early concepts and the reconstructed transparent vector logo.
 
 Run from repository root with Python + fontTools. Runtime uses only generated SVGs.
 Assistant is distributed under the SIL Open Font License (copied beside exports).
@@ -9,7 +9,7 @@ from fontTools.varLib.instancer import instantiateVariableFont
 from fontTools.pens.svgPathPen import SVGPathPen
 from xml.sax.saxutils import escape
 import shutil
-import base64
+import runpy
 from functools import lru_cache
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -69,23 +69,7 @@ for i, (mark, name) in enumerate(zip(MARKS, NAMES), 1):
         ("mono", "#031E1A", "#031E1A"),
     ]:
         if i == 5:
-            # Preserve the approved artwork byte-for-byte. SVG only selects the
-            # relevant region of the supplied presentation; it does not redraw,
-            # retouch, remove texture, recolour, or regenerate its typography.
-            source = base64.b64encode((OUT / "approved-logo-board.png").read_bytes()).decode("ascii")
-            crops = {
-                "dark": ("55 92 250 190", "125 98 112 112"),
-                "light": ("343 44 166 126.16", "394 54 66 66"),
-                "mono": ("343 235 166 126.16", "397 246 62 62"),
-            }
-            for mark_only in [False, True]:
-                viewbox = crops[mode][int(mark_only)]
-                suffix = "-mark" if mark_only else ""
-                title = "מסודרים 360 — עושים לך סדר בכסף."
-                (OUT / f"concept-5-{mode}{suffix}.svg").write_text(
-                    f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{viewbox}" role="img">'
-                    f'<title>{title}</title><image width="512" height="384" href="data:image/png;base64,{source}"/></svg>',
-                    encoding="utf-8")
+            # Selected assets are generated below from vector paths and grain.
             continue
         symbol = mark.format(p=primary, a=accent)
         title = escape(f"מסודרים 360 — {name}")
@@ -101,4 +85,5 @@ for license_file in [FONT / "LICENSE", FONT / "OFL.txt"]:
     if license_file.exists():
         shutil.copyfile(license_file, OUT / "Assistant-OFL.txt")
         break
-print(f"Exported five concepts, three colour modes, logo + mark to {OUT}")
+runpy.run_path(str(ROOT / "scripts/rebuild-selected-logo.py"), run_name="__main__")
+print(f"Exported five vector concepts to {OUT}")
