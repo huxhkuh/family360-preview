@@ -4,7 +4,7 @@ import type {Service} from '../lib/model';
 export function questionnaireReview(answers:Answers,services:Service[]){
  function fields(definitions:LegacyField[],values:Answers,prefix=''):Array<{label:string;value:string}>{
   return definitions.filter(f=>!f.cond||f.cond(values)).flatMap(f=>{
-   const value=values[f.k];if(value==null||value===''||Array.isArray(value)&&!value.length)return [];
+   const value=values[f.k];if(value==null||typeof value==='string'&&!value.trim()||Array.isArray(value)&&!value.length)return f.followUp?[{label:prefix+(f.l||f.k),value:f.followUp}]:[];
    if(f.type==='repeat')return Array.isArray(value)?value.flatMap((row,i)=>fields(f.sub||[],row,`${f.l||f.k} ${i+1} · `)):[];
    const text=(v:unknown)=>f.opts?.find(([key])=>key===v)?.[1]||String(v);
    return [{label:prefix+(f.l||({savings:'חסכונות',ins:'ביטוחים'} as Record<string,string>)[f.k]||f.k),value:Array.isArray(value)?value.map(text).join(', '):text(value)}];

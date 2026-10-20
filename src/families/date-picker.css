@@ -1,0 +1,34 @@
+.date-picker{position:relative;min-width:0}
+.date-picker>input{width:100%;padding-left:56px}
+.date-picker>input::-webkit-calendar-picker-indicator{display:none}
+.date-picker>.date-picker-toggle{position:absolute;left:7px;top:50%;transform:translateY(-50%);display:grid;place-items:center;width:42px;min-height:40px;padding:8px;background:#f5efe6;color:#12483d;border:0;border-radius:10px;box-shadow:none}
+.date-picker-toggle .icon{width:21px;height:21px}
+.date-picker>input:disabled+.date-picker-toggle{pointer-events:none;opacity:.5}
+.date-calendar{position:fixed;z-index:1000;width:min(340px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;background:#fcfaf6;border:1px solid #d9cabb;border-radius:20px;box-shadow:0 16px 48px #031e1a26;color:#123b31;font-family:inherit;padding:0 14px 10px;isolation:isolate}
+.date-calendar *{box-sizing:border-box}
+.date-calendar .date-calendar-heading{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(125deg,#082d25,#194c3e);color:#fff8ec;margin:0 -14px 14px;padding:15px 20px;border-bottom:2px solid #c68b59}
+.date-calendar-heading>div{display:grid;gap:2px}
+.date-calendar-heading span{font-size:12px;color:#e3c4a4}
+.date-calendar-heading strong{font-size:19px;font-weight:600}
+.date-calendar button{font:inherit;cursor:pointer;box-shadow:none;transition:background .12s;color:#123b31}
+.date-calendar-heading button{background:transparent;border:0;color:#fff8ec;font-size:26px;width:40px;min-height:40px;padding:0;border-radius:10px}
+.date-calendar .date-calendar-controls{display:flex;align-items:center;gap:6px;margin-bottom:12px}
+.date-calendar-controls label{flex:1;min-width:0}
+.date-calendar-controls select{width:100%;font:inherit;font-size:16px;color:#163f33;background:#f3ece2;border:1px solid #ddd0bf;border-radius:10px;min-height:42px;padding:5px 7px}
+.date-calendar-controls>button{width:32px;min-height:42px;border:0;background:transparent;padding:0;font-size:27px;border-radius:10px}
+.date-calendar-grid>[role=row]{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.date-calendar-grid [role=gridcell]{display:grid;place-items:center;padding:2px 0}
+.date-calendar-grid button{width:100%;max-width:42px;height:40px;min-height:40px;border:1px solid transparent;border-radius:12px;background:transparent;padding:0;font-size:16px;font-variant-numeric:tabular-nums}
+.date-calendar-weekdays{font-size:13px;color:#746957;text-align:center;padding-bottom:8px}
+.date-calendar-grid button[data-outside=true]{color:#92897b}
+.date-calendar button:hover:not(:disabled){background:#eae1d4}
+.date-calendar-grid button[aria-current=date]{border-color:#b27848;color:#865128;font-weight:700}
+.date-calendar-grid [aria-selected=true] button{background:#12483d;color:#fff;font-weight:700;border-color:#12483d;box-shadow:0 2px 6px #12483d20}
+.date-calendar-grid [aria-selected=true] button:hover:not(:disabled){background:#082d25}
+.date-calendar button:disabled{opacity:.3;cursor:default}
+.date-calendar button:focus-visible,.date-calendar select:focus-visible{outline:2px solid #a7653b;outline-offset:1px}
+.date-calendar footer{display:flex;align-items:center;justify-content:space-between;border-top:1px solid #e3d9cb;margin-top:10px;padding-top:6px}
+.date-calendar footer button{border:0;background:transparent;padding:6px 10px;min-height:40px;border-radius:10px;font-size:14px}
+.date-calendar footer span{font-size:12px;color:#7a7062}
+.date-calendar-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+@media(prefers-reduced-motion:reduce){.date-calendar button{transition:none}}

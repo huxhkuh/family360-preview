@@ -15,7 +15,9 @@
     "test:chapter-process": "node scripts/check-chapter-process.mjs",
     "test:client-workspace": "node scripts/check-client-workspace.mjs && node scripts/check-client-document-request.mjs",
     "test:client-folio": "node scripts/check-client-folio.mjs",
-    "test:branding": "node scripts/check-branding.mjs"
+    "test:branding": "node scripts/check-branding.mjs",
+    "test:companion": "node scripts/check-companion.mjs",
+    "test:date-picker": "node scripts/check-date-picker.mjs"
   },
   "dependencies": {
     "@fontsource-variable/assistant": "5.3.0",

@@ -1,0 +1,82 @@
+{
+  "welcome": {
+    "width": 250,
+    "height": 458,
+    "source_cell": [
+      183,
+      11,
+      409,
+      445
+    ]
+  },
+  "explain": {
+    "width": 326,
+    "height": 452,
+    "source_cell": [
+      586,
+      16,
+      888,
+      444
+    ]
+  },
+  "pause": {
+    "width": 249,
+    "height": 459,
+    "source_cell": [
+      979,
+      11,
+      1204,
+      446
+    ]
+  },
+  "document": {
+    "width": 250,
+    "height": 456,
+    "source_cell": [
+      1422,
+      13,
+      1648,
+      445
+    ]
+  },
+  "later": {
+    "width": 264,
+    "height": 453,
+    "source_cell": [
+      160,
+      448,
+      400,
+      877
+    ]
+  },
+  "success": {
+    "width": 241,
+    "height": 456,
+    "source_cell": [
+      564,
+      447,
+      781,
+      879
+    ]
+  },
+  "review": {
+    "width": 264,
+    "height": 453,
+    "source_cell": [
+      974,
+      448,
+      1214,
+      877
+    ]
+  },
+  "complete": {
+    "width": 366,
+    "height": 455,
+    "source_cell": [
+      1398,
+      448,
+      1740,
+      879
+    ]
+  }
+}

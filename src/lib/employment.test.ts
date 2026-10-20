@@ -19,11 +19,14 @@ describe('combined employment',()=>{
   }
   expect(conditionMatches({[field]:[]},{field,op:'not_equals',value:'none'})).toBe(false);
  });
- it('requires both employee and self-employed details without requiring a hidden spouse',()=>{
+ it('shows both employee and self-employed details without requiring optional data or a hidden spouse',()=>{
   const answers={marital:'single',h_emp:['emp','self'],w_emp:['emp','self']};
   const keys=missingAnswers(answers,[]).map(x=>x.key);
-  expect(keys).toEqual(expect.arrayContaining(['h_work','h_gross','h_biz_type']));expect(keys.some(k=>k.startsWith('w_'))).toBe(false);
-  expect(missingAnswers({...answers,marital:'married'},[]).map(x=>x.key)).toEqual(expect.arrayContaining(['w_work','w_gross']));
+  for(const key of ['h_work','h_gross','h_biz_type'])expect(keys).not.toContain(key);
+  expect(keys.some(k=>k.startsWith('w_'))).toBe(false);
+  const shown=CHAPTERS.find(c=>c.key==='work')!.secs.filter(s=>!s.cond||s.cond(answers)).flatMap(s=>(s.fields||[]).filter(f=>!f.cond||f.cond(answers)).map(f=>f.k));
+  expect(shown).toEqual(expect.arrayContaining(['h_work','h_gross','h_biz_type']));
+  expect(missingAnswers({...answers,marital:'married'},[]).map(x=>x.key)).toEqual(expect.arrayContaining(['w_first','w_id','w_dob']));
  });
  it('keeps detailed answers when a work selection is removed and puts loans after insurance',()=>{
   const answers={marital:'single',h_emp:['self'],h_work:'Stored job',h_gross:5000};const before=structuredClone(answers);

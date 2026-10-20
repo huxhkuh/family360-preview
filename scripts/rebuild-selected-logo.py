@@ -80,7 +80,7 @@ def lettering(name, fill):
 
 def svg(mode, mark=False):
     mono = mode.startswith("mono")
-    title = "מסודרים 360" if mark else "מסודרים 360 — עושים לך סדר בכסף."
+    title = "מסודרים 360°" if mark else "מסודרים 360° — עושים לך סדר בכסף."
     desc = "שחזור וקטורי מהתמונה שאושרה. רקע שקוף; הכיתוב בקווי מתאר."
     if not mono:
         desc += " גרדיאנטים ומרקם גרעיני מצורות וקטוריות."
@@ -95,7 +95,13 @@ def svg(mode, mark=False):
         body = (
             '<g transform="translate(26.25 10) scale(1.25)">'
             f'<g transform="translate(51 0)">{symbol(mode)}</g>'
-            f'{lettering("name", primary)}{lettering("tagline", accent)}</g>'
+            f'{lettering("name", primary)}'
+            # Outlined degree sign in the gap after the zero, raised above
+            # the cap line. Uses the same fill as the lettering in every mode.
+            f'<path id="degree" fill="{primary}" fill-rule="evenodd" '
+            'd="M77.4 121.5a3.4 3.4 0 1 0-6.8 0a3.4 3.4 0 1 0 6.8 0'
+            'M76 121.5a2 2 0 1 0-4 0a2 2 0 1 0 4 0"/>'
+            f'{lettering("tagline", accent)}</g>'
         )
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{viewbox}" role="img" aria-labelledby="title description">'
@@ -114,10 +120,11 @@ for app_mode, export_mode in {"light": "on-light", "dark": "on-dark", "mono": "m
         source = OUT / f'mesudarim-360-{export_mode}{"-symbol" if mark else ""}.svg'
         shutil.copyfile(source, BRAND / f'concept-5-{app_mode}{"-mark" if mark else ""}.svg')
 
-readme = """# מסודרים 360 — קובצי לוגו
+readme = """# מסודרים 360° — קובצי לוגו
 
 כל קובצי ה־SVG שקופים ועצמאיים. אין בהם תמונת רסטר מוטמעת,
 פונט חיצוני או תלות ברשת. הכיתוב הומר לקווי מתאר.
+סימן המעלות נוסף כקווי מתאר לצד 360 בכל גרסאות הלוגו המלא.
 
 - on-light: לרקע לבן, שמנת ורקע בהיר; ירוק עמוק ונחושת.
 - on-dark: לרקע ירוק כהה, שחור ורקע כהה; שמנת ונחושת.

@@ -7,7 +7,7 @@ describe('questionnaire chapter progress',()=>{
  });
  it('includes mortgage only for ownership and does not erase hidden answers',()=>{
   const answers={housing:'own',has_mortgage:'yes',mort_bank:'leumi',mort_balance:'400000',mort_monthly:'3000'};
-  expect(chapterProgress(answers).find(s=>s.chapter.key==='mortgage')).toMatchObject({required:4,remaining:0});
+  expect(chapterProgress(answers).find(s=>s.chapter.key==='mortgage')).toMatchObject({required:1,remaining:0});
   expect(chapterProgress({...answers,housing:'family'}).some(s=>s.chapter.key==='mortgage')).toBe(false);
   expect(answers.mort_bank).toBe('leumi');
  });

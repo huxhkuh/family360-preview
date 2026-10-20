@@ -2,7 +2,7 @@
 import {employed} from "../lib/employment";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Answers=Record<string, any>;
-export interface LegacyField { k:string;l?:string;type?:string;req?:number;full?:number;opts?:string[][];cond?:(a:Answers)=>boolean;sub?:LegacyField[];addLabel?:string; }
+export interface LegacyField { k:string;l?:string;type?:string;req?:number;followUp?:string;full?:number;opts?:string[][];cond?:(a:Answers)=>boolean;sub?:LegacyField[];addLabel?:string; }
 export interface Chapter { key:string;title:string;icon:string;desc:string;cond?:(a:Answers)=>boolean;secs:{t:string;cond?:(a:Answers)=>boolean;fields?:LegacyField[];hint?:string;dyn?:string;optional?:boolean}[]; }
 export const hasCurrentPartner=(a:Answers)=>a.marital==='married';
 const yn=[['yes','כן'],['no','לא']];
@@ -11,11 +11,11 @@ export const CHAPTERS: Chapter[]=[
   secs:[
    {t:'המשפחה',fields:[
      {k:'marital',l:'מצב משפחתי',type:'select',req:1,opts:[['married','נשוי/אה'],['single','רווק/ה'],['divorced','גרוש/ה'],['widowed','אלמן/ה']]},
-     {k:'city',l:'עיר מגורים',req:1},{k:'address',l:'כתובת',req:1,full:1}]},
+     {k:'city',l:'עיר מגורים'},{k:'address',l:'כתובת מלאה (רשות)',full:1}]},
    {t:'פרטים אישיים',fields:[
      {k:'h_first',l:'שם פרטי',req:1},{k:'h_last',l:'שם משפחה',req:1},
      {k:'h_id',l:'תעודת זהות',req:1,type:'id'},{k:'h_dob',l:'תאריך לידה',type:'date',req:1},
-     {k:'h_phone',l:'טלפון נייד',type:'tel',req:1},{k:'h_email',l:'דוא״ל',type:'email',req:1}]},
+     {k:'h_phone',l:'טלפון נייד',type:'tel',req:1},{k:'h_email',l:'דוא״ל',type:'email'}]},
    {t:'בת הזוג',cond:hasCurrentPartner,fields:[
      {k:'w_first',l:'שם פרטי',req:1},{k:'w_id',l:'תעודת זהות',type:'id',req:1},
      {k:'w_dob',l:'תאריך לידה',type:'date',req:1},{k:'w_phone',l:'טלפון נייד',type:'tel'}]},
@@ -26,13 +26,13 @@ export const CHAPTERS: Chapter[]=[
   secs:[
    {t:'התעסוקה שלך',fields:[
      {k:'h_emp',l:'סטטוס תעסוקה',type:'employment',req:1,opts:[['avrech','אברך'],['emp','שכיר'],['self','עצמאי'],['none','לא עובד'],['other','אחר']]},
-     {k:'h_work',l:'מקום עבודה',cond:a=>employed(a,'h','emp'),req:1},
+     {k:'h_work',l:'מקום עבודה',cond:a=>employed(a,'h','emp')},
      {k:'h_tenure',l:'ותק (שנים)',type:'number',cond:a=>employed(a,'h','emp')},
-     {k:'h_gross',l:'שכר ברוטו (₪)',type:'currency',cond:a=>employed(a,'h','emp'),req:1},
+     {k:'h_gross',l:'שכר ברוטו (₪)',type:'currency',cond:a=>employed(a,'h','emp'),followUp:'לא נמסר — להשלמה מהתלוש עם הנציג'},
      {k:'h_net',l:'שכר נטו (₪)',type:'currency',cond:a=>employed(a,'h','emp')},
      {k:'h_employers',l:'מספר מעסיקים',type:'number',cond:a=>employed(a,'h','emp')},
      {k:'h_job_change',l:'החליף עבודה השנה?',type:'pills',opts:yn,cond:a=>employed(a,'h','emp')},
-     {k:'h_biz_type',l:'תחום העסק',cond:a=>employed(a,'h','self'),req:1},
+     {k:'h_biz_type',l:'תחום העסק',cond:a=>employed(a,'h','self')},
      {k:'h_biz_income',l:'הכנסה חודשית ממוצעת (₪)',type:'currency',cond:a=>employed(a,'h','self')},
      {k:'h_biz_years',l:'ותק העסק (שנים)',type:'number',cond:a=>employed(a,'h','self')},
      {k:'h_biz_registration',l:'סוג העוסק הרשום',opts:[['exempt','עוסק פטור'],['licensed','עוסק מורשה'],['company','חברה'],['other','אחר'],['dk','לא יודע']],cond:a=>employed(a,'h','self')},
@@ -40,8 +40,8 @@ export const CHAPTERS: Chapter[]=[
      {k:'h_stopped',l:'הפסיק לעבוד במהלך השנה האחרונה?',type:'pills',opts:yn,cond:a=>employed(a,'h','none')||employed(a,'h','avrech'),full:1}]},
    {t:'תעסוקה — בת הזוג',cond:hasCurrentPartner,fields:[
      {k:'w_emp',l:'סטטוס תעסוקה',type:'employment',req:1,opts:[['emp','שכירה'],['self','עצמאית'],['none','לא עובדת'],['other','אחר']]},
-     {k:'w_work',l:'מקום עבודה',cond:a=>employed(a,'w','emp'),req:1},
-     {k:'w_gross',l:'שכר ברוטו (₪)',type:'currency',cond:a=>employed(a,'w','emp'),req:1},
+     {k:'w_work',l:'מקום עבודה',cond:a=>employed(a,'w','emp')},
+     {k:'w_gross',l:'שכר ברוטו (₪)',type:'currency',cond:a=>employed(a,'w','emp'),followUp:'לא נמסר — להשלמה מהתלוש עם הנציג'},
      {k:'w_net',l:'שכר נטו (₪)',type:'currency',cond:a=>employed(a,'w','emp')},
      {k:'w_job_change',l:'החליפה עבודה השנה?',type:'pills',opts:yn,cond:a=>employed(a,'w','emp')},
      {k:'w_biz_type',l:'תחום העסק',cond:a=>employed(a,'w','self')},
@@ -56,14 +56,14 @@ export const CHAPTERS: Chapter[]=[
      {k:'housing',l:'סטטוס מגורים',type:'pills',req:1,opts:[['own','בעלות'],['rent','שכירות'],['family','אצל משפחה / אחר']]},
      {k:'prop_value',l:'שווי נכס משוער (₪)',type:'currency',cond:a=>a.housing==='own'},
      {k:'prop_count',l:'מספר נכסים בבעלותכם',type:'number',cond:a=>a.housing==='own'},
-     {k:'rent_amount',l:'שכר דירה חודשי (₪)',type:'currency',cond:a=>a.housing==='rent',req:1},
-     {k:'rent_aid_now',l:'מקבלים סיוע בשכר דירה?',type:'pills',opts:yn,cond:a=>a.housing==='rent',req:1}]}]},
+     {k:'rent_amount',l:'שכר דירה חודשי (₪)',type:'currency',cond:a=>a.housing==='rent',followUp:'לא נמסר — להשלמה מחוזה השכירות עם הנציג'},
+     {k:'rent_aid_now',l:'מקבלים סיוע בשכר דירה?',type:'pills',opts:[...yn,['dk','לא יודעים — נברר עם הנציג']],cond:a=>a.housing==='rent'}]}]},
  {key:'mortgage',title:'משכנתא',icon:'documents',desc:'משכנתא היא הלוואה המובטחת בנכס. מלאו את הפרטים הידועים לכם; את הנתונים המדויקים אפשר להשלים מתוך המסמכים.',cond:a=>a.housing==='own',
   secs:[{t:'פרטי המשכנתא',fields:[
      {k:'has_mortgage',l:'קיימת משכנתא על הנכס?',type:'pills',req:1,opts:yn,full:1},
-     {k:'mort_bank',l:'הבנק',type:'select',cond:a=>a.has_mortgage==='yes',req:1,opts:[['leumi','לאומי'],['poalim','הפועלים'],['mizrahi','מזרחי טפחות'],['discount','דיסקונט'],['other','אחר']]},
-     {k:'mort_balance',l:'יתרה משוערת (₪)',type:'currency',cond:a=>a.has_mortgage==='yes',req:1},
-     {k:'mort_monthly',l:'החזר חודשי (₪)',type:'currency',cond:a=>a.has_mortgage==='yes',req:1},
+     {k:'mort_bank',l:'הבנק',type:'select',cond:a=>a.has_mortgage==='yes',opts:[['leumi','לאומי'],['poalim','הפועלים'],['mizrahi','מזרחי טפחות'],['discount','דיסקונט'],['other','אחר']]},
+     {k:'mort_balance',l:'יתרה משוערת (₪)',type:'currency',cond:a=>a.has_mortgage==='yes',followUp:'לא נמסר — להשלמה מדוח המשכנתא עם הנציג'},
+     {k:'mort_monthly',l:'החזר חודשי (₪)',type:'currency',cond:a=>a.has_mortgage==='yes',followUp:'לא נמסר — להשלמה מדוח המשכנתא עם הנציג'},
      {k:'mort_date',l:'תאריך לקיחה משוער',type:'date',cond:a=>a.has_mortgage==='yes'},
      {k:'mort_refi',l:'בוצע מחזור בעבר?',type:'pills',opts:yn,cond:a=>a.has_mortgage==='yes'},
      {k:'mort_count',l:'מספר משכנתאות',type:'number',cond:a=>a.has_mortgage==='yes'}]}]},

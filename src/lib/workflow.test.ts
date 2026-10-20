@@ -53,7 +53,7 @@ describe('questionnaire missing fields',()=>{
   expect(missing).not.toContain('bank_count');expect(missing).not.toContain('w_first');expect(missing).not.toContain('mort_bank');expect(missing).not.toContain('h_work');expect(missing).toContain('h_first');
  });
  it('points conditional questions to their chapter',()=>{
-  expect(missingAnswers({housing:'own',has_mortgage:'yes'},[])).toContainEqual({key:'mort_bank',label:'משכנתא · פרטי המשכנתא: הבנק',chapter:'mortgage'});
+  expect(missingAnswers({housing:'own'},[])).toContainEqual({key:'has_mortgage',label:'משכנתא · פרטי המשכנתא: קיימת משכנתא על הנכס?',chapter:'mortgage'});
  });
  it('includes only visible required custom service fields',()=>{
   const w=workspace();w.services=[{id:'s1',key:'s1',name:'Custom',active:true,trigger_conditions:[],client_fields:[{key:'extra',label:'Extra',type:'text',required:true,show_when:{field:'h_emp',op:'equals',value:'self'}}],professional_fields:[],required_documents:[]}];

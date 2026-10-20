@@ -16,7 +16,7 @@ try{for(const [device,width,height] of [['desktop',1440,1000],['tablet',820,900]
  const chapter=page.getByRole('navigation',{name:'פרקי השאלון'});
  await chapter.getByRole('button',{name:'פרטי משפחה',exact:true}).click();
  await page.locator('[data-answer-key=marital]').selectOption('single');
- for(const [key,value] of Object.entries({city:'עיר לדוגמה',address:'רחוב הדוגמה 1',h_first:'ישראל',h_last:'לדוגמה',h_id:'000000018',h_dob:'1990-01-01',h_phone:'0500000000',h_email:'demo@example.invalid'}))await page.locator(`[data-answer-key=${key}]`).fill(value);
+ for(const [key,value] of Object.entries({h_first:'ישראל',h_last:'לדוגמה',h_id:'000000018',h_dob:'1990-01-01',h_phone:'0500000000'}))await page.locator(`[data-answer-key=${key}]`).fill(value);
  await chapter.getByRole('button',{name:'עבודה והכנסות',exact:true}).click();await page.getByRole('checkbox',{name:'לא עובד',exact:true}).check();
  await chapter.getByRole('button',{name:'מגורים',exact:true}).click();await page.locator('[data-answer-key=housing]').selectOption('family');
  await chapter.getByRole('button',{name:'ביטוחים',exact:true}).click();await page.locator('[data-answer-key=has_car]').selectOption('no');

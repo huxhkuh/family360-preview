@@ -1,0 +1,19 @@
+.questionnaire-paper .chapter-end-label{margin:22px 0 0;color:#76634f;font-size:13px;letter-spacing:.02em}
+.questionnaire-paper .chapter-actions{margin-bottom:0;border-bottom:0}
+.questionnaire-paper>.questionnaire-after{margin:0;padding:0;border:0;min-width:0}
+.questionnaire-paper .questionnaire-support-card,
+.questionnaire-paper>.resource-library{margin:32px 0 0;padding:24px 28px;background:#fffdf9;border:1px solid #dfd5c7;border-radius:18px;box-shadow:0 4px 18px #38291805}
+.questionnaire-paper .questionnaire-support-card>h2,
+.questionnaire-paper .questionnaire-support-card>h3,
+.questionnaire-paper>.resource-library>h2{font-size:22px;color:#123e32;margin:0 0 8px;line-height:1.35}
+.questionnaire-paper .questionnaire-support-card>p{margin:0 0 16px;line-height:1.6;max-width:70ch;font-size:15px}
+.questionnaire-support-card .companion-document-summary>summary{min-height:44px;align-content:center}
+.questionnaire-support-card .document-companion{margin-bottom:0}
+.questionnaire-paper .questionnaire-submit.questionnaire-support-card{margin-top:32px;padding-top:24px;border-top:1px solid #dfd5c7}
+@media(max-width:650px){
+ .questionnaire-paper .questionnaire-support-card,
+ .questionnaire-paper>.resource-library{margin-top:24px;padding:20px 16px;border-radius:15px}
+ .questionnaire-paper .questionnaire-submit.questionnaire-support-card{margin-top:24px;padding-top:20px}
+ .questionnaire-paper .questionnaire-support-card>h2,
+ .questionnaire-paper .questionnaire-support-card>h3{font-size:21px}
+}

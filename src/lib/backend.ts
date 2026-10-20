@@ -6,6 +6,7 @@ import seed from './demo-seed';
 import {questionnaireIssues} from '../families/questionnaire-validation';
 import {operationRpc} from './demo-operations';
 import {meetingRpc} from './demo-meeting';
+import {documentPreparation} from '../companion/document-preparation';
 import {workspaceSchema,type Role} from './model';
 const initial=structuredClone(seed);
 let state:any;
@@ -73,6 +74,17 @@ export async function rpc<T=unknown>(name:string,a:Record<string,any>={}):Promis
  const run=()=>{
  const operation=operationRpc(name,a,state,role);if(operation!==undefined)return operation;
  const staff=role==='admin'||role==='representative';
+ if(name==='rpc_demo_prepare_document'){
+  if(!staff&&!(role==='client'&&a.p_family_id==='f1'))throw Error('PERMISSION_DENIED');
+  const family=find('families',a.p_family_id);
+  const preparation=documentPreparation(family.answers||{}).find(p=>p.key===a.p_key);
+  if(!preparation)throw Error('VALIDATION');
+  let doc=state.documents.find(d=>d.family_id===family.id&&d.key===preparation.key);
+  if(doc&&doc.type!=='file')throw Error('VALIDATION');
+  if(!doc){doc={id:id(),family_id:family.id,name:preparation.name+' — דוגמה בלבד',key:preparation.key,type:'file',status:'missing',purpose:preparation.reason,source_hint:preparation.source,period:preparation.period};state.documents.push(doc);}
+  if(['missing','rejected'].includes(doc.status))Object.assign(doc,{status:'pending',file_name:'דוגמה מדומה — לא הועלה קובץ',reject_reason:null});
+  return doc;
+ }
  if(name==='rpc_search_families'){const q=String(a.p_query||'').trim().toLowerCase();return {items:workspace().families.filter(f=>[f.name,f.case_number,f.contact_name,f.phone,f.email].some(v=>v?.toLowerCase().includes(q))),next:null};}
  if(name==='rpc_family_activity'){if(!staff)throw Error('PERMISSION_DENIED');const items=[...state.timeline.filter(r=>r.family_id===a.p_family_id).map(r=>({key:r.id,at:r.created_at,kind:'event',title:r.title,detail:'',author:'',target:'overview'})),...state.familyContacts.filter(r=>r.family_id===a.p_family_id).map(r=>({key:r.id,at:r.occurred_at,kind:'contact',title:'קשר עם המשפחה',detail:r.summary,author:r.author_name,target:'overview'})),...[...state.familyTasks,...state.followUps].filter(r=>r.family_id===a.p_family_id).map(r=>({key:r.id,at:r.updated_at,kind:'task',title:r.title,detail:r.details,author:r.owner_name,target:'followups'}))].filter(r=>a.p_kind==='all'||r.kind===a.p_kind).sort((a,b)=>b.at.localeCompare(a.at));return {items,next:null};}
  if(name==='rpc_list_resources')return state.resources.filter(r=>a.p_manage&&role==='admin'||r.active&&r.verified_at);
