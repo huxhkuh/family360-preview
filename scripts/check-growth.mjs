@@ -9,7 +9,7 @@ try{for(const [device,width,height] of [['desktop',1440,1000],['mobile',390,844]
  const nav=()=>page.getByRole('navigation',{name:'ניווט ראשי'});
  const role=async value=>{await page.getByLabel('צפייה בתפקיד',{exact:true}).selectOption(value);};
  const noOverflow=async()=>{expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);if(width<600)expect(await page.locator('.growth-page .table-wrap').evaluateAll(elements=>elements.every(el=>el.scrollWidth<=el.clientWidth+1))).toBe(true);};
- await page.goto(base);await expect(page.getByText(/מחיר השירות:.*490/)).toBeVisible();
+ await page.goto(base+'#workspace');await expect(page.getByText(/מחיר השירות:.*490/)).toBeVisible();
  await page.getByRole('button',{name:/^05 משווק /}).click();await expect(page.getByRole('heading',{name:'ההפניות שלי',exact:true})).toBeVisible();
  await expect(nav().getByRole('button')).toHaveCount(1);await expect(page.getByText('REF-101',{exact:true})).toBeVisible();await expect(page.getByText('REF-201',{exact:true})).toHaveCount(0);await expect(page.getByText('משפחת פרידמן',{exact:true})).toHaveCount(0);
  const link=await page.getByLabel('הקישור השיווקי שלי').inputValue();expect(link).toContain('?ref=mesudarim-demo-a');await noOverflow();
@@ -20,7 +20,7 @@ try{for(const [device,width,height] of [['desktop',1440,1000],['mobile',390,844]
  await page.getByLabel('סכום בשקלים',{exact:true}).fill('19.90');await page.getByLabel('פירוט או אסמכתה שיוצגו למשווק').fill('אסמכתה לתשלום שבוצע');await page.getByRole('button',{name:'שמירת התנועה',exact:true}).click();await expect(page.getByRole('alert')).toHaveCount(0);await expect(page.getByLabel('סכום בשקלים',{exact:true})).toHaveValue('');
  await role('marketer');await expect(page.locator('tbody strong').first()).toContainText('REF-101');await expect(page.locator('.growth-kpis article').nth(3)).toContainText('30');await expect(page.getByText('אסמכתה לתשלום שבוצע',{exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'שמירת התנועה',exact:true})).toHaveCount(0);await noOverflow();await page.screenshot({path:`${out}/${device}-marketer.png`,fullPage:true});
  // Register via the actual marketing link, then inspect attribution without reloading the demo store.
- await page.goto(link);await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();await role('marketer');await expect(page.locator('.growth-kpis article').first()).toContainText('3');await noOverflow();
+ await page.goto(link+'#workspace');await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();await role('marketer');await expect(page.locator('.growth-kpis article').first()).toContainText('3');await noOverflow();
  expect(errors).toEqual([]);results.push({device,checks:'price, scoped referral portal, private-route denial, exact commission credit/payout, insufficient balance, link attribution',errors});await page.close();
 }}finally{await browser.close();}
 writeFileSync(`${out}/results.json`,JSON.stringify(results,null,2));console.log(JSON.stringify(results,null,2));

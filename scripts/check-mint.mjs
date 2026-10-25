@@ -5,7 +5,7 @@ const browser=await chromium.launch();mkdirSync('test-results/mint-after',{recur
 for(const [device,width,height] of [['desktop',1440,1000],['mobile',390,844]]){
  const page=await browser.newPage({viewport:{width,height}});page.setDefaultTimeout(10000);const errors=[],dialogs=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',async d=>{dialogs.push(d.message());await d.accept();});
  const go=async hash=>{await page.goto(base+'#/'+hash);};const nav=page.getByRole('navigation',{name:'ניווט ראשי'});
- await page.goto(base);await page.getByRole('button',{name:/^01 נציג/}).click();await go('meetings/m3');await page.getByRole('button',{name:'התחלת פגישה',exact:true}).click();
+ await page.goto(base+'#workspace');await page.getByRole('button',{name:/^01 נציג/}).click();await go('meetings/m3');await page.getByRole('button',{name:'התחלת פגישה',exact:true}).click();
  // Contact edits remain in the call, with a field-level validation message.
  const context=page.getByRole('region',{name:'הקשר המשפחה בזמן השיחה'});await context.getByRole('button',{name:'פרטי קשר',exact:true}).click();await context.getByRole('button',{name:'עריכת טלפון',exact:true}).click();await context.getByRole('button',{name:'שמירת טלפון',exact:true}).click();await expect(context.getByLabel('טלפון',{exact:true})).toHaveAttribute('aria-invalid','true');await context.getByLabel('טלפון',{exact:true}).fill('0500000000');await context.getByRole('button',{name:'שמירת טלפון',exact:true}).click();await expect(context.getByText('פרטי הקשר נשמרו בתיק. לא נשלחה הודעה.')).toBeVisible();await context.getByRole('button',{name:'קיפול פרטי התיק'}).click();
  // Unsaved decisions survive topic changes and leaving the call without a dialog.

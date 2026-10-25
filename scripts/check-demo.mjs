@@ -9,10 +9,10 @@ const results=[];
 for(const [device,width,height] of [['desktop',1440,1000],['mobile',390,844]]){
  const page=await browser.newPage({viewport:{width,height}});const errors=[],requests=[];
  page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>requests.push(r.url()));page.on('dialog',d=>d.accept());
- await page.goto(base);await page.getByRole('heading',{name:'התנסות במסודרים 360°',exact:true}).waitFor();
+ await page.goto(base+'#workspace');await page.reload();await page.getByRole('heading',{name:'התנסות במסודרים 360°',exact:true}).waitFor();
  await page.screenshot({path:`test-results/${device}-welcome.png`,fullPage:true});
  for(const [role,label] of [['representative','נציג'],['client','לקוח'],['professional','בעל מקצוע'],['admin','מנהל'],['marketer','משווק']]){
-  await page.goto(base);await page.getByRole('button',{name:new RegExp('^0[1-5] '+label+' ')}).click();
+  await page.goto(base+'#workspace');await page.reload();await page.getByRole('button',{name:new RegExp('^0[1-5] '+label+' ')}).click();
   if(role==='client')await openClientNavigation(page);
   await page.getByRole('navigation',{name:'ניווט ראשי'}).waitFor();await page.getByRole('button',{name:'רענון נתונים',exact:true}).click();
   const nav=page.getByRole('navigation',{name:'ניווט ראשי'});const names=await nav.getByRole('button').allTextContents();

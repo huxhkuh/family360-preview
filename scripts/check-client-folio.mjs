@@ -6,7 +6,7 @@ const base=process.env.DEMO_URL||'http://127.0.0.1:5250/family360-preview/';
 mkdirSync('test-results/client-folio',{recursive:true});const results=[];const browser=await chromium.launch();
 try{for(const [device,width,height] of [['desktop',1440,1000],['tablet',820,900],['mobile',390,844],['narrow',320,740]]){
  const page=await browser.newPage({viewport:{width,height},reducedMotion:'reduce'});const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
- await page.goto(base);await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();await page.evaluate(()=>document.fonts.ready);
+ await page.goto(base+'#workspace');await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();await page.evaluate(()=>document.fonts.ready);
  const nav=page.getByRole('navigation',{name:'ניווט ראשי'});const entry=nav.getByRole('button',{name:'שאלון',exact:true});await expect(entry).toBeVisible();
  const startTop=await page.getByRole('button',{name:'התחלת השאלון',exact:true}).evaluate(el=>el.getBoundingClientRect().top+scrollY);
  if(device==='mobile')expect(startTop).toBeLessThan(height);

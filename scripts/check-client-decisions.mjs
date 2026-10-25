@@ -10,7 +10,7 @@ try{for(const width of [1440,390,320]){
  const chapter=title=>page.getByRole('navigation',{name:'פרקי השאלון'}).getByRole('button',{name:title,exact:true}).click();
  const route=async hash=>{await page.evaluate(h=>{location.hash=h},hash);};
  const save=async()=>{await page.getByRole('button',{name:'שמירת טיוטה',exact:true}).click();await expect(page.getByText('הטיוטה נשמרה. אפשר להמשיך בין המסכים; רענון הדמו מאפס את הנתונים.',{exact:true})).toBeVisible();};
- await page.goto(base);await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();await page.getByRole('button',{name:'התחלת השאלון',exact:true}).click();
+ await page.goto(base+'#workspace');await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();await page.getByRole('button',{name:'התחלת השאלון',exact:true}).click();
  await expect(field('h_phone')).toHaveValue('0500000000');
  await field('marital').selectOption('married');
  for(const[k,v]of Object.entries({h_first:'ישראל',h_last:'דוגמה',h_id:'000000018',h_dob:'1990-01-01',h_phone:'0520000000',h_email:'demo@example.invalid',w_first:'דוגמה',w_id:'000000026',w_dob:'1992-01-01'}))await field(k).fill(v);

@@ -6,7 +6,7 @@ const browser=await chromium.launch();const results=[];
 try{for(const [device,width,height] of [['desktop',1440,1000],['tablet',820,900],['mobile',390,844],['narrow',320,800]]){
  const page=await browser.newPage({viewport:{width,height},reducedMotion:'reduce'});page.setDefaultTimeout(10000);const errors=[],external=[];
  page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());page.on('request',r=>{if(!r.url().startsWith(base)&&!r.url().startsWith('data:'))external.push(r.url());});
- await page.goto(base);await page.locator('.demo-roles button').filter({has:page.locator('strong', {hasText:'לקוח'})}).click();
+ await page.goto(base+'#workspace');await page.locator('.demo-roles button').filter({has:page.locator('strong', {hasText:'לקוח'})}).click();
  await expect(page.getByRole('heading',{name:'מה נדרש ממני · 2',exact:true})).toBeVisible();
  const mine=page.locator('.client-priorities'),care=page.locator('.client-care');
  await expect(mine).toContainText('להעלות דוח חיסכון עדכני');await expect(mine).not.toContainText('לתאם שיחת מעקב');await expect(care).toContainText('לתאם שיחת מעקב');
@@ -26,7 +26,7 @@ try{for(const [device,width,height] of [['desktop',1440,1000],['tablet',820,900]
  await page.getByRole('navigation',{name:'סינון משימות המשך'}).getByRole('button',{name:'הכול',exact:true}).click();await followup.getByRole('button',{name:'פתיחה מחדש',exact:true}).click();await followup.getByRole('button',{name:/עדכון אחראי או מועד/}).click();await followup.getByRole('button',{name:'שמירת אחראי ומועד',exact:true}).click();await expect(followup.getByRole('link',{name:/פתיחת המסמך/})).toBeVisible();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1)).toBe(false);
  // Start a fresh synthetic intake in a new page: validate drafts and nested errors.
- const fresh=await browser.newPage({viewport:{width,height}});fresh.on('pageerror',e=>errors.push(e.message));await fresh.goto(base);await fresh.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();await fresh.getByRole('button',{name:'התחלת השאלון',exact:true}).click();
+ const fresh=await browser.newPage({viewport:{width,height}});fresh.on('pageerror',e=>errors.push(e.message));await fresh.goto(base+'#workspace');await fresh.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();await fresh.getByRole('button',{name:'התחלת השאלון',exact:true}).click();
  const chapters=fresh.getByRole('navigation',{name:'פרקי השאלון'});
  await fresh.locator('[data-answer-key=marital]').selectOption('single');
  for(const [key,value] of Object.entries({city:'עיר לדוגמה',address:'רחוב הדוגמה 1',h_first:'ישראל',h_last:'לדוגמה',h_id:'abc',h_dob:'1990-01-01',h_phone:'0500000000',h_email:'not-an-email'}))await fresh.locator(`[data-answer-key=${key}]`).fill(value);

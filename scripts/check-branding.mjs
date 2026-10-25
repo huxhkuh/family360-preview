@@ -47,7 +47,7 @@ try{
   const errors=[],external=[];page.on('pageerror',e=>errors.push(e.message));
   page.on('request',r=>{if(!r.url().startsWith(base)&&!r.url().startsWith('data:'))external.push(r.url());});
   await page.addInitScript(()=>localStorage.setItem('mesudarim360:brand:stacked','4'));
-  await page.goto(base+'?brandlab=1&brand=1');
+  await page.goto(base+'?brandlab=1&brand=1#workspace');
   await expect(page.locator('#brand-lab,.brand-controls')).toHaveCount(0);
   await expect(page.getByLabel('חלופת לוגו',{exact:true})).toHaveCount(0);
   await expect(page.getByRole('button',{name:'חמש חלופות למיתוג',exact:true})).toHaveCount(0);
@@ -84,7 +84,7 @@ try{
  }
  const blocked=await browser.newPage();
  await blocked.addInitScript(()=>{Object.defineProperty(Storage.prototype,'getItem',{value(){throw new Error('Storage unavailable');}});Object.defineProperty(Storage.prototype,'setItem',{value(){throw new Error('Storage unavailable');}});});
- await blocked.goto(base+'?brand=999&brandlab=1');
+ await blocked.goto(base+'?brand=999&brandlab=1#workspace');
  await expect(blocked.locator('.welcome-logo')).toHaveAttribute('src',/concept-5-light.svg$/);
  await expect(blocked.locator('#brand-lab,.brand-controls')).toHaveCount(0);await blocked.close();
  results.push({storageBlocked:true,approvedBrandFixed:true,passed:true});

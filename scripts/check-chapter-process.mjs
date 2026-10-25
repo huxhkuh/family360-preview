@@ -6,7 +6,7 @@ const base=process.env.DEMO_URL||'http://127.0.0.1:5250/family360-preview/';
 mkdirSync('test-results/chapter-process',{recursive:true});const browser=await chromium.launch();const results=[];
 try{for(const [device,width,height] of [['desktop',1440,1000],['tablet',820,900],['mobile',390,844],['narrow',320,740]]){
  const page=await browser.newPage({viewport:{width,height},reducedMotion:'reduce'});page.setDefaultTimeout(10000);const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
- await page.goto(base);await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();await page.getByRole('button',{name:'התחלת השאלון',exact:true}).click();
+ await page.goto(base+'#workspace');await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();await page.getByRole('button',{name:'התחלת השאלון',exact:true}).click();
  const nav=page.getByRole('navigation',{name:'פרקי השאלון'});const heading=page.locator('.chapter-heading');const select=async name=>{await nav.getByRole('button',{name,exact:true}).click();await expect(heading).toBeFocused();};
  await expect(nav.locator('button')).toHaveCount(8);await expect(page.locator('.questionnaire-context')).not.toHaveAttribute('open','');
  expect(await nav.locator('li').first().evaluate(el=>getComputedStyle(el,'::before').height)).toBe('2px');

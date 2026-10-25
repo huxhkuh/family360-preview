@@ -5,7 +5,7 @@ const browser=await chromium.launch();const results=[];
 try{for(const [device,width,height] of [['desktop',1440,900],['tablet',820,900],['mobile',390,844]]){
  console.log('Checking '+device);const page=await browser.newPage({viewport:{width,height}});page.setDefaultTimeout(10000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
  const go=async path=>page.goto(base+'#/'+path);const nav=page.getByRole('navigation',{name:'ניווט ראשי'});
- await page.goto(base);await page.getByRole('button',{name:/^01 נציג/}).click();
+ await page.goto(base+'#workspace');await page.getByRole('button',{name:/^01 נציג/}).click();
  // Consecutive creates must use distinct IDs, and edits must retain task status.
  await go('families/f1/followups');const tasks=page.getByRole('region',{name:'פעולות בתיק המשפחה',exact:true});
  for(const title of ['פעולה חדשה ראשונה','פעולה חדשה שנייה']){

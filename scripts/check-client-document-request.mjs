@@ -3,7 +3,7 @@ const base=process.env.DEMO_URL||'http://127.0.0.1:5250/family360-preview/';
 const browser=await chromium.launch();
 try{
  const page=await browser.newPage({viewport:{width:1440,height:1000}});page.setDefaultTimeout(10000);const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
- await page.goto(base);await page.locator('.demo-roles button').filter({has:page.locator('strong',{hasText:'נציג'})}).click();await page.goto(base+'#/families/f1/documents');
+ await page.goto(base+'#workspace');await page.locator('.demo-roles button').filter({has:page.locator('strong',{hasText:'נציג'})}).click();await page.goto(base+'#/families/f1/documents');
  const request=page.locator('section.card').filter({has:page.getByRole('heading',{name:'בקשת מסמך',exact:true})});
  await request.getByLabel('סוג מסמך',{exact:true}).selectOption('dt1');
  for(const [label,value] of [['למה המסמך נדרש?','לבדיקת הנתונים בשיחה הבאה'],['עבור מי?','בעל החיסכון לדוגמה'],['לאיזו תקופה?','השנה האחרונה'],['איפה אפשר למצוא אותו?','באזור האישי של הגוף המנהל']])await request.getByLabel(label,{exact:true}).fill(value);

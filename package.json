@@ -28,7 +28,8 @@
     "test:final-report": "node scripts/check-final-report.mjs",
     "test:representative": "node scripts/check-representative.mjs",
     "test:homepage": "node scripts/check-homepage.mjs",
-    "test:completed-example": "node scripts/check-completed-example.mjs"
+    "test:completed-example": "node scripts/check-completed-example.mjs",
+    "test:customer-journey": "node scripts/check-customer-journey.mjs"
   },
   "dependencies": {
     "@fontsource-variable/assistant": "5.3.0",

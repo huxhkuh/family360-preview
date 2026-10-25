@@ -11,7 +11,7 @@ try{for(const width of [1440,390,320]){
  const nav=page.getByRole('navigation',{name:'פרקי השאלון'});
  const chapter=title=>nav.getByRole('button',{name:title,exact:true}).click();
  const mainNav=page.getByRole('navigation',{name:'ניווט ראשי'});
- await page.goto(base);await expect(page.getByRole('heading',{name:'התנסות במסודרים 360°'})).toBeVisible();
+ await page.goto(base+'#workspace');await expect(page.getByRole('heading',{name:'התנסות במסודרים 360°'})).toBeVisible();
  await page.screenshot({path:`${out}/${width}-entry.png`,fullPage:true});
  await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();
  await expect(page.locator('.intake-caption')).toContainText('בדמו מתחילים בשאלון');

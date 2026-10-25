@@ -6,7 +6,7 @@ const browser=await chromium.launch();const results=[];
 try{for(const [device,width,height] of [['desktop',1440,1000],['tablet',820,900],['mobile',390,844]]){
  const page=await browser.newPage({viewport:{width,height}});const errors=[],external=[];
  page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());page.on('request',r=>{if(!r.url().startsWith(base)&&!r.url().startsWith('data:'))external.push(r.url());});
- await page.goto(base);await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();
+ await page.goto(base+'#workspace');await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();
  const journey=page.getByRole('region',{name:'המסלול שלכם, צעד אחר צעד'});
  await expect(journey.getByRole('list',{name:'שלבי התהליך'}).getByRole('listitem')).toHaveCount(4);await expect(journey.getByRole('heading',{name:'השאלון המשפחתי',exact:true})).toBeVisible();
  await journey.getByText('מה לגבי התשלום בדמו?',{exact:true}).click();await expect(journey).toContainText('אין כאן חיוב או אישור תשלום');

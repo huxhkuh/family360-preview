@@ -8,7 +8,7 @@ const browser=await chromium.launch(),results=[];
 try{for(const [device,width,height] of [['desktop',1440,1000],['mobile',390,844],['narrow',320,740]]){
  const page=await browser.newPage({viewport:{width,height},reducedMotion:'reduce'});
  const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
- await page.goto(base);
+ await page.goto(base+'#workspace');
  await expect.poll(()=>page.locator('.companion-entry img').evaluate(i=>i.complete&&i.naturalWidth>0)).toBe(true);
  await page.screenshot({path:`${out}/${device}-welcome.png`,fullPage:true});
  await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();

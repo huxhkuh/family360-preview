@@ -58,6 +58,7 @@ jobs:
           npm run test:final-report
           npm run test:representative
           npm run test:completed-example
+          npm run test:customer-journey
       - uses: actions/upload-pages-artifact@v4
         with:
           path: dist

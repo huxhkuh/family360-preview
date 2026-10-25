@@ -9,7 +9,7 @@ try{for(const width of [1440,390,320]){
  page.on('dialog',dialog=>dialog.accept());
  const field=key=>page.locator(`[data-answer-key="${key}"]`);const nav=page.getByRole('navigation',{name:'פרקי השאלון'});
  const next=page.getByRole('button',{name:/^שמירה והמשך/});
- await page.goto(base);await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();await page.getByRole('button',{name:'התחלת השאלון',exact:true}).click();
+ await page.goto(base+'#workspace');await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();await page.getByRole('button',{name:'התחלת השאלון',exact:true}).click();
  await expect(field('h_email')).toHaveAttribute('aria-required','true');
  await field('marital').selectOption('single');await field('h_first').fill('ישראל');await field('h_last').fill('לדוגמה');await field('h_dob').fill('1990-01-01');
  await field('h_phone').fill('123');await field('h_id').fill('000000019');await next.click();
@@ -37,6 +37,6 @@ try{for(const width of [1440,390,320]){
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);expect(errors).toEqual([]);expect(external).toEqual([]);
  results.push({width,passed:true,checks:['required contact and identity checks','bad checksum blocked','forward navigation blocked','official city and street suggestions','help opens without layout movement','keyboard dismissal','recorded sample consent visible to representative','meeting preparation explained','no external requests or JS errors']});await page.close();
 }
- const fallback=await browser.newPage();await fallback.route('**/data/address-catalog.json',route=>route.abort());await fallback.goto(base);await fallback.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();await fallback.getByRole('button',{name:'התחלת השאלון',exact:true}).click();await expect(fallback.getByText('רשימת ההצעות אינה זמינה כרגע. אפשר להקליד את הכתובת כרגיל.').first()).toBeVisible();await fallback.locator('[data-answer-key=city]').fill('יישוב בהקלדה ידנית');await expect(fallback.locator('[data-answer-key=city]')).toHaveValue('יישוב בהקלדה ידנית');await fallback.close();
+ const fallback=await browser.newPage();await fallback.route('**/data/address-catalog.json',route=>route.abort());await fallback.goto(base+'#workspace');await fallback.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();await fallback.getByRole('button',{name:'התחלת השאלון',exact:true}).click();await expect(fallback.getByText('רשימת ההצעות אינה זמינה כרגע. אפשר להקליד את הכתובת כרגיל.').first()).toBeVisible();await fallback.locator('[data-answer-key=city]').fill('יישוב בהקלדה ידנית');await expect(fallback.locator('[data-answer-key=city]')).toHaveValue('יישוב בהקלדה ידנית');await fallback.close();
 }finally{await browser.close();}
 writeFileSync(out+'/qa.json',JSON.stringify(results,null,2));console.log(JSON.stringify(results,null,2));

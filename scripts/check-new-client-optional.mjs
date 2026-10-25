@@ -8,7 +8,7 @@ try{for(const width of [1440,390,320]){
  const errors=[],requests=[],chapters=[];page.on('dialog',d=>d.accept());page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.status()>=400)requests.push(r.url()+':'+r.status())});
  const field=k=>page.locator(`[data-answer-key="${k}"]`);
  const next=async()=>{chapters.push(await page.locator('.chapter-heading h3').innerText());expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);await page.getByRole('button',{name:/^שמירה והמשך/}).click();};
- await page.goto(base);await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();
+ await page.goto(base+'#workspace');await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();
  await page.screenshot({path:`${out}/${width}-home.png`});await page.getByRole('button',{name:'התחלת השאלון',exact:true}).click();
  await field('marital').selectOption('single');await field('h_first').fill('ישראל');await field('h_last').fill('בדיקת דמו');await field('h_id').fill('000000018');await field('h_email').fill('demo@example.invalid');
  // Use the visible calendar, including a real month/year selection, rather than just programmatic date filling.

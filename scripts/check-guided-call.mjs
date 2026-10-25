@@ -12,7 +12,7 @@ try{for(const [device,width,height] of [['desktop',1440,1000],['mobile',390,844]
  page.on('pageerror',error=>errors.push(error.message));
  page.on('dialog',async dialog=>{dialogs.push(dialog.message());await dialog.accept();});
  const noOverflow=async()=>expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
- await page.goto(base);
+ await page.goto(base+'#workspace');
  await page.getByRole('button',{name:/^01 נציג/}).click();
  await page.goto(base+'#/meetings/m3?family=f3');
  const steps=page.getByRole('navigation',{name:'שלבי השיחה'});
