@@ -15,7 +15,7 @@ export function WelcomePage({onSystem}:{onSystem:()=>void}){
  useEffect(()=>{if(showNext)closeRef.current?.focus();},[showNext]);
  function close(){setShowNext(false);requestAnimationFrame(()=>triggerRef.current?.focus());}
  function begin(e:MouseEvent<HTMLButtonElement>){triggerRef.current=e.currentTarget;setShowNext(true);}
- return <div className="welcome-page">
+ return <div className="welcome-page" onClick={e=>{const anchor=(e.target as HTMLElement).closest('a[href^="#"]');if(!anchor)return;const id=anchor.getAttribute('href')?.slice(1);const target=id==='welcome'?e.currentTarget:document.getElementById(id||'');if(target){e.preventDefault();target.scrollIntoView({block:'start',behavior:'auto'});}}}>
   <a className="welcome-skip" href="#welcome-main">דילוג לתוכן</a>
   <header className="welcome-nav"><a href="#welcome" className="welcome-brand" aria-label="מסודרים 360, ראש הדף"><img className="landing-brand-image" src={WELCOME_ART.logo} alt="מסודרים 360 — עושים לך סדר בכסף"/></a><nav aria-label="ניווט בדף הבית"><a href="#welcome-how">איך זה עובד?</a><a href="#welcome-price">כמה זה עולה?</a><button onClick={onSystem}>כניסה לדמו המערכת <span aria-hidden="true">↗</span></button></nav></header>
   <main id="welcome-main">

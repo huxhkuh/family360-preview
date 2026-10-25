@@ -31,6 +31,8 @@ try{
   const before=await nav.evaluate(el=>({color:getComputedStyle(el).color,font:getComputedStyle(el).fontSize}));
   await page.getByRole('button',{name:'דף הבית',exact:true}).click();
   await page.getByRole('heading',{name:'את הצעד הראשון כבר עשיתם.',exact:true}).waitFor();
+  await page.getByRole('link',{name:'בואו נראה איך זה עובד'}).click();
+  assert.equal(new URL(page.url()).hash,'#welcome');
   await page.getByRole('button',{name:'דמו המערכת',exact:true}).click();
   await nav.waitFor();
   assert.equal(new URL(page.url()).hash,route);
