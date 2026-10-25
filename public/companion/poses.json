@@ -1,82 +1,82 @@
 {
   "welcome": {
-    "width": 250,
-    "height": 458,
+    "width": 255,
+    "height": 465,
     "source_cell": [
-      183,
-      11,
-      409,
-      445
+      180,
+      7,
+      411,
+      448
     ]
   },
   "explain": {
-    "width": 326,
-    "height": 452,
+    "width": 331,
+    "height": 461,
     "source_cell": [
-      586,
-      16,
-      888,
-      444
+      583,
+      11,
+      890,
+      448
     ]
   },
   "pause": {
-    "width": 249,
-    "height": 459,
+    "width": 252,
+    "height": 464,
     "source_cell": [
-      979,
-      11,
-      1204,
-      446
+      978,
+      8,
+      1206,
+      448
     ]
   },
   "document": {
-    "width": 250,
-    "height": 456,
+    "width": 254,
+    "height": 463,
     "source_cell": [
-      1422,
-      13,
-      1648,
-      445
+      1420,
+      9,
+      1650,
+      448
     ]
   },
   "later": {
-    "width": 264,
-    "height": 453,
+    "width": 272,
+    "height": 459,
     "source_cell": [
-      160,
-      448,
-      400,
-      877
+      157,
+      446,
+      405,
+      881
     ]
   },
   "success": {
-    "width": 241,
-    "height": 456,
+    "width": 245,
+    "height": 462,
     "source_cell": [
-      564,
-      447,
-      781,
-      879
+      563,
+      443,
+      784,
+      881
     ]
   },
   "review": {
-    "width": 264,
-    "height": 453,
+    "width": 267,
+    "height": 459,
     "source_cell": [
-      974,
-      448,
-      1214,
-      877
+      973,
+      446,
+      1216,
+      881
     ]
   },
   "complete": {
-    "width": 366,
-    "height": 455,
+    "width": 376,
+    "height": 460,
     "source_cell": [
-      1398,
-      448,
-      1740,
-      879
+      1397,
+      445,
+      1749,
+      881
     ]
   }
 }
