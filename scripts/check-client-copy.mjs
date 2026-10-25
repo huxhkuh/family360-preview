@@ -14,7 +14,7 @@ try{for(const width of [1440,390,320]){
  await page.goto(base+'#workspace');await expect(page.getByRole('heading',{name:'התנסות במסודרים 360°'})).toBeVisible();
  await page.screenshot({path:`${out}/${width}-entry.png`,fullPage:true});
  await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();
- await expect(page.locator('.intake-caption')).toContainText('בדמו מתחילים בשאלון');
+ await expect(page.locator('.intake-caption')).toContainText('מכירים אתכם, פרק בכל פעם');
  await page.screenshot({path:`${out}/${width}-home.png`,fullPage:true});
  await page.getByRole('button',{name:'התחלת השאלון',exact:true}).click();
  await expect(page.locator('.questionnaire-status')).toContainText('עדיין לא מילאתם');
