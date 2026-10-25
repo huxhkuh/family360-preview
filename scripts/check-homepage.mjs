@@ -1,0 +1,72 @@
+import {chromium} from '@playwright/test';
+import assert from 'node:assert/strict';
+import {mkdirSync} from 'node:fs';
+const base=process.env.DEMO_URL||'http://127.0.0.1:5263/family360-preview/';
+mkdirSync('test-results',{recursive:true});
+const browser=await chromium.launch({headless:true});
+try{
+ for(const width of [1440,390]){
+  const page=await browser.newPage({viewport:{width,height:1000}}),errors=[];
+  page.on('pageerror',e=>errors.push(e.message));
+  page.on('dialog',dialog=>dialog.accept());
+  await page.goto(base+'#welcome');
+  await page.getByRole('heading',{name:'את הצעד הראשון כבר עשיתם.',exact:true}).waitFor();
+  for(const image of await page.locator('.welcome-page img').all())await image.evaluate(img=>img.decode());
+  assert.equal(await page.locator('.welcome-page .landing-brand-image').count(),2);
+  assert.equal(await page.locator('.welcome-art img').count(),3);
+  assert.equal(await page.locator('.welcome-intro').evaluate(el=>getComputedStyle(el).fontSize),'40px');
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+  await page.screenshot({path:`test-results/homepage-${width}.png`,fullPage:true});
+  await page.getByRole('button',{name:'נשמע מתאים? בואו נמשיך'}).click();
+  await page.getByRole('dialog').waitFor();await page.keyboard.press('Escape');
+  assert.equal(await page.getByRole('dialog').count(),0);
+  await page.getByRole('button',{name:'דמו המערכת',exact:true}).click();
+  await page.getByRole('heading',{name:'התנסות במסודרים 360°',exact:true}).waitFor();
+  assert.equal(await page.locator('.demo-roles>button').count(),5);
+  await page.getByRole('button',{name:'פתיחת תיק מלא ודוח לדוגמה',exact:true}).waitFor();
+  await page.getByRole('button',{name:/^01 נציג /}).click();
+  const nav=page.getByRole('navigation',{name:'ניווט ראשי'});
+  await nav.waitFor();
+  await page.getByRole('heading',{name:'יום העבודה שלי',exact:true}).waitFor();
+  assert.equal(await page.locator('.representative-shell').count(),1);
+  await nav.getByRole('button',{name:'משפחות',exact:true}).click();
+  await page.getByLabel('חיפוש משפחה',{exact:true}).fill('פרידמן');
+  await page.waitForURL(/q=/);
+  const route=new URL(page.url()).hash;
+  const before=await nav.evaluate(el=>({color:getComputedStyle(el).color,font:getComputedStyle(el).fontSize}));
+  await page.getByRole('button',{name:'דף הבית',exact:true}).click();
+  await page.getByRole('heading',{name:'את הצעד הראשון כבר עשיתם.',exact:true}).waitFor();
+  await page.getByRole('link',{name:'בואו נראה איך זה עובד'}).click();
+  assert.equal(new URL(page.url()).hash,'#welcome');
+  await page.getByRole('button',{name:'דמו המערכת',exact:true}).click();
+  await nav.waitFor();
+  assert.equal(new URL(page.url()).hash,route);
+  assert.equal(await page.getByLabel('חיפוש משפחה',{exact:true}).inputValue(),'פרידמן');
+  assert.deepEqual(await nav.evaluate(el=>({color:getComputedStyle(el).color,font:getComputedStyle(el).fontSize})),before);
+  await page.screenshot({path:`test-results/system-preserved-${width}.png`,fullPage:true});
+  for(const role of ['client','professional','admin','marketer']){
+   await page.getByLabel('צפייה בתפקיד',{exact:true}).selectOption(role);
+   await page.getByRole('navigation',{name:'ניווט ראשי'}).waitFor();
+   if(role==='marketer')await page.getByRole('heading',{name:'ההפניות שלי',exact:true}).waitFor();
+   const currentRoute=new URL(page.url()).hash;
+   const shellClass=await page.locator('.app-shell').getAttribute('class');
+   await page.getByRole('button',{name:'דף הבית',exact:true}).click();
+   await page.getByRole('link',{name:'בואו נראה איך זה עובד'}).click();
+   assert.equal(new URL(page.url()).hash,'#welcome');
+   await page.getByRole('button',{name:'דמו המערכת',exact:true}).click();
+   assert.equal(await page.getByLabel('צפייה בתפקיד',{exact:true}).inputValue(),role);
+   assert.equal(new URL(page.url()).hash,currentRoute);
+   assert.equal(await page.locator('.app-shell').getAttribute('class'),shellClass);
+   if(role==='marketer')await page.screenshot({path:`test-results/homepage-marketer-${width}.png`,fullPage:true});
+  }
+  await page.goto(base);
+  await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();
+  await page.getByRole('button',{name:'התחלת השאלון',exact:true}).click();
+  await page.locator('[data-answer-key=city]').fill('טיוטה שנשמרת במעבר לדף הבית');
+  await page.getByRole('button',{name:'דף הבית',exact:true}).click();
+  await page.getByRole('button',{name:'דמו המערכת',exact:true}).click();
+  assert.equal(await page.locator('[data-answer-key=city]').inputValue(),'טיוטה שנשמרת במעבר לדף הבית');
+  assert.deepEqual(errors,[]);await page.close();
+ }
+ console.log('PASS: homepage, logo, 2x type, five roles including marketer, current representative design, route/search/draft retention on return, desktop/mobile.');
+}finally{await browser.close();}

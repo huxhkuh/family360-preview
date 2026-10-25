@@ -26,7 +26,9 @@
     "test:yitzchak-feedback": "node scripts/check-yitzchak-feedback.mjs",
     "test:growth": "node scripts/check-growth.mjs",
     "test:final-report": "node scripts/check-final-report.mjs",
-    "test:representative": "node scripts/check-representative.mjs"
+    "test:representative": "node scripts/check-representative.mjs",
+    "test:homepage": "node scripts/check-homepage.mjs",
+    "test:completed-example": "node scripts/check-completed-example.mjs"
   },
   "dependencies": {
     "@fontsource-variable/assistant": "5.3.0",

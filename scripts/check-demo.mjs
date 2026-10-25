@@ -11,8 +11,8 @@ for(const [device,width,height] of [['desktop',1440,1000],['mobile',390,844]]){
  page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>requests.push(r.url()));page.on('dialog',d=>d.accept());
  await page.goto(base);await page.getByRole('heading',{name:'התנסות במסודרים 360°',exact:true}).waitFor();
  await page.screenshot({path:`test-results/${device}-welcome.png`,fullPage:true});
- for(const [role,label] of [['representative','נציג'],['client','לקוח'],['professional','בעל מקצוע'],['admin','מנהל']]){
-  await page.goto(base);await page.getByRole('button',{name:new RegExp('^0[1-4] '+label+' ')}).click();
+ for(const [role,label] of [['representative','נציג'],['client','לקוח'],['professional','בעל מקצוע'],['admin','מנהל'],['marketer','משווק']]){
+  await page.goto(base);await page.getByRole('button',{name:new RegExp('^0[1-5] '+label+' ')}).click();
   if(role==='client')await openClientNavigation(page);
   await page.getByRole('navigation',{name:'ניווט ראשי'}).waitFor();await page.getByRole('button',{name:'רענון נתונים',exact:true}).click();
   const nav=page.getByRole('navigation',{name:'ניווט ראשי'});const names=await nav.getByRole('button').allTextContents();
@@ -29,6 +29,6 @@ for(const [device,width,height] of [['desktop',1440,1000],['mobile',390,844]]){
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,role+' horizontal overflow');
  }
  assert.deepEqual(errors,[]);assert.deepEqual(requests.filter(url=>!url.startsWith(base)&&!url.startsWith('data:')),[]);
- results.push({device,roles:4,consoleErrors:errors.length,externalRequests:0,checks:'navigation, search, contact, task save/complete, professional offer, no horizontal overflow'});await page.close();
+ results.push({device,roles:5,consoleErrors:errors.length,externalRequests:0,checks:'navigation, search, contact, task save/complete, professional offer, marketer portal, no horizontal overflow'});await page.close();
 }
 await browser.close();writeFileSync('test-results/qa.json',JSON.stringify(results,null,2));console.log(JSON.stringify(results,null,2));
