@@ -26,8 +26,8 @@ export function questionnaireIssues(answers:Answers,services:Service[],today=new
   if(field.type==='approx-date'&&!validApproxDate(text,today))add('אפשר להזין שנה (2018), חודש ושנה (2018-06) או תאריך מלא בעבר.');
   if(field.opts){const selected=Array.isArray(value)?value:[value];if(selected.length>1&&selected.some(v=>field.exclusive?.includes(v)))add('אין לשלב ״אין״ או ״לא יודעים״ עם תשובות אחרות.');if(selected.some(v=>!field.opts!.some(([key])=>key===v)))add('יש לבחור אפשרות מהרשימה.');return;}
   if(field.type==='email'&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text))add('יש להזין כתובת דוא״ל תקינה, למשל name@example.com.');
-  if(field.type==='id'&&!/^\d{9}$/.test(text))add('יש להזין 9 ספרות, כולל אפסים בתחילת המספר אם יש.');
-  if(field.type==='tel'&&!/^\+?\d{7,15}$/.test(text.replace(/[\s()-]/g,'')))add('יש להזין מספר טלפון תקין, כולל קידומת.');
+  if(field.type==='id'&&!validIdentityNumber(text))add('יש להזין מספר תעודת זהות תקין בן 9 ספרות, כולל ספרת הביקורת.');
+  if(field.type==='tel'&&!validPhoneNumber(text))add('יש להזין מספר טלפון תקין, כולל קידומת, למשל 0500000000.');
   if(['number','currency'].includes(field.type||'')&&(!Number.isFinite(Number(value))||Number(value)<0))add('יש להזין מספר שאינו שלילי.');
   if(field.type==='date'){
    const date=new Date(text+'T00:00:00Z');
@@ -41,4 +41,13 @@ export function questionnaireIssues(answers:Answers,services:Service[],today=new
  }));
  services.filter(s=>s.active&&s.trigger_conditions.every(r=>conditionMatches(answers,r))).forEach(s=>s.client_fields.filter(f=>!f.show_when||conditionMatches(answers,f.show_when)).forEach(f=>check({k:f.key,l:s.name+' · '+f.label,type:f.type,req:f.required?1:0,opts:f.options?.map(x=>[x,x])},answers,'custom')));
  return issues;
+}
+
+export function validIdentityNumber(value:string){
+ if(!/^\d{9}$/.test(value)||/^0+$/.test(value))return false;
+ return [...value].reduce((sum,digit,index)=>{const n=Number(digit)*(index%2+1);return sum+(n>9?n-9:n);},0)%10===0;
+}
+export function validPhoneNumber(value:string){
+ const phone=value.replace(/[\s()-]/g,'');
+ return /^0(?:[23489]\d{7}|[57]\d{8})$/.test(phone)||/^\+[1-9]\d{6,14}$/.test(phone);
 }

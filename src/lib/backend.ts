@@ -8,6 +8,7 @@ import {questionnaireIssues} from '../families/questionnaire-validation';
 import {operationRpc} from './demo-operations';
 import {meetingRpc} from './demo-meeting';
 import {documentPreparation} from '../companion/document-preparation';
+import {clearinghouseConsent} from '../families/clearinghouse-consent';
 import {workspaceSchema,type Role} from './model';
 const initial=structuredClone(seed);
 let state:any;
@@ -75,6 +76,16 @@ export async function rpc<T=unknown>(name:string,a:Record<string,any>={}):Promis
  const run=()=>{
  const operation=operationRpc(name,a,state,role);if(operation!==undefined)return operation;
  const staff=role==='admin'||role==='representative';
+ if(name==='rpc_sign_document'){
+  const doc=find('documents',a.p_document_id);
+  if(role!=='client'||doc.family_id!=='f1')throw Error('PERMISSION_DENIED');
+  if(doc.type!=='signature'||!/^clearinghouse_auth_[hw]$/.test(doc.key)||doc.status==='signed')throw Error('INVALID_STATE');
+  const signer=String(a.p_signer||'').trim();
+  if(a.p_consent!==true||signer.length<2||signer.length>150||a.p_version!==clearinghouseConsent.version||a.p_text!==clearinghouseConsent.text)throw Error('VALIDATION');
+  doc.consent={...clearinghouseConsent,signer,signed_at:now()};doc.status='signed';
+  state.timeline.push({id:id(),family_id:doc.family_id,title:'תועדה חתימה לדוגמה על הרשאה למסלקה',created_at:doc.consent.signed_at});
+  return doc;
+ }
  if(name==='rpc_review_questionnaire_topic'){
   if(!staff)throw Error('PERMISSION_DENIED');
   const f=find('families',a.p_family_id);

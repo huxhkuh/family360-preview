@@ -10,7 +10,7 @@ try{for(const width of [1440,390,320]){
  const next=async()=>{chapters.push(await page.locator('.chapter-heading h3').innerText());expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);await page.getByRole('button',{name:/^שמירה והמשך/}).click();};
  await page.goto(base);await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();
  await page.screenshot({path:`${out}/${width}-home.png`});await page.getByRole('button',{name:'התחלת השאלון',exact:true}).click();
- await field('marital').selectOption('single');await field('h_first').fill('ישראל');await field('h_last').fill('בדיקת דמו');await field('h_id').fill('000000018');
+ await field('marital').selectOption('single');await field('h_first').fill('ישראל');await field('h_last').fill('בדיקת דמו');await field('h_id').fill('000000018');await field('h_email').fill('demo@example.invalid');
  // Use the visible calendar, including a real month/year selection, rather than just programmatic date filling.
  await page.getByRole('button',{name:'פתיחת לוח שנה: תאריך לידה',exact:true}).click();
  const calendar=page.getByRole('dialog',{name:'בחירת תאריך: תאריך לידה',exact:true});await calendar.getByRole('combobox',{name:'שנה',exact:true}).selectOption('1990');await calendar.getByRole('combobox',{name:'חודש',exact:true}).selectOption('0');await calendar.getByRole('button',{name:'1 בינואר 1990',exact:true}).click();await expect(field('h_dob')).toHaveValue('1990-01-01');
@@ -29,7 +29,7 @@ try{for(const width of [1440,390,320]){
  await page.getByRole('button',{name:'כל המסמכים',exact:true}).click();const prep=page.locator('.document-preparation-more');await expect(prep).not.toHaveAttribute('open');await prep.locator(':scope > summary').click();
  // A deliberately deferred signature must stay optional and must not become an orange "missing" obligation.
  await prep.locator('[data-preparation-key=clearinghouse_auth_h]').getByRole('button',{name:'הוספת הרשאה להשלמה עם הנציג',exact:true}).click();
- await expect(page.locator('article.document .badge')).toHaveText('לבירור עם הנציג');await expect(page.locator('.client-completion')).toBeVisible();await expect(page.locator('article.document')).toContainText('טרם הוגדר נוסח הסכמה');
+ await expect(page.locator('article.document .badge')).toHaveText('חתימה לפני פנייה למסלקה');await expect(page.locator('.client-completion')).toBeVisible();await expect(page.locator('article.document')).toContainText('קוראים וחותמים על ההרשאה');
  await home.scrollIntoViewIfNeeded();await page.screenshot({path:`${out}/${width}-optional-authorization.png`});
  await prep.locator('[data-preparation-key=bank_identity]').getByRole('button',{name:'צירוף דוגמה',exact:true}).click();await expect(page.locator('article.document')).toHaveCount(2);await expect(page.locator('.client-completion')).toBeVisible();
  await page.getByLabel('צפייה בתפקיד',{exact:true}).selectOption('representative');await page.evaluate(()=>{location.hash='/families/f1/documents'});

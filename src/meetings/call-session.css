@@ -102,3 +102,8 @@
 .call-session .call-phone{font-size:19px;white-space:nowrap}
 .call-session .topic-evidence{margin-top:16px}
 .call-session .topic-evidence>summary{font-weight:600}
+.call-preparation-brief{padding-bottom:20px;margin-bottom:20px;border-bottom:1px solid var(--border)}
+.call-preparation-brief ol{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;padding-inline-start:22px}
+.call-preparation-brief li{padding-inline-start:4px}
+.call-preparation-brief li p{font-size:15px;color:var(--muted);line-height:1.7;margin:8px 0 0}
+@media(max-width:800px){.call-preparation-brief ol{grid-template-columns:1fr;gap:14px}}

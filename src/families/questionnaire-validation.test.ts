@@ -1,20 +1,20 @@
 import {describe,it,expect} from 'vitest';
-import {missingAnswers,questionnaireIssues} from './questionnaire-validation';
+import {missingAnswers,questionnaireIssues,validIdentityNumber,validPhoneNumber} from './questionnaire-validation';
 import {validDemoAnswers} from './questionnaire-fixture';
 import {CHAPTERS} from './questionnaire-definition';
 import {questionnaireReview} from './questionnaire-review';
 import {documentPreparation} from '../companion/document-preparation';
 describe('household conditions',()=>{
- it('allows submission without optional location and email details',()=>{
-  const answers={...validDemoAnswers,address:'',city:'',h_email:''};
+ it('allows submission without optional location details',()=>{
+  const answers={...validDemoAnswers,address:'',city:''};
   expect(missingAnswers(answers,[])).toEqual([]);
   expect(questionnaireIssues(answers,[])).toEqual([]);
  });
- it.each(['h_id','h_dob','h_phone','h_first','h_last','marital','h_emp','housing','has_car','bank_count'])('still blocks submission without %s',key=>{
+ it.each(['h_email','h_id','h_dob','h_phone','h_first','h_last','marital','h_emp','housing','has_car','bank_count'])('still blocks submission without %s',key=>{
   expect(questionnaireIssues({...validDemoAnswers,[key]:''},[]).map(f=>f.key)).toContain(key);
  });
  it('allows employed married owners to defer details while retaining document requests and visible follow-ups',()=>{
-  const answers={...validDemoAnswers,city:'',h_email:'',marital:'married',w_first:'דוגמה',w_id:'000000018',w_dob:'1991-01-01',h_emp:['emp','self'],w_emp:['emp'],housing:'own',has_mortgage:'yes'};
+  const answers={...validDemoAnswers,city:'',marital:'married',w_first:'דוגמה',w_id:'000000018',w_dob:'1991-01-01',h_emp:['emp','self'],w_emp:['emp'],housing:'own',has_mortgage:'yes'};
   expect(questionnaireIssues(answers,[])).toEqual([]);
   expect(documentPreparation(answers).map(d=>d.key)).toEqual(expect.arrayContaining(['payslips_h','payslips_w','tax_assessment_h','mortgage_balance']));
   const rows=questionnaireReview(answers,[]).flatMap(c=>c.items);
@@ -54,4 +54,11 @@ describe('household conditions',()=>{
   const before=structuredClone(answers);missingAnswers(answers,[]);expect(answers).toEqual(before);
   expect(missingAnswers({...answers,marital:'married'},[]).map(f=>f.key)).not.toContain('w_first');
  });
+});
+
+describe('contact validity',()=>{
+ it.each(['000000000','000000019','123456789','123','not-an-id'])('rejects malformed or bad-checksum identity %s',value=>expect(validIdentityNumber(value)).toBe(false));
+ it.each(['000000018','000000026'])('accepts a valid synthetic checksum %s',value=>expect(validIdentityNumber(value)).toBe(true));
+ it.each(['1234567','050123','050abcd123','+000000000'])('rejects invalid phone %s',value=>expect(validPhoneNumber(value)).toBe(false));
+ it.each(['050-000-0000','02-1234567','+1 202 555 0123'])('accepts formatted local or international phone %s',value=>expect(validPhoneNumber(value)).toBe(true));
 });

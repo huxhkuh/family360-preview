@@ -1,3 +1,4 @@
+import {fillRequiredContactAnswers} from './client-navigation.mjs';
 import {openClientNavigation} from './client-navigation.mjs';
 import {chromium,expect} from '@playwright/test';
 import {mkdirSync,writeFileSync} from 'node:fs';
@@ -9,7 +10,7 @@ try{for(const [device,width,height] of [['desktop',1440,1000],['tablet',820,900]
  const nav=page.getByRole('navigation',{name:'פרקי השאלון'});const heading=page.locator('.chapter-heading');const select=async name=>{await nav.getByRole('button',{name,exact:true}).click();await expect(heading).toBeFocused();};
  await expect(nav.locator('button')).toHaveCount(8);await expect(page.locator('.questionnaire-context')).not.toHaveAttribute('open','');
  expect(await nav.locator('li').first().evaluate(el=>getComputedStyle(el,'::before').height)).toBe('2px');
- await page.locator('[data-answer-key=city]').fill('עיר לדוגמה');await select('מגורים');await page.locator('[data-answer-key=housing]').selectOption('own');await expect(nav.locator('button')).toHaveCount(9);
+ await page.locator('[data-answer-key=city]').fill('עיר לדוגמה');await fillRequiredContactAnswers(page);await select('מגורים');await page.locator('[data-answer-key=housing]').selectOption('own');await expect(nav.locator('button')).toHaveCount(9);
  await select('משכנתא');await page.locator('[data-answer-key=has_mortgage]').selectOption('yes');await page.locator('[data-answer-key=mort_balance]').fill('123000');
  await page.getByRole('button',{name:/^שמירה והמשך/}).click();await expect(nav.getByRole('button',{name:'חסכונות והשקעות',exact:true})).toHaveAttribute('aria-current','step');await expect(heading).toBeFocused();expect(await heading.evaluate(el=>el.getBoundingClientRect().top)).toBeLessThan(50);
  await page.getByRole('button',{name:'לפרק הקודם',exact:true}).click();await expect(page.locator('[data-answer-key=mort_balance]')).toHaveValue('123000');

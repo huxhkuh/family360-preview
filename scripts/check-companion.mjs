@@ -1,3 +1,4 @@
+import {fillRequiredContactAnswers} from './client-navigation.mjs';
 import {openClientNavigation} from './client-navigation.mjs';
 import {chromium,expect} from '@playwright/test';
 import {mkdirSync,writeFileSync} from 'node:fs';
@@ -23,7 +24,7 @@ try{for(const [device,width,height] of [['desktop',1440,1000],['mobile',390,844]
  await page.locator('.chapter-heading').scrollIntoViewIfNeeded();
  await page.screenshot({path:`${out}/${device}-explanation.png`});
  const chapters=page.getByRole('navigation',{name:'פרקי השאלון'});
- await chapters.getByRole('button',{name:'מגורים',exact:true}).click();
+ await fillRequiredContactAnswers(page);await chapters.getByRole('button',{name:'מגורים',exact:true}).click();
  await page.locator('[data-answer-key=housing]').selectOption('rent');
  await expect(collection).toBeVisible();
  await collection.locator('summary').first().click();
@@ -43,7 +44,7 @@ try{for(const [device,width,height] of [['desktop',1440,1000],['mobile',390,844]
  await expect(inline.getByRole('button',{name:'השארנו להמשך'})).toBeVisible();
  await page.locator('[data-answer-key=housing]').selectOption('');
  await expect(inline).toHaveCount(0);
- await expect(collection).toHaveCount(0);
+ await expect(collection.locator('[data-preparation-key=rental_contract]')).toHaveCount(0);
  await page.locator('[data-answer-key=housing]').selectOption('rent');
  await inline.getByRole('button',{name:'צירוף דוגמה'}).click();
  await expect(inline.locator('img')).toHaveAttribute('src',/success.webp$/);

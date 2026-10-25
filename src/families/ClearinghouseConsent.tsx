@@ -1,0 +1,9 @@
+import type {Document} from '../lib/model';
+import {rpc} from '../lib/backend';
+import {Field,SaveForm,textValue} from '../ui';
+import {clearinghouseConsent} from './clearinghouse-consent';
+export function ClearinghouseConsent({doc,client,refresh}:{doc:Document;client:boolean;refresh:()=>Promise<void>}){
+ const saved=doc.consent;
+ if(saved)return <section aria-label="אישור הרשאה שנחתם"><h3>ההרשאה נחתמה בדמו</h3><dl><div><dt>חתימה</dt><dd>{saved.signer}</dd></div><div><dt>מועד</dt><dd>{new Date(saved.signed_at).toLocaleString('he-IL')}</dd></div><div><dt>מקבל ההרשאה</dt><dd>{saved.recipient}</dd></div><div><dt>היקף</dt><dd>{saved.scope}</dd></div></dl><details><summary>הנוסח שעליו נחתם</summary><p>{saved.text}</p><small>גרסה: {saved.version}</small></details><p className="hint">תיעוד הדגמה בלבד. אין פנייה למסלקה או העברת מידע.</p></section>;
+ return <section aria-label="חתימה על הרשאה למסלקה"><h3>קוראים וחותמים על ההרשאה</h3><p className="hint">הדגמה בלבד · השתמשו בשם מדומה. בטיפול אמיתי יש להשלים את פרטי הסוכן ואת נוסח ההרשאה שלו.</p><dl><div><dt>מקבל ההרשאה</dt><dd>{clearinghouseConsent.recipient}</dd></div><div><dt>מטרת הבקשה</dt><dd>{clearinghouseConsent.scope}</dd></div></dl><p>{clearinghouseConsent.text}</p>{client?<SaveForm label="חתימה ושמירת ההרשאה בדמו" successMessage="החתימה תועדה בדמו. לא נשלח מידע למסלקה." save={async data=>{await rpc('rpc_sign_document',{p_document_id:doc.id,p_signer:textValue(data,'signer'),p_consent:data.get('consent')==='on',p_text:clearinghouseConsent.text,p_version:clearinghouseConsent.version});await refresh();}}><Field label="חתימה — הקלדת שם מלא"><input name="signer" autoComplete="off" required minLength={2} maxLength={150}/></Field><label className="check"><input name="consent" type="checkbox" required/>קראתי את הנוסח ומאשר/ת את ההרשאה המוצגת להדגמה.</label></SaveForm>:<p>הלקוח קורא וחותם מתוך לשונית המסמכים בחשבון שלו. לאחר החתימה יוצגו כאן השם, המועד והנוסח שנחתם.</p>}</section>;
+}

@@ -1,3 +1,4 @@
+import {fillRequiredContactAnswers} from './client-navigation.mjs';
 import {openClientNavigation} from './client-navigation.mjs';
 import {chromium,expect} from '@playwright/test';
 import {mkdirSync,writeFileSync} from 'node:fs';
@@ -18,7 +19,7 @@ try{for(const [device,width,height] of [['desktop',1440,1000],['tablet',820,900]
  await page.screenshot({path:`test-results/client-folio/${device}-questionnaire.png`,fullPage:false});expect(firstFieldTop).toBeLessThan(width<=390?1050:850);
  // Guidance and reusing existing data remain available without covering the form on arrival.
  await page.locator('.questionnaire-introduction>summary').click();await page.locator('.contact-reuse>summary').click();await page.getByLabel('למי שייכים פרטי הקשר?').selectOption('h');await page.getByRole('button',{name:'העתקת פרטי הקשר',exact:true}).click();await expect(page.locator('[data-answer-key=h_phone]')).not.toHaveValue('');
- await page.locator('.questionnaire-introduction>summary').click();await page.locator('[data-answer-key=city]').fill('עיר בדיקת טיוטה');await page.getByRole('navigation',{name:'פרקי השאלון'}).getByRole('button',{name:'עבודה והכנסות',exact:true}).click();
+ await page.locator('.questionnaire-introduction>summary').click();await page.locator('[data-answer-key=city]').fill('עיר בדיקת טיוטה');await fillRequiredContactAnswers(page);await page.getByRole('navigation',{name:'פרקי השאלון'}).getByRole('button',{name:'עבודה והכנסות',exact:true}).click();
  await openClientNavigation(page);await nav.getByRole('button',{name:/^(סקירה|הבית שלי|פרטי התיק)$/}).click();await entry.click();await expect(page.getByRole('navigation',{name:'פרקי השאלון'}).getByRole('button',{name:'עבודה והכנסות',exact:true})).toHaveAttribute('aria-current','step');
  await page.getByRole('navigation',{name:'פרקי השאלון'}).getByRole('button',{name:'פרטי משפחה',exact:true}).click();await expect(page.locator('[data-answer-key=city]')).toHaveValue('עיר בדיקת טיוטה');
  // A direct chooser link still works and never lists a family outside this client's workspace.

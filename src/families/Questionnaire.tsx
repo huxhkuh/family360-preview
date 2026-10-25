@@ -1,3 +1,4 @@
+import {AddressLookup} from './AddressLookup';
 import {initialAnswers,toggleAnswer} from './questionnaire-decisions';
 import {EmploymentFields} from './EmploymentFields';
 import {ChapterCompanion} from '../companion/Companion';
@@ -37,7 +38,7 @@ export function AnswerField({field,answers,onChange,advancedEmployment=false,pat
  return <section className="repeat"><div className="question-heading"><h4>{title}</h4>{help}</div>{rows.map((row,index)=><div className="repeat-row" key={index}>{field.sub?.map(sub=><AnswerField key={sub.k} path={`${key}.${index}.`} field={sub} answers={row} onChange={(k,v)=>onChange(field.k,rows.map((r,i)=>i===index?{...r,[k]:v}:r))}/>)}<button type="button" className="ghost" aria-label={`הסרת ${title} ${index+1}`} onClick={()=>onChange(field.k,rows.filter((_,i)=>i!==index))}>הסרת {title}</button></div>)}<button type="button" onClick={()=>onChange(field.k,[...rows,{}])}>{field.addLabel||'הוספה'}</button></section>;
  }
  if(field.type==='checks')return <fieldset className="checks" data-answer-key={key} tabIndex={-1} aria-invalid={!!error} aria-describedby={error?errorId:undefined}><legend>{title}</legend><div className="question-heading question-group-help"><span>אפשר לבחור כמה אפשרויות</span>{help}</div>{field.opts?.map(([v,label])=><div className="check-option" key={v}><label><input type="checkbox" checked={Array.isArray(value)&&value.includes(v)} onChange={e=>onChange(field.k,toggleAnswer(value,v,e.target.checked,field.exclusive))}/>{label}</label><QuestionHelp fieldKey={field.k} option={v} label={label}/></div>)}{error&&<p className="field-error" id={errorId}>{error}</p>}</fieldset>;
- return <Field label={`${title}${field.req?' *':''}`} help={help} error={error}>{field.opts?<select data-answer-key={key} aria-required={!!field.req} value={value??''} onChange={e=>onChange(field.k,e.target.value)}><option value="">בחרו…</option>{field.opts.map(([v,l])=><option key={v} value={v}>{l}</option>)}</select>:field.type==='date'?<DatePicker data-answer-key={key} aria-required={!!field.req} label={title} value={value??''} max={/(^|_)dob$/.test(field.k)?isoDate(new Date()):undefined} onValueChange={v=>onChange(field.k,v)}/>:<input data-answer-key={key} aria-required={!!field.req} value={value??''} onChange={e=>onChange(field.k,e.target.value)} placeholder={field.type==='approx-date'?'למשל 2018 או 2018-06':undefined} dir={field.type==='approx-date'?'ltr':undefined} maxLength={500} min={0} type={['currency','number'].includes(field.type||'')?'number':['date','email','tel'].includes(field.type||'')?field.type:'text'}/>}</Field>;
+ return <Field label={`${title}${field.req?' *':''}`} help={help} error={error}>{field.opts?<select data-answer-key={key} aria-required={!!field.req} value={value??''} onChange={e=>onChange(field.k,e.target.value)}><option value="">בחרו…</option>{field.opts.map(([v,l])=><option key={v} value={v}>{l}</option>)}</select>:field.type==='date'?<DatePicker data-answer-key={key} aria-required={!!field.req} label={title} value={value??''} max={/(^|_)dob$/.test(field.k)?isoDate(new Date()):undefined} onValueChange={v=>onChange(field.k,v)}/>:['city','address'].includes(field.k)?<AddressLookup kind={field.k as 'city'|'address'} answerKey={key} city={String(answers.city||'')} value={String(value??'')} required={!!field.req} onChange={value=>onChange(field.k,value)}/>:<input data-answer-key={key} aria-required={!!field.req} value={value??''} onChange={e=>onChange(field.k,e.target.value)} placeholder={field.type==='approx-date'?'למשל 2018 או 2018-06':undefined} dir={field.type==='approx-date'?'ltr':undefined} maxLength={500} min={0} type={['currency','number'].includes(field.type||'')?'number':['date','email','tel'].includes(field.type||'')?field.type:'text'}/>}</Field>;
 }
 function dynamic(field:DynamicField):LegacyField{return {k:field.key,l:field.label,type:field.type,req:field.required?1:0,opts:field.options?.map(x=>[x,x])};}
 export function Questionnaire({family,services,refresh,onDirtyChange,onComplete,onEditContact,advancedEmployment=false,resourceLibraryEnabled=false,clientGuide=false,documents=[]}:{clientGuide?:boolean;documents?:Document[];family:Family;services:Service[];refresh:()=>Promise<void>;onDirtyChange:(dirty:boolean)=>void;onComplete:()=>void;onEditContact?:()=>void;advancedEmployment?:boolean;resourceLibraryEnabled?:boolean}){
@@ -45,7 +46,7 @@ export function Questionnaire({family,services,refresh,onDirtyChange,onComplete,
  const {answers,saved,revision}=work;
  const setAnswers=(next:Answers|((a:Answers)=>Answers))=>setWork(prev=>({...prev,answers:typeof next==='function'?next(prev.answers):next}));
  const [chapter,setChapter]=useRetainedState('questionnaire-view:'+family.id,()=> 'family');const [showMissing,setShowMissing]=useState(false);
- const [busy,setBusy]=useState(false);const [discard,setDiscard]=useState(false);
+ const [busy,setBusy]=useState(false);const [discard,setDiscard]=useState(false);const [blockedChapter,setBlockedChapter]=useState('');
  const dirty=JSON.stringify(answers)!==saved;
  function loadLatest(){setWork({answers:initialAnswers(family),saved:JSON.stringify(initialAnswers(family)),revision:family.updated_at});setDiscard(false);}
  useEffect(()=>{if(!dirty)loadLatest();},[family.updated_at]);
@@ -54,11 +55,13 @@ export function Questionnaire({family,services,refresh,onDirtyChange,onComplete,
  const heading=useRef<HTMLDivElement>(null);const focusRequested=useRef(false);
  const current=visible.find(c=>c.key===chapter)||visible[0];const index=visible.indexOf(current);
  const focusChapter=()=>{heading.current?.focus({preventScroll:true});heading.current?.scrollIntoView({block:'start',behavior:'instant'});};
- const chooseChapter=(key:string)=>{if(key===current.key){focusChapter();return;}focusRequested.current=true;setChapter(key);};
+ const chapterIssues=()=>questionnaireIssues(answers,services).filter(issue=>issue.chapter===current.key&&/(^|_)(id|phone|email)$/.test(issue.key));
+ const validateChapter=()=>{const missing=chapterIssues();if(!missing.length)return true;setBlockedChapter(current.key);jump(missing[0].key,current.key);return false;};
+ const chooseChapter=(key:string)=>{if(key===current.key){focusChapter();return;}if(visible.findIndex(c=>c.key===key)>index&&!validateChapter())return;setBlockedChapter('');focusRequested.current=true;setChapter(key);};
  useEffect(()=>{if(focusRequested.current){focusRequested.current=false;focusChapter();}},[current.key]);
  const set=(k:string,v:unknown)=>setAnswers(prev=>({...prev,[k]:v}));
  const custom=services.filter(s=>s.active&&s.trigger_conditions.every(r=>conditionMatches(answers,r)));
- const issues=questionnaireIssues(answers,services);const errors=showMissing?Object.fromEntries(issues.map(i=>[i.key,i.message])):{};
+ const issues=questionnaireIssues(answers,services);const errors=Object.fromEntries(issues.filter(issue=>showMissing||issue.chapter===blockedChapter).map(i=>[i.key,i.message]));
  const persistDraft=async()=>{const result=await rpc<Family>('rpc_save_family',{p_family_id:family.id,p_patch:{answers},p_expected_updated_at:revision});setWork(prev=>({...prev,saved:JSON.stringify(answers),revision:result.updated_at}));await refresh();};
  const saveDraft=async()=>{setBusy(true);try{await persistDraft();}finally{setBusy(false);}};
  const submitted=family.onboarding_pct===100;
@@ -74,8 +77,9 @@ export function Questionnaire({family,services,refresh,onDirtyChange,onComplete,
 
  {custom.some(s=>s.client_fields.length>0)&&<details><summary>שאלות נוספות לפי תחום</summary>{custom.map(s=><section key={s.id}><h4>{s.name}</h4>{s.client_fields.filter(f=>!f.show_when||conditionMatches(answers,f.show_when)).map(f=><AnswerField key={f.key} field={dynamic(f)} answers={answers} onChange={set}/>)}</section>)}</details>}
  </SaveForm>
+ {blockedChapter===current.key&&chapterIssues().length>0&&<div className="validation-summary" role="status"><strong>לפני שממשיכים, יש להשלים או לתקן:</strong><ul>{chapterIssues().map(issue=><li key={issue.key}><button className="text-button" onClick={()=>jump(issue.key,current.key)}>{issue.label} · {issue.message}</button></li>)}</ul></div>}
  <p className="chapter-end-label">סוף הפרק · {current.title}</p>
- <div className="chapter-actions"><button disabled={index===0} onClick={()=>chooseChapter(visible[index-1].key)}>לפרק הקודם</button>{index<visible.length-1?<AsyncButton action={async()=>{await saveDraft();chooseChapter(visible[index+1].key);}}>שמירה והמשך<Icon name="arrow"/><span className="chapter-next-name">לפרק {visible[index+1]?.title}</span></AsyncButton>:<span className="muted">זה הפרק האחרון. אפשר לעבור לסיכום ולשלוח לבדיקה.</span>}</div>
+ <div className="chapter-actions"><button disabled={index===0} onClick={()=>chooseChapter(visible[index-1].key)}>לפרק הקודם</button>{index<visible.length-1?<AsyncButton action={async()=>{if(!validateChapter())throw new Error('QUESTIONNAIRE_INCOMPLETE');await saveDraft();chooseChapter(visible[index+1].key);}}>שמירה והמשך<Icon name="arrow"/><span className="chapter-next-name">לפרק {visible[index+1]?.title}</span></AsyncButton>:<span className="muted">זה הפרק האחרון. אפשר לעבור לסיכום ולשלוח לבדיקה.</span>}</div>
  </fieldset></AnswerErrors.Provider></Panel>
  <fieldset className="questionnaire-after" disabled={busy} aria-busy={busy}>
  {clientGuide&&<DocumentCompanion familyId={family.id} answers={answers} documents={documents} chapter={current.key} submitted={submitted} beforeAction={saveDraft} refresh={refresh}/>}

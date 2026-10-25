@@ -22,7 +22,7 @@ try{for(const width of [1440,820,390,320]){
  await page.keyboard.press('Enter');
  const closeMenu=page.getByRole('button',{name:'סגירת התפריט',exact:true});if(await closeMenu.isVisible())await closeMenu.click();
  await field('marital').selectOption('married');
- for(const[k,v]of Object.entries({h_first:'ישראל',h_last:'דוגמה',h_id:'000000018',h_dob:'1990-01-01',h_phone:'0500000000',w_first:'דוגמה',w_id:'000000026',w_dob:'1992-01-01'}))await field(k).fill(v);
+ for(const[k,v]of Object.entries({h_first:'ישראל',h_last:'דוגמה',h_id:'000000018',h_dob:'1990-01-01',h_phone:'0500000000',h_email:'demo@example.invalid',w_first:'דוגמה',w_id:'000000026',w_dob:'1992-01-01'}))await field(k).fill(v);
  await chapter('עבודה והכנסות');
  await field('h_emp').getByLabel('שכיר',{exact:true}).check();
  await field('w_emp').getByLabel('שכיר/ה',{exact:true}).check();

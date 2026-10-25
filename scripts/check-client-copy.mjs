@@ -27,7 +27,7 @@ try{for(const width of [1440,390,320]){
  await expect(page.getByRole('alert')).toContainText('השאלון עדיין לא נשלח');
  await expect(field('marital')).toHaveAttribute('aria-required','true');
  await field('marital').selectOption('married');
- for(const[k,v]of Object.entries({h_first:'ישראל',h_last:'לדוגמה',h_id:'000000018',h_dob:'1990-01-01',h_phone:'0500000000',w_first:'דוגמה',w_id:'000000026',w_dob:'1992-01-01'}))await field(k).fill(v);
+ for(const[k,v]of Object.entries({h_first:'ישראל',h_last:'לדוגמה',h_id:'000000018',h_dob:'1990-01-01',h_phone:'0500000000',h_email:'demo@example.invalid',w_first:'דוגמה',w_id:'000000026',w_dob:'1992-01-01'}))await field(k).fill(v);
  for(const k of ['h_id','h_dob','w_id','w_dob'])await expect(field(k)).toHaveAttribute('aria-required','true');
  await expect(field('city')).toHaveAttribute('aria-required','false');
  await page.getByRole('button',{name:'הוספת ילד',exact:true}).click();

@@ -39,6 +39,7 @@ jobs:
           npm run test:demo
           node scripts/check-journey.mjs
           npm run test:guided-call
+          npm run test:yitzchak-feedback
           npm run test:ux
           npm run test:professional-admin
           npm run test:client-intake

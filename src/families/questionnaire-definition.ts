@@ -17,7 +17,7 @@ export const CHAPTERS: Chapter[]=[
    {t:'פרטים אישיים',fields:[
      {k:'h_first',l:'שם פרטי',req:1},{k:'h_last',l:'שם משפחה',req:1},
      {k:'h_id',l:'מספר תעודת זהות',req:1,type:'id'},{k:'h_dob',l:'תאריך לידה',type:'date',req:1},
-     {k:'h_phone',l:'טלפון נייד',type:'tel',req:1},{k:'h_email',l:'דוא״ל',type:'email'}]},
+     {k:'h_phone',l:'טלפון נייד',type:'tel',req:1},{k:'h_email',l:'דוא״ל',type:'email',req:1}]},
    {t:'בן/בת הזוג',cond:hasCurrentPartner,fields:[
      {k:'w_first',l:'שם פרטי',req:1},{k:'w_id',l:'מספר תעודת זהות',type:'id',req:1},
      {k:'w_dob',l:'תאריך לידה',type:'date',req:1},{k:'w_phone',l:'טלפון נייד',type:'tel'}]},

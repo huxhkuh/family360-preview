@@ -1,0 +1,42 @@
+import {chromium,expect} from '@playwright/test';
+import {mkdirSync,writeFileSync} from 'node:fs';
+const base=process.env.DEMO_URL||'http://127.0.0.1:5262/family360-preview/';
+const out='test-results/yitzchak-feedback';mkdirSync(out,{recursive:true});
+const browser=await chromium.launch(),results=[];
+try{for(const width of [1440,390,320]){
+ const page=await browser.newPage({viewport:{width,height:900},reducedMotion:'reduce'});const errors=[],external=[];
+ page.on('pageerror',e=>errors.push(e.message));page.on('request',request=>{if(!request.url().startsWith(base)&&!request.url().startsWith('data:'))external.push(request.url());});
+ page.on('dialog',dialog=>dialog.accept());
+ const field=key=>page.locator(`[data-answer-key="${key}"]`);const nav=page.getByRole('navigation',{name:'פרקי השאלון'});
+ const next=page.getByRole('button',{name:/^שמירה והמשך/});
+ await page.goto(base);await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();await page.getByRole('button',{name:'התחלת השאלון',exact:true}).click();
+ await expect(field('h_email')).toHaveAttribute('aria-required','true');
+ await field('marital').selectOption('single');await field('h_first').fill('ישראל');await field('h_last').fill('לדוגמה');await field('h_dob').fill('1990-01-01');
+ await field('h_phone').fill('123');await field('h_id').fill('000000019');await next.click();
+ await expect(nav.getByRole('button',{name:'פרטי משפחה',exact:true})).toHaveAttribute('aria-current','step');
+ for(const key of ['h_id','h_phone','h_email'])await expect(field(key)).toHaveAttribute('aria-invalid','true');
+ await field('h_email').fill('invalid');await nav.getByRole('button',{name:'עבודה והכנסות',exact:true}).click();await expect(field('h_email')).toBeVisible();
+ await field('h_id').fill('000000018');await field('h_phone').fill('0500000000');await field('h_email').fill('demo@example.invalid');
+ await field('city').fill('ירושלים');const cityList=await field('city').getAttribute('list');await expect(page.locator(`datalist[id="${cityList}"] option[value="ירושלים"]`)).toHaveCount(1);
+ await field('address').fill('יפו');const streetList=await field('address').getAttribute('list');await expect(page.locator(`datalist[id="${streetList}"] option[value="יפו"]`)).toHaveCount(1);await field('address').fill('יפו 10 דירה 2');
+ const phoneHelp=page.locator('.field').filter({has:field('h_phone')}).locator('.question-help');
+ const before=await field('h_email').evaluate(el=>el.getBoundingClientRect().top+scrollY);
+ await phoneHelp.locator('summary').click();const note=phoneHelp.locator('[popover]');await expect(note).toBeVisible();await expect(note).toHaveJSProperty('popover','auto');
+ const after=await field('h_email').evaluate(el=>el.getBoundingClientRect().top+scrollY);expect(Math.abs(after-before)).toBeLessThan(1);
+ const bounds=await note.boundingBox();expect(bounds.x).toBeGreaterThanOrEqual(0);expect(bounds.x+bounds.width).toBeLessThanOrEqual(width);
+ await page.screenshot({path:`${out}/${width}-floating-help.png`});await page.keyboard.press('Escape');await expect(note).not.toBeVisible();
+ await next.click();await field('h_emp').getByLabel('לא עובד',{exact:true}).check();await next.click();await field('housing').selectOption('family');await next.click();
+ await expect(field('savings')).toBeVisible();
+ const authorization=page.locator('[data-preparation-key="clearinghouse_auth_h"]').first();await authorization.getByRole('button',{name:'הוספת הרשאה להשלמה עם הנציג',exact:true}).click();
+ await page.goto(base+'#/families/f1/documents');
+ const consent=page.getByRole('region',{name:'חתימה על הרשאה למסלקה',exact:true});await expect(consent).toBeVisible();await expect(consent).toContainText('סוכן פנסיוני לדוגמה');
+ await consent.getByLabel('חתימה — הקלדת שם מלא',{exact:true}).fill('ישראל לדוגמה');await consent.getByRole('checkbox').check();await consent.getByRole('button',{name:'חתימה ושמירת ההרשאה בדמו',exact:true}).click();
+ const signed=page.getByRole('region',{name:'אישור הרשאה שנחתם',exact:true});await expect(signed).toContainText('ישראל לדוגמה');await expect(signed).toContainText('ההרשאה נחתמה בדמו');await page.screenshot({path:`${out}/${width}-consent.png`});
+ await page.getByLabel('צפייה בתפקיד',{exact:true}).selectOption('representative');await page.goto(base+'#/families/f1/documents');await expect(page.getByRole('region',{name:'אישור הרשאה שנחתם',exact:true})).toContainText('ישראל לדוגמה');
+ await page.goto(base+'#/meetings/m3?family=f3');await expect(page.getByRole('region',{name:'המידע וההכנה של הנציג',exact:true})).toContainText('התפקיד שלך בשיחה');await page.screenshot({path:`${out}/${width}-meeting-preparation.png`,fullPage:true});
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);expect(errors).toEqual([]);expect(external).toEqual([]);
+ results.push({width,passed:true,checks:['required contact and identity checks','bad checksum blocked','forward navigation blocked','official city and street suggestions','help opens without layout movement','keyboard dismissal','recorded sample consent visible to representative','meeting preparation explained','no external requests or JS errors']});await page.close();
+}
+ const fallback=await browser.newPage();await fallback.route('**/data/address-catalog.json',route=>route.abort());await fallback.goto(base);await fallback.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();await fallback.getByRole('button',{name:'התחלת השאלון',exact:true}).click();await expect(fallback.getByText('רשימת ההצעות אינה זמינה כרגע. אפשר להקליד את הכתובת כרגיל.').first()).toBeVisible();await fallback.locator('[data-answer-key=city]').fill('יישוב בהקלדה ידנית');await expect(fallback.locator('[data-answer-key=city]')).toHaveValue('יישוב בהקלדה ידנית');await fallback.close();
+}finally{await browser.close();}
+writeFileSync(out+'/qa.json',JSON.stringify(results,null,2));console.log(JSON.stringify(results,null,2));

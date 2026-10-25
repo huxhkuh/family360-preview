@@ -1,3 +1,4 @@
+import {fillRequiredContactAnswers} from './client-navigation.mjs';
 import {chromium,expect} from '@playwright/test';
 import {mkdirSync,writeFileSync,readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
@@ -73,7 +74,7 @@ try{
   }else await expect(page.locator('.questionnaire-signature')).toBeVisible();
   const city=page.locator('[data-answer-key=city]');await city.fill('טיוטה עם הלוגו הקבוע');
   const nav=page.getByRole('navigation',{name:'פרקי השאלון'});
-  await nav.getByRole('button',{name:'עבודה והכנסות',exact:true}).click();
+  await fillRequiredContactAnswers(page);await nav.getByRole('button',{name:'עבודה והכנסות',exact:true}).click();
   await nav.getByRole('button',{name:'פרטי משפחה',exact:true}).click();await expect(city).toHaveValue('טיוטה עם הלוגו הקבוע');
   await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path:`${output}/${device}-fixed-questionnaire.png`});
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);

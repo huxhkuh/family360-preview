@@ -13,7 +13,7 @@ try{for(const width of [1440,390,320]){
  await page.goto(base);await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();await page.getByRole('button',{name:'התחלת השאלון',exact:true}).click();
  await expect(field('h_phone')).toHaveValue('0500000000');
  await field('marital').selectOption('married');
- for(const[k,v]of Object.entries({h_first:'ישראל',h_last:'דוגמה',h_id:'000000018',h_dob:'1990-01-01',h_phone:'0520000000',w_first:'דוגמה',w_id:'000000026',w_dob:'1992-01-01'}))await field(k).fill(v);
+ for(const[k,v]of Object.entries({h_first:'ישראל',h_last:'דוגמה',h_id:'000000018',h_dob:'1990-01-01',h_phone:'0520000000',h_email:'demo@example.invalid',w_first:'דוגמה',w_id:'000000026',w_dob:'1992-01-01'}))await field(k).fill(v);
  await expect(page.getByRole('heading',{name:'בן/בת הזוג',exact:true})).toBeVisible();await save();
  await route('/families/f1/overview');await expect(page.locator('.contact-inline')).toContainText('0520000000');
  await route('/families/f1/questionnaire');await expect(field('h_phone')).toHaveValue('0520000000');
@@ -28,13 +28,13 @@ try{for(const width of [1440,390,320]){
  await page.locator('.chapter-heading').scrollIntoViewIfNeeded();await page.screenshot({path:`${out}/${width}-mortgages.png`,fullPage:true});
  await chapter('חסכונות והשקעות');await field('savings').getByLabel('פנסיה',{exact:true}).check();await field('savings').getByLabel('לא יודעים',{exact:true}).check();await expect(field('savings').getByLabel('פנסיה',{exact:true})).not.toBeChecked();
  await field('savings_goals').getByLabel('דמי ניהול',{exact:true}).check();
- const auth=page.locator('[data-preparation-key=clearinghouse_auth_h]').first();await auth.getByRole('button',{name:'הוספת הרשאה להשלמה עם הנציג',exact:true}).click();await expect(auth).toContainText('בתיק · רשות');
+ const auth=page.locator('[data-preparation-key=clearinghouse_auth_h]').first();await auth.getByRole('button',{name:'הוספת הרשאה להשלמה עם הנציג',exact:true}).click();await expect(auth).toContainText('חתימה לפני פנייה למסלקה');
  await chapter('ביטוחים');await field('ins').getByLabel('אין ביטוחים',{exact:true}).check();await field('has_car').selectOption('no');
  await chapter('זכויות והטבות');await field('btl_allowances').getByLabel('קצבה אחרת',{exact:true}).check();await field('btl_allowances_other').fill('קצבה לדוגמה');await field('ravkav_discount').selectOption('yes');await field('ravkav_review').selectOption('yes');
  await chapter('בנקים ואשראי');await field('bank_count').fill('2');await field('credit_frame').selectOption('yes');await field('overdraft').selectOption('yes');await field('credit_used').fill('2000');await field('overdraft_amount').fill('2500');await save();
  await chapter('משכנתא');await expect(field('mort_date')).toHaveValue('2018');await expect(field('mortgages.0.mort_date')).toHaveValue('2020-06');
  await page.getByRole('button',{name:'שליחת השאלון לבדיקה',exact:true}).click();
- await expect(page.locator('.client-completion')).toBeVisible();await expect(page.locator('article.document')).toHaveCount(1);await expect(page.locator('article.document')).toContainText('טרם הוגדר נוסח הסכמה');
+ await expect(page.locator('.client-completion')).toBeVisible();await expect(page.locator('article.document')).toHaveCount(1);await expect(page.locator('article.document')).toContainText('קוראים וחותמים על ההרשאה');
  const prep=page.locator('.document-preparation-more');await prep.locator(':scope > summary').click();
  for(const key of ['identity_h','identity_w','bank_identity','municipal_bill','electricity_bill','tax_assessment_h','payslips_w','mortgage_balance','rental_contract'])await expect(prep.locator(`[data-preparation-key=${key}]`)).toBeVisible();
  await expect(prep.locator('[data-preparation-key=bank_statements]')).toHaveCount(0);

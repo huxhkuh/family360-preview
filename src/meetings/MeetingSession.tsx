@@ -1,5 +1,6 @@
 import {useRetainedState,useWorkingDrafts} from '../lib/draft-guard';
 import {CallContext} from './CallContext';
+import {MeetingBrief} from './MeetingBrief';
 import {ResourceLibrary} from '../resources/ResourceLibrary';
 import {RentReminder} from '../families/PreparationTip';
 import {MeetingControls} from './MeetingControls';
@@ -105,6 +106,7 @@ export function MeetingSession({meeting:m,w,edit,refresh,onDirtyChange,leave,bac
   {edit&&w.workflowV2Enabled&&<MeetingControls meeting={m} refresh={refresh} leave={leave}/>}
   {activeStage==='checklist'&&<TopicChecklist w={w} meeting={m} refresh={refresh} onDirtyChange={setDirty} leave={leave} onComplete={()=>move(()=>setStage('summary'))}/>}
   {activeStage==='prepare'&&<section className="card meeting-preparation">
+   <MeetingBrief items={items} w={w} familyId={m.family_id}/>
    <h2>מגיעים לשיחה עם תמונה מסודרת</h2><p className="call-opening"><strong>אפשר לפתוח כך: </strong>״נעבור יחד על מה שבדקנו, נחליט מה מתאים לכם, ובסוף נסכם מי עושה מה ומתי.״</p>
    <div className="call-preparation-action"><div><strong>{progress.total} המלצות מוכנות לשיחה</strong><p className="muted">מתקדמים נושא־נושא. בכל שלב אפשר לחזור ולעדכן.</p></div>{m.status==='scheduled'?<AsyncButton className="primary" disabled={!items.length} action={start}>התחלת פגישה</AsyncButton>:<button className="primary" onClick={()=>setStage('discussion')}>חזרה לנושאים</button>}</div>
    <h3>הנושאים שנעבור עליהם</h3>{items.map(i=><button className="agenda-link" key={i.id} onClick={()=>move(()=>onView({topic:i.id,stage:'discussion'}))}><span>{i.title||'נושא לשיחה'}</span><span className="muted">{i.visible_to_client?'משותף עם הלקוח':'פנימי לצוות'} · {comparisonGaps(readComparison(i.financial?.comparison)).length} פרטי השוואה להשלמה<Icon name="arrow"/></span></button>)}

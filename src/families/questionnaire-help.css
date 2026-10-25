@@ -1,4 +1,4 @@
-/* Help stays in the document flow: no overlays, clipped popovers or hover-only access. */
+/* Native top-layer help leaves the question and form layout in place. */
 .question-heading{position:relative;min-height:44px;padding-inline-end:48px;margin-bottom:6px;min-width:0}
 .question-heading>label,.question-heading>h4,.question-heading>span{display:block;margin:0;padding-top:10px;font-weight:600;line-height:1.5}
 .question-help{margin:0;min-width:0;text-align:start;font-weight:400}
@@ -20,6 +20,9 @@
 .question-help-with-companion>.companion-portrait{width:44px;height:60px}
 .question-help-with-companion>.speech-bubble{padding:12px;min-width:0}
 .question-help-with-companion strong{font-size:16px;color:#185241}
+.question-help-body[popover]{position:fixed;inset:auto;margin:0!important;max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);overflow:auto;z-index:30;border:1px solid #ded5c9;background:#fcfaf6;border-radius:12px;box-shadow:0 10px 36px #031e1a26;padding:16px;direction:rtl}
+.question-help-body[popover]:not(:popover-open){display:none}
+.question-help-body[popover]::backdrop{background:transparent}
 .question-group-help{grid-column:1/-1;width:100%}
 .complete-check-option,.check-option{position:relative;padding-inline-end:44px;align-items:start!important;flex-wrap:wrap}
 .complete-check-option>.question-help,.check-option>.question-help{flex-basis:100%;width:100%}
