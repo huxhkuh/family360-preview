@@ -1,0 +1,18 @@
+.growth-page{max-width:1100px;margin-inline:auto}
+.growth-page .growth-kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
+.growth-kpis article b{font-size:29px}
+.growth-page table{width:100%}
+.telephone-script{border-inline-start:3px solid var(--green);padding:18px 22px;background:#f1f4ed;line-height:1.8}
+.growth-page .check{display:flex;align-items:flex-start;gap:10px;margin-block:18px}
+@media(max-width:800px){.growth-page .growth-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.growth-kpis article b{font-size:24px}.growth-page th,.growth-page td{font-size:14px;padding:12px 8px}}
+
+@media(max-width:600px){
+ .growth-page .table-wrap{overflow:visible;border:0}
+ .growth-page .table-wrap table,.growth-page .table-wrap tbody{display:block;width:100%;min-width:0}
+ .growth-page thead{display:none}
+ .growth-page tbody tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));padding:8px 0;border:1px solid var(--border);border-radius:14px}
+ .growth-page tbody tr+tr{margin-top:12px}
+ .growth-page td{display:block;min-width:0;padding:8px 12px;border:0;white-space:normal;overflow-wrap:anywhere}
+ .growth-page td::before{content:attr(data-label);display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+ .growth-page td[data-label="פירוט"]{grid-column:1/-1}
+}

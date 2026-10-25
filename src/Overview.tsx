@@ -1,3 +1,4 @@
+import {RepresentativeHome} from './representative/RepresentativeHome';
 import {MeetingLaunch} from './meetings/MeetingLaunch';
 import {BrandLogo} from './branding/Brand';
 import {ClientHome} from './ClientHome';
@@ -22,6 +23,7 @@ export function Journey({family,w,onNavigate,compact=false,activeTarget}:{family
 }
 
 export function Overview({w,openFamily,navigate,openRecord,filter,onFilter,refresh}:{refresh:()=>Promise<void>;w:Workspace;openFamily:(id:string,target?:Destination)=>void;navigate:(target:string)=>void;openRecord:(r:RouteState)=>void;filter:string;onFilter:(value:string)=>void}){
+ if(w.profile.role==='representative')return <RepresentativeHome w={w} open={openRecord} filter={filter} onFilter={onFilter}/>;
  const staff=['admin','representative'].includes(w.profile.role);
  const client=w.profile.role==='client';
  const followUps=w.followUps.filter(t=>!client||t.visible_to_client&&(!t.item_id||w.meetingItems.some(i=>i.id===t.item_id&&i.visible_to_client)));

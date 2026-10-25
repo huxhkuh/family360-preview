@@ -23,7 +23,10 @@
     "test:client-decisions": "node scripts/check-client-decisions.mjs",
     "test:new-client-optional": "node scripts/check-new-client-optional.mjs",
     "test:guided-call": "node scripts/check-guided-call.mjs",
-    "test:yitzchak-feedback": "node scripts/check-yitzchak-feedback.mjs"
+    "test:yitzchak-feedback": "node scripts/check-yitzchak-feedback.mjs",
+    "test:growth": "node scripts/check-growth.mjs",
+    "test:final-report": "node scripts/check-final-report.mjs",
+    "test:representative": "node scripts/check-representative.mjs"
   },
   "dependencies": {
     "@fontsource-variable/assistant": "5.3.0",

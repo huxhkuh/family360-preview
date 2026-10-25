@@ -1,3 +1,4 @@
+import {reportReadiness} from '../reports/report-data';
 import type {Workspace} from './model';
 import type {RouteState} from './navigation';
 export type WorkItem={id:string;familyId:string;familyName:string;title:string;owner:string;mine:boolean;waiting:boolean;approval:boolean;due?:string;target:RouteState;label:string};
@@ -37,6 +38,9 @@ export function workQueue(w:Workspace,now=new Date()):WorkItem[]{
    if(w.familyServices.some(s=>s.family_id===f.id&&s.status==='approved_analysis')&&!w.meetings.some(m=>m.family_id===f.id&&['scheduled','in_progress'].includes(m.status)))add({id:'schedule:'+f.id,title:'תיאום שיחה על הממצאים שאושרו',owner:rep?.name||'הנציג המטפל',mine:mine&&can('families.edit'),waiting:!can('families.edit'),approval:false,target:{page:'meetings',family:f.id},label:'לתכנון השיחה'});
    for(const m of w.meetings.filter(m=>m.family_id===f.id&&['scheduled','in_progress'].includes(m.status)))add({id:'meeting:'+m.id,title:m.status==='scheduled'?'שיחה מתוכננת':'שיחה בתהליך',owner:rep?.name||'הנציג המטפל',mine:mine&&can('families.edit'),waiting:!can('families.edit'),approval:false,due:m.scheduled_at||undefined,target:{page:'meetings',id:m.id},label:'לפרטי השיחה'});
    for(const t of w.followUps.filter(t=>t.family_id===f.id&&['open','in_progress'].includes(t.status)))add({id:'followup:'+t.id,title:t.title,owner:t.owner_name,mine:t.owner_role==='representative'&&mine&&can('families.edit'),waiting:t.owner_role==='client'||!can('families.edit'),approval:false,due:t.due_on,target:{page:'families',id:f.id,tab:'followups'},label:'למשימות ההמשך'});
+   const finalMeeting=w.meetings.filter(m=>m.family_id===f.id&&m.status==='completed').sort((a,b)=>(b.scheduled_at||'').localeCompare(a.scheduled_at||''))[0];
+   if(finalMeeting&&reportReadiness(w,finalMeeting.id).length===0&&!w.finalReports.some(r=>r.meeting_id===finalMeeting.id&&r.status==='approved')){const draft=w.finalReports.some(r=>r.meeting_id===finalMeeting.id);add({id:'final-report:'+finalMeeting.id,title:draft?'בדיקת הדוח הסופי ואישורו':'הכנת הדוח הסופי למשפחה',owner:rep?.name||'הנציג המטפל',mine:mine&&can('families.edit'),waiting:!can('families.edit'),approval:draft,target:{page:'meetings',id:finalMeeting.id,stage:'summary'},label:draft?'לבדיקת הדוח':'להכנת הדוח'});}
+
   }
  }
  return rows.sort((a,b)=>Number(isLate(b,now))-Number(isLate(a,now))||Number(b.mine)-Number(a.mine)||(a.due||'9999').localeCompare(b.due||'9999')||a.id.localeCompare(b.id));

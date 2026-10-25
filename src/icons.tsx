@@ -1,4 +1,6 @@
 const paths:Record<string,string>={
+ referrals:'M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-2 2 M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l2-2',
+ telephone:'M5 3h4l2 5-3 2a14 14 0 0 0 6 6l2-3 5 2v4c-10 3-20-7-16-16z',
  followups:'M4 5h16v16H4z M8 3v4 M16 3v4 M8 15l3 3 5-6',
  overview:'M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z',
  family:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M16 3a4 4 0 0 1 0 8 M22 21v-2a4 4 0 0 0-3-3.87 M13 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0',

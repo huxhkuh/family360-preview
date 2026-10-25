@@ -15,10 +15,13 @@ export function ClientHome({family:f,w,open,refresh}:{family:Family;w:Workspace;
  const pending=docs.filter(d=>d.status==='pending');
  const meetings=w.meetings.filter(m=>m.family_id===f.id&&m.status!=='cancelled').sort((a,b)=>(b.scheduled_at||'').localeCompare(a.scheduled_at||''));
  const upcoming=meetings.filter(m=>['scheduled','in_progress'].includes(m.status)).sort((a,b)=>(a.scheduled_at||'9999').localeCompare(b.scheduled_at||'9999'));
+ const finalReport=w.finalReports.filter(r=>r.family_id===f.id&&r.status==='approved'&&r.snapshot).sort((a,b)=>(b.snapshot?.approved_at||'').localeCompare(a.snapshot?.approved_at||''))[0];
  const last=meetings.find(m=>m.status==='completed');
  const owner=w.representatives.find(r=>r.id===f.representative_id)?.name||'טרם שויך נציג';
  const count=mine.length+missing.length;
  return <section className="client-home" aria-label={`האזור האישי של ${f.name}`}><div className="section-heading"><div><h1>{f.name}<span className="family-period" aria-hidden="true">.</span></h1><p className="muted">הנציג המטפל: {owner}</p></div><button className="ghost" onClick={()=>go('overview')}>פרטי התיק</button></div>
+ {f.preferred_channel==='phone'&&<p className="hint">המשך הטיפול שלכם מתואם דרך המוקד הטלפוני. הפניות והמשימות נשמרות גם בתיק הזה.</p>}
+ {finalReport&&<section className="client-meeting" aria-label="הדוח הסופי שאושר"><h2>הדוח הסופי שלכם מוכן</h2><p>סיכום התוצאות וההמלצות שאושר על ידי הנציג, כולל אפשרות להדפסה.</p><button className="primary" onClick={()=>open({page:'meetings',id:finalReport.meeting_id,stage:'summary'})}>לצפייה בדוח הסופי</button></section>}
  {submitted&&<ClientCompletion family={f} w={w}/>}
  {!submitted&&<ClientJourney family={f} w={w} onNavigate={go}/>}
  {submitted&&<section className="client-priorities" aria-labelledby={`client-actions-${f.id}`}><header><p className="eyebrow">הצעד הבא שלכם</p><h2 id={`client-actions-${f.id}`}>מה נדרש ממני{count?` · ${count}`:''}</h2><p>{count?'אפשר להשלים כל פעולה מהמקום שבו היא מופיעה.':'כרגע אין פעולה פתוחה באחריותכם. עדכונים ובקשות נוספות יופיעו כאן.'}</p></header>

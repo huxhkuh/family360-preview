@@ -1,4 +1,11 @@
 // @ts-nocheck
+import {exampleAnswers,exampleComparison,exampleReportContent} from '../reports/completed-example';
+import {comparisonFinancial} from '../meetings/comparison';
+import {createGrowthStore,growthProjection,registerReferral} from '../growth/referrals';
+import {reportOperation} from '../reports/report-operations';
+import {telephoneOperation} from '../growth/telephone-operations';
+import {growthOperation} from '../growth/growth-operations';
+
 import {questionnaireDiscussion} from "../families/questionnaire-discussion";
 // This module intentionally replaces the production backend in the demo repository.
 // No network, persistence, credentials or production service initialization.
@@ -12,11 +19,14 @@ import {clearinghouseConsent} from '../families/clearinghouse-consent';
 import {workspaceSchema,type Role} from './model';
 const initial=structuredClone(seed);
 let state:any;
+let growth=createGrowthStore();
 let role:Role='representative';
 const now=()=>new Date().toISOString();
 const id=()=>crypto.randomUUID();
 export function resetDemo(){
+ growth=createGrowthStore();
  state=structuredClone(initial);
+ state.finalReports=[];state.finalReportHistory=[];
  Object.assign(state,{workflowV2Enabled:true,questionnaireV2Enabled:true,familyWorkEnabled:true,familyDirectoryEnabled:true,activityFeedEnabled:true,resourceLibraryEnabled:true,professionalPoolEnabled:true,familyTasks:[],familyContacts:[]});
  state.families.forEach(f=>{f.representative_id='rep1';f.phone='';f.email='family@example.invalid';});
  state.professionals=[1,2,3].map(n=>({id:'pro'+n,profile_id:'professional'+n,name:['מומחה א׳ לדוגמה','מומחה ב׳ לדוגמה','מומחה ג׳ לדוגמה'][n-1],active:true,profile_active:true,analysis_enabled:true,execution_enabled:true,business_name:'משרד לדוגמה'}));
@@ -37,17 +47,42 @@ export function resetDemo(){
  state.notifications=[{id:'notice1',title:'ברוכים הבאים לדמו',body:'הנתונים והפעולות כאן הם להמחשה בלבד. אפשר לאפס את הדמו בכל עת.',read_at:null}];
 }
 resetDemo();
-export function startClientIntake(){
- resetDemo();
+export function startClientIntake(code?:string){
+ const retainedGrowth=growth;resetDemo();growth=retainedGrowth;
  Object.assign(state.families.find(f=>f.id==='f1'),{status:'new',onboarding_pct:0,answers:{},contact_name:'לקוח לדוגמה',phone:'0500000000'});
  for(const key of ['familyServices','documents','meetings','meetingItems','followUps','familyTasks','familyContacts','executionTasks'])state[key]=state[key].filter(x=>x.family_id!=='f1');
+ if(code)registerReferral(growth,code,'f1');
+}
+export function loadCompletedFamilyExample(){
+ startClientIntake();selectRole('representative');const at=now();const family=state.families.find(f=>f.id==='f1');
+ Object.assign(family,{name:'משפחת לדוגמה',answers:structuredClone(exampleAnswers),contact_name:'ישראל לדוגמה',phone:'0500000000',email:'demo@example.invalid',onboarding_pct:100,status:'meeting_done'});
+ const fsId='example-service',analysisId='example-analysis',executionId='example-execution',meetingId='example-meeting';
+ state.familyServices.push({id:fsId,family_id:'f1',service_id:'s2',status:'completed',analysis_task_id:analysisId,execution_task_id:executionId});
+ state.analysisTasks.push({id:analysisId,family_id:'f1',family_service_id:fsId,service_id:'s2',professional_id:'pro1',task_number:'A-EXAMPLE',status:'approved',financial:comparisonFinancial({},exampleComparison),current_situation:exampleComparison.current_detail,recommendation:exampleComparison.proposed_detail,client_summary:'הוצעה חלופה של 25 ₪ לחודש, בכפוף לתנאים. בדוגמה זו הצעה בלבד.',result_tone:'yellow',internal_note:'תיעוד פנימי לדוגמה — אינו חלק מהדוח ללקוח.'});
+ state.executionTasks.push({id:executionId,family_id:'f1',family_service_id:fsId,service_id:'s2',professional_id:'pro1',task_number:'E-EXAMPLE',status:'completed',instructions:'לבצע רק את המסלול שהמשפחה אישרה ולבדוק חיוב חדש וזיכוי.',outcome_summary:'דיווח מדומה: בוצע מסלול של 30 ₪ לחודש והתקבל זיכוי חד־פעמי של 120 ₪. ההצעה ל־25 ₪ לא מומשה.'});
+ state.executionHistory[executionId]={messages:[],updates:[{id:id(),text:'דיווח ביצוע מדומה: חיוב מעודכן 30 ₪ וזיכוי 120 ₪; הנציג בדק ואישר.'}]};
+ state.meetings.push({id:meetingId,family_id:'f1',status:'completed',scheduled_at:at,type:'phone'});
+ state.meetingItems.push({id:'example-item',meeting_id:meetingId,family_id:'f1',family_service_id:fsId,title:'בדיקת עמלות הבנק',client_summary:'המשפחה אישרה מסלול בעלות 30 ₪ לחודש. הצעת 25 ₪ לא התאימה לתנאים בדוגמה.',client_decision:'progress',visible_to_client:true,sort_order:1,financial:comparisonFinancial({},exampleComparison),current_situation:exampleComparison.current_detail,recommendation:exampleComparison.proposed_detail,decision_note:'תועד אישור למסלול של 30 ₪; זה שונה מהחלופה המקורית.',execution_instructions:'החלופה שאושרה היא 30 ₪ לחודש, עם בדיקת זיכוי.'});
+ for(const [suffix,name] of [['a','מסמך הדגמה א׳ — חיוב ישן 85 ₪'],['b','הצעה מדומה ב׳ — 25 ₪ בכפוף לתנאים'],['c','אישור הדגמה ג׳ — חיוב חדש 30 ₪'],['d','אישור הדגמה ד׳ — זיכוי 120 ₪']])state.documents.push({id:'example-doc-'+suffix,family_id:'f1',name,key:'example_'+suffix,type:'file',status:'approved',file_name:'מקור מדומה בלבד — לא הועלה קובץ',purpose:'המחשת מקור נתון בלבד, ללא מסמך אמיתי.'});
+ state.familyContacts.push({id:'example-contact',family_id:'f1',kind:'meeting',summary:'המשפחה ביקשה להפחית עמלות ולהבין את החיוב. הנציג הסביר את ההצעה ואת המסלול שנבחר.',occurred_at:at,author_name:'נציג לדוגמה',next_task_id:null});
+ state.familyTasks.push({id:'example-verification',family_id:'f1',title:'לבדוק את החיוב המעודכן ואת הזיכוי',details:'בדיקה מדומה לצורך המחשת סיום התהליך.',owner_role:'representative',owner_name:'נציג לדוגמה',due_on:at.slice(0,10),visible_to_client:true,status:'completed',revision:1,updated_at:at});
+ reportOperation('rpc_save_final_report',{p_meeting_id:meetingId,p_expected_revision:0,p_content:structuredClone(exampleReportContent)},state,'representative');
+ reportOperation('rpc_approve_final_report',{p_meeting_id:meetingId,p_expected_revision:1,p_treatment_complete:true,p_reviewed:true},state,'representative');
+ return meetingId;
 }
 export function selectRole(next:Role){role=next;}
 function workspace(){
  const data=structuredClone(state);
+ Object.assign(data,growthProjection(growth,role,state.families));
+ if(role==='marketer'){
+  data.familyDirectoryEnabled=false;
+  for(const key of ['finalReports','families','services','familyServices','documents','analysisTasks','executionTasks','meetings','meetingItems','followUps','familyTasks','familyContacts','timeline','notifications','profiles','professionals','professionalServices','representatives','audit','templates','automations','documentTypes','topicChecks','resources','offers'])data[key]=[];
+  data.settings={system_name:state.settings.system_name};
+ }
  const profileId=role==='professional'?'professional1':role;
  data.notifications=data.notifications.filter(n=>!n.audience||n.audience===role||role==='admin'&&n.audience==='representative').filter(n=>role!=='client'||!n.family_id||n.family_id==='f1');
  if(role==='client'){
+  data.finalReports=data.finalReports.filter(r=>r.family_id==='f1'&&r.status==='approved');
   data.families=data.families.filter(f=>f.id==='f1').map(({internal_notes,questionnaire_reviews,...f})=>f);
   for(const key of ['documents','familyServices','meetings','meetingItems','followUps','familyTasks'])data[key]=data[key].filter(x=>x.family_id==='f1');
   data.followUps=data.followUps.filter(t=>t.visible_to_client);data.familyTasks=data.familyTasks.filter(t=>t.visible_to_client);
@@ -55,11 +90,12 @@ function workspace(){
   data.analysisTasks=[];data.executionTasks=[];data.timeline=[];data.familyContacts=[];data.topicChecks=[];data.topicChecksEnabled=false;
  }
  if(role==='professional'){
+  data.finalReports=[];
   data.analysisTasks=data.analysisTasks.filter(t=>t.professional_id==='pro1');data.executionTasks=data.executionTasks.filter(t=>t.professional_id==='pro1');
   data.families=[];data.familyServices=[];data.documents=[];data.meetings=[];data.meetingItems=[];data.followUps=[];data.familyTasks=[];data.familyContacts=[];data.timeline=[];
  }
  if(role!=='admin'){data.profiles=[];data.audit=[];}
- return workspaceSchema.parse({...data,profile:{id:profileId,name:({client:'לקוח לדוגמה',representative:'נציג לדוגמה',professional:'מומחה א׳ לדוגמה',admin:'מנהל לדוגמה'})[role],role,active:true},permissions:role==='admin'?['*']:role==='representative'?state.representatives[0].permissions:[]});
+ return workspaceSchema.parse({...data,profile:{id:profileId,name:({client:'לקוח לדוגמה',representative:'נציג לדוגמה',professional:'מומחה א׳ לדוגמה',admin:'מנהל לדוגמה',marketer:'משווק לדוגמה'})[role],role,active:true},permissions:role==='admin'?['*']:role==='representative'?state.representatives[0].permissions:[]});
 }
 export async function loadWorkspace(familyId?:string){const w=workspace();if(familyId&&w.families.some(f=>f.id===familyId))w.scopedFamilyId=familyId;return w;}
 export class WorkspaceNetworkError extends Error{}
@@ -74,6 +110,10 @@ function update(key:string,identifier:string,patch:any,expected?:number){const o
 function assign(serviceId:string,kind:string,professionalId:string){const fs=find('familyServices',serviceId);const task={id:id(),family_id:fs.family_id,family_service_id:fs.id,service_id:fs.service_id,professional_id:professionalId,task_number:'DEMO-'+(state.analysisTasks.length+state.executionTasks.length+1),status:kind==='analysis'?'assigned':'sent_execution',due_at:new Date(Date.now()+86400000*3).toISOString()};state[kind==='analysis'?'analysisTasks':'executionTasks'].push(task);fs[kind+'_task_id']=task.id;fs.status=kind==='analysis'?'in_analysis':'sent_execution';return task.id;}
 export async function rpc<T=unknown>(name:string,a:Record<string,any>={}):Promise<T>{
  const run=()=>{
+ if(role==='marketer')throw Error('PERMISSION_DENIED');
+ const growthResult=growthOperation(name,a,growth,role);if(growthResult!==undefined)return growthResult;
+ const reportResult=reportOperation(name,a,state,role);if(reportResult!==undefined)return reportResult;
+ const phoneResult=telephoneOperation(name,a,state,role);if(phoneResult!==undefined)return phoneResult;
  const operation=operationRpc(name,a,state,role);if(operation!==undefined)return operation;
  const staff=role==='admin'||role==='representative';
  if(name==='rpc_sign_document'){

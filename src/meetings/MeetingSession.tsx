@@ -1,3 +1,4 @@
+import {FinalReportPanel} from '../reports/FinalReportPanel';
 import {useRetainedState,useWorkingDrafts} from '../lib/draft-guard';
 import {CallContext} from './CallContext';
 import {MeetingBrief} from './MeetingBrief';
@@ -106,11 +107,12 @@ export function MeetingSession({meeting:m,w,edit,refresh,onDirtyChange,leave,bac
   {edit&&w.workflowV2Enabled&&<MeetingControls meeting={m} refresh={refresh} leave={leave}/>}
   {activeStage==='checklist'&&<TopicChecklist w={w} meeting={m} refresh={refresh} onDirtyChange={setDirty} leave={leave} onComplete={()=>move(()=>setStage('summary'))}/>}
   {activeStage==='prepare'&&<section className="card meeting-preparation">
-   <MeetingBrief items={items} w={w} familyId={m.family_id}/>
+   {w.profile.role!=='representative'&&<MeetingBrief items={items} w={w} familyId={m.family_id}/>}
    <h2>מגיעים לשיחה עם תמונה מסודרת</h2><p className="call-opening"><strong>אפשר לפתוח כך: </strong>״נעבור יחד על מה שבדקנו, נחליט מה מתאים לכם, ובסוף נסכם מי עושה מה ומתי.״</p>
    <div className="call-preparation-action"><div><strong>{progress.total} המלצות מוכנות לשיחה</strong><p className="muted">מתקדמים נושא־נושא. בכל שלב אפשר לחזור ולעדכן.</p></div>{m.status==='scheduled'?<AsyncButton className="primary" disabled={!items.length} action={start}>התחלת פגישה</AsyncButton>:<button className="primary" onClick={()=>setStage('discussion')}>חזרה לנושאים</button>}</div>
    <h3>הנושאים שנעבור עליהם</h3>{items.map(i=><button className="agenda-link" key={i.id} onClick={()=>move(()=>onView({topic:i.id,stage:'discussion'}))}><span>{i.title||'נושא לשיחה'}</span><span className="muted">{i.visible_to_client?'משותף עם הלקוח':'פנימי לצוות'} · {comparisonGaps(readComparison(i.financial?.comparison)).length} פרטי השוואה להשלמה<Icon name="arrow"/></span></button>)}
    {!items.length&&<Empty>אין נושאים בשיחה. יש לבדוק את התיק לפני תחילת השיחה.</Empty>}
+   {w.profile.role==='representative'&&<MeetingBrief items={items} w={w} familyId={m.family_id}/>}
    <details><summary>על הנתונים שהוכנו לשיחה</summary><p className="muted">השיחה מציגה עותק של הממצאים שאושרו בעת תיאומה. ניתוח שעודכן לאחר מכן אינו מתעדכן כאן אוטומטית. עוברים על תאריך הבדיקה, בסיס החישוב והתנאים; נתון חסר מבקשים להשלים לפני החלטה.</p></details>
   </section>}
  {edit&&pendingDecisions.length>0&&<section className="draft-tray" aria-label="טיוטות החלטה בשיחה"><strong>{pendingDecisions.length} טיוטות החלטה שטרם נשמרו בתיק</strong><span>אפשר לעבור בין נושאים ולחזור. סיום השיחה יתאפשר לאחר שמירה או ביטול של הטיוטות.</span>{pendingDecisions.map(d=><button className="ghost" key={d.key} onClick={()=>move(()=>onView({stage:'discussion',topic:d.key.slice(('decision:'+m.id+':').length)}))}>חזרה לטיוטה: {d.label}</button>)}</section>}
@@ -129,6 +131,7 @@ export function MeetingSession({meeting:m,w,edit,refresh,onDirtyChange,leave,bac
    <section className="card"><FollowUps openFamily={openFamily} w={w} refresh={refresh} meetingId={m.id} onDirtyChange={setDirty} leave={leave}/>{edit&&w.followUpsEnabled&&<details className="summary-preview"><summary>תצוגת משימות ההמשך של הלקוח</summary><FollowUps openFamily={openFamily} w={w} refresh={refresh} meetingId={m.id} onDirtyChange={setDirty} leave={leave} preview/></details>}</section>
    {edit&&m.status==='in_progress'&&<section className="card meeting-finish"><h2>בדיקה לפני סיום השיחה</h2>{progress.missing.length>0?<><p>נותרו {progress.missing.length} נושאים גלויים ללא החלטה. חזרו אליהם לפני הסיום:</p>{progress.missing.map(i=><button className="ghost" key={i.id} onClick={()=>move(()=>onView({topic:i.id,stage:'discussion'}))}>{i.title}<Icon name="arrow"/></button>)}</>:<p>כל הנושאים הגלויים כוללים החלטה שמורה. נושאים שאושרו ימתינו לשיוך לביצוע; נושאים למחשבה יישארו למעקב הנציג.</p>}<p className="muted">סיום השיחה מעדכן את מצב התחומים בתיק. הוא אינו שולח מייל ואינו משייך בעל מקצוע אוטומטית.</p><AsyncButton className="primary" disabled={progress.missing.length>0||dirty||pendingDecisions.length>0||!items.length} action={async()=>{await rpc('rpc_finish_meeting',{p_meeting_id:m.id,p_force:false});await refresh();}}>סיום הפגישה ושמירת הסיכום</AsyncButton></section>}
    {edit&&m.status==='completed'&&<section className="card"><h2>המשך הטיפול באחריות הנציג</h2><button className="primary" onClick={()=>openFamily(m.family_id,'services')}>לשיוך בתחומי הטיפול</button><p>בדקו בתיק המשפחה אילו תחומים ממתינים לשיוך לביצוע ואילו נושאים ממתינים להחלטת המשפחה.</p><p className="muted">התיעוד הפנימי שנשמר נגיש כאן לצוות המורשה.</p>{items.filter(i=>i.decision_note||i.execution_instructions).map(i=><details key={i.id}><summary>{i.title} — תיעוד פנימי</summary><p>{i.decision_note}</p><p>{i.execution_instructions}</p></details>)}</section>}
+   <FinalReportPanel w={w} meeting={m} refresh={refresh}/>
   </>}
  </div>;
 }
