@@ -12,7 +12,7 @@ import {useRetainedState} from '../lib/draft-guard';
 import {ResourceLibrary} from '../resources/ResourceLibrary';
 import {ContactReuse} from './ContactReuse';
 import {PreparationTip} from './PreparationTip';
-import {createContext,useContext,useId,useEffect,useRef,useState} from 'react';
+import {createContext,useContext,useId,useEffect,useLayoutEffect,useRef,useState} from 'react';
 import {type Answers,type LegacyField} from './questionnaire-definition';
 import type {Family,Service,Document,Field as DynamicField} from '../lib/model';
 import {AsyncButton,Field,SaveForm,Panel} from '../ui';
@@ -65,7 +65,10 @@ export function Questionnaire({family,services,refresh,onDirtyChange,onComplete,
  const persistDraft=async()=>{const result=await rpc<Family>('rpc_save_family',{p_family_id:family.id,p_patch:{answers},p_expected_updated_at:revision});setWork(prev=>({...prev,saved:JSON.stringify(answers),revision:result.updated_at}));await refresh();};
  const saveDraft=async()=>{setBusy(true);try{await persistDraft();}finally{setBusy(false);}};
  const submitted=family.onboarding_pct===100;
- function jump(key:string,chapterKey:string){setChapter(chapterKey==='custom'?current.key:chapterKey);requestAnimationFrame(()=>{const field=Array.from(paper.current?.querySelectorAll<HTMLElement>('[data-answer-key]')||[]).find(el=>el.dataset.answerKey===key);if(field){let parent=field.parentElement;while(parent){if(parent instanceof HTMLDetailsElement)parent.open=true;parent=parent.parentElement;}field.focus();field.scrollIntoView({block:'center',behavior:'auto'});}});}
+ // Set validation focus with the committed fields, before the next user interaction.
+ const pendingField=useRef<string|null>(null);
+ useLayoutEffect(()=>{const key=pendingField.current;if(!key)return;pendingField.current=null;const field=Array.from(paper.current?.querySelectorAll<HTMLElement>('[data-answer-key]')||[]).find(el=>el.dataset.answerKey===key);if(field){let parent=field.parentElement;while(parent){if(parent instanceof HTMLDetailsElement)parent.open=true;parent=parent.parentElement;}field.focus();field.scrollIntoView({block:'center',behavior:'auto'});}});
+ function jump(key:string,chapterKey:string){pendingField.current=key;setChapter(chapterKey==='custom'?current.key:chapterKey);}
  return <div ref={paper} className={`questionnaire-paper${focused?" questionnaire-focused":""}`}><BrandLogo className="questionnaire-signature"/><BrandLogo mark className="questionnaire-stamp"/><Panel title="השאלון המשפחתי"><AnswerErrors.Provider value={errors}><fieldset disabled={busy} aria-busy={busy}>
  <details className="questionnaire-introduction"><summary>לפני שמתחילים · מה ממלאים ואיך שומרים?</summary><p className="section-intro">רק שדות עם כוכבית (*) נדרשים לשליחה. את יתר השדות אפשר להשאיר ריקים ולהשלים עם הנציג. להסבר על שאלה, לחצו על סימן השאלה שלצדה.</p><p>שאלות נוספות יופיעו לפי התשובות שלכם. בדמו משתמשים בפרטים מדומים בלבד.</p><p>״שמירת טיוטה״ שומרת בלי לעבור פרק; ״שמירה והמשך״ שומרת ועוברת לפרק הבא. אפשר לחזור ולתקן. רענון או סגירת הדמו אינם שומרים את ההתקדמות לביקור הבא.</p><div className="chapter-assistance"><PreparationTip chapter={current.key}/>{current.key==='family'&&<ContactReuse family={family} answers={answers} apply={patch=>setAnswers(a=>({...a,...patch}))}/>}</div></details>
  {family.updated_at!==revision&&<p className="hint" role="status">התיק השתנה מאז שהתחלתם לערוך. הטיוטה עדיין מוצגת כאן. בדקו את התשובות השמורות לפני שמירה נוספת. <button className="text-button" onClick={()=>{if(dirty)setDiscard(true);else loadLatest();}}>טעינת התשובות המעודכנות</button></p>}

@@ -16,6 +16,7 @@ try{for(const width of [1440,390,320]){
  await expect(nav.getByRole('button',{name:'פרטי משפחה',exact:true})).toHaveAttribute('aria-current','step');
  for(const key of ['h_id','h_phone','h_email'])await expect(field(key)).toHaveAttribute('aria-invalid','true');
  await field('h_email').fill('invalid');await nav.getByRole('button',{name:'עבודה והכנסות',exact:true}).click();await expect(field('h_email')).toBeVisible();
+ await nav.getByRole('button',{name:'עבודה והכנסות',exact:true}).evaluate(async button=>{button.click();await Promise.resolve();document.querySelector('[data-answer-key=h_phone]').focus();await new Promise(resolve=>requestAnimationFrame(resolve));});await expect(field('h_phone')).toBeFocused();
  await field('h_id').fill('000000018');await field('h_phone').fill('0500000000');await field('h_email').fill('demo@example.invalid');
  await field('city').fill('ירושלים');const cityList=await field('city').getAttribute('list');await expect(page.locator(`datalist[id="${cityList}"] option[value="ירושלים"]`)).toHaveCount(1);
  await field('address').fill('יפו');const streetList=await field('address').getAttribute('list');await expect(page.locator(`datalist[id="${streetList}"] option[value="יפו"]`)).toHaveCount(1);await field('address').fill('יפו 10 דירה 2');

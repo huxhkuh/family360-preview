@@ -6,7 +6,7 @@ try{for(const width of [1440,390]){
  const page=await browser.newPage({viewport:{width,height:1000},reducedMotion:'reduce'}),errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
  const noDashboard=async()=>{await expect(page.getByRole('navigation',{name:'ניווט ראשי'})).toHaveCount(0);await expect(page.locator('.demo-bar')).toBeHidden();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);};
  await page.goto(base);await expect(page.getByRole('heading',{name:'את הצעד הראשון כבר עשיתם.',exact:true})).toBeVisible();await noDashboard();
- await page.locator('.public-hero img').evaluate(img=>img.decode());await page.screenshot({path:`${out}/${width}-home.png`,fullPage:true});
+ for(const img of await page.locator('.welcome-page img').all())await img.evaluate(el=>el.decode());await page.screenshot({path:`${out}/${width}-home.png`,fullPage:true});
  await page.getByRole('button',{name:'קודם, ספרו לנו עוד',exact:true}).click();await expect(page.getByRole('heading',{name:'מה קורה כשמתחילים לעשות סדר?',exact:true})).toBeVisible();await noDashboard();await page.screenshot({path:`${out}/${width}-explain.png`,fullPage:true});
  await page.getByRole('button',{name:'כן, מתחילים יחד · 490 ש״ח ←',exact:true}).click();await expect(page.locator('.customer-flow')).toHaveAttribute('data-stage','payment');await noDashboard();
  expect(await page.locator('.customer-flow input').count()).toBe(0);await page.screenshot({path:`${out}/${width}-payment.png`,fullPage:true});
