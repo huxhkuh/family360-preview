@@ -18,3 +18,5 @@ class Boundary extends React.Component<{children:React.ReactNode},{failed:boolea
  render(){return this.state.failed?<main className="auth-card"><h1>אירעה תקלה בתצוגה</h1><p>יש לטעון מחדש את המסך.</p><button onClick={()=>location.reload()}>טעינה מחדש</button></main>:this.props.children;}
 }
 createRoot(document.getElementById('root')!).render(<React.StrictMode><Boundary><Demo/></Boundary></React.StrictMode>);
+
+import './landing/welcome.css';

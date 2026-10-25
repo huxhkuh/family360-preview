@@ -53,6 +53,7 @@ jobs:
           npm run test:client-focus
           npm run test:client-decisions
           npm run test:new-client-optional
+          node scripts/check-homepage.mjs
       - uses: actions/upload-pages-artifact@v4
         with:
           path: dist
