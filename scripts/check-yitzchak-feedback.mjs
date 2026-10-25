@@ -25,7 +25,7 @@ try{for(const width of [1440,390,320]){
  const after=await field('h_email').evaluate(el=>el.getBoundingClientRect().top+scrollY);expect(Math.abs(after-before)).toBeLessThan(1);
  const bounds=await note.boundingBox();expect(bounds.x).toBeGreaterThanOrEqual(0);expect(bounds.x+bounds.width).toBeLessThanOrEqual(width);
  await page.screenshot({path:`${out}/${width}-floating-help.png`});await page.keyboard.press('Escape');await expect(note).not.toBeVisible();
- await next.click();await field('h_emp').getByLabel('לא עובד',{exact:true}).check();await next.click();await field('housing').selectOption('family');await next.click();
+ await next.click();try{await field('h_emp').getByLabel('לא עובד',{exact:true}).check({timeout:10000});}catch(error){console.error(JSON.stringify({width,chapter:await page.locator('.chapter-heading h3').allTextContents(),issues:await page.locator('.validation-summary').allTextContents(),alerts:await page.locator('[role=alert]').allTextContents()}));await page.screenshot({path:out+'/'+width+'-failure.png',fullPage:true});throw error;}await next.click();await field('housing').selectOption('family');await next.click();
  await expect(field('savings')).toBeVisible();
  const authorization=page.locator('[data-preparation-key="clearinghouse_auth_h"]').first();await authorization.getByRole('button',{name:'הוספת הרשאה להשלמה עם הנציג',exact:true}).click();
  await page.goto(base+'#/families/f1/documents');
