@@ -39,7 +39,8 @@
     "dev:api": "wrangler dev --config server/wrangler.jsonc",
     "deploy:api:staging": "wrangler deploy --config server/wrangler.jsonc",
     "test:runtime": "wrangler deploy --config server/wrangler.jsonc --dry-run --minify --outdir artifacts/runtime && node scripts/check-worker-runtime.mjs",
-    "test:focused-home": "node scripts/check-focused-home.mjs"
+    "test:focused-home": "node scripts/check-focused-home.mjs",
+    "test:task-surfaces": "node scripts/check-task-surfaces.mjs"
   },
   "dependencies": {
     "@fontsource-variable/assistant": "5.3.0",

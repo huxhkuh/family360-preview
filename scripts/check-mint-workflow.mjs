@@ -1,3 +1,4 @@
+import {revealTaskContent} from './task-navigation.mjs';
 import {chromium,expect} from '@playwright/test';
 import {writeFileSync,mkdirSync} from 'node:fs';
 const base=(process.env.DEMO_URL||'http://127.0.0.1:5250/family360-preview/').replace(/\/?$/,'/');
@@ -17,7 +18,7 @@ try{for(const [device,width,height] of [['desktop',1440,900],['tablet',820,900],
  await task.getByRole('button',{name:'עריכת הפעולה',exact:true}).click();await tasks.getByLabel('פרטי המשימה').fill('פרטים שנשמרו');await tasks.getByRole('button',{name:'שמירת הפעולה',exact:true}).click();
  await task.getByRole('button',{name:'התחלת פעולה',exact:true}).click();await task.getByRole('button',{name:'עריכת הפעולה',exact:true}).click();await tasks.getByLabel('פרטי המשימה').fill('טיוטה שנשארת לאחר ניווט');await nav.getByRole('button',{name:'פגישות',exact:true}).click();await go('families/f1/followups');await expect(tasks.getByLabel('פרטי המשימה')).toHaveValue('טיוטה שנשארת לאחר ניווט');await tasks.getByRole('button',{name:'שמירת הפעולה',exact:true}).click();await expect(task.locator('.badge')).toHaveText('בטיפול');
  // Repeated contact records remain separate; adding a next action stays optional.
- await go('families/f1/overview');const contacts=page.getByRole('region',{name:'קשר עם המשפחה',exact:true});
+ await go('families/f1/overview');await revealTaskContent(page,'section[aria-label="קשר עם המשפחה"]');const contacts=page.getByRole('region',{name:'קשר עם המשפחה',exact:true});
  for(const summary of ['תיעוד קשר ראשון לבדיקה','תיעוד קשר שני לבדיקה']){
   await contacts.getByRole('button',{name:'תיעוד קשר',exact:true}).click();await contacts.getByLabel('תיעוד פנימי של הקשר').fill(summary);await contacts.getByRole('button',{name:'שמירת תיעוד הקשר',exact:true}).click();await expect(page.getByText(summary,{exact:true})).toBeVisible();
  }

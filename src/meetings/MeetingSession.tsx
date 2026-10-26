@@ -1,3 +1,5 @@
+import {TaskSupport} from '../workspace/TaskSurface';
+import {readRoute} from '../lib/navigation';
 import {FinalReportPanel} from '../reports/FinalReportPanel';
 import {useRetainedState,useWorkingDrafts} from '../lib/draft-guard';
 import {CallContext} from './CallContext';
@@ -95,16 +97,22 @@ export function MeetingSession({meeting:m,w,edit,refresh,onDirtyChange,leave,bac
   :m.status==='cancelled'
   ?['הפגישה בוטלה','אפשר לעיין בתיעוד שנשמר ולתאם פגישה חדשה דרך תיק המשפחה.']
   :[progress.missing.length?'משלימים החלטות לפני הסיום':'מסכמים עם המשפחה את הצעד הבא',progress.missing.length?'חוזרים לנושאים הפתוחים ומתעדים החלטה. לאחר מכן עוברים על הסיכום ועל המשימות.':'קוראים יחד את הסיכום, מוודאים מי מטפל ובאיזה מועד, ואז מסיימים את הפגישה.'];
- return <div className={edit?'call-session':'meeting-summary-view'}>
+ const taskMode=readRoute(location.hash).focus===m.id;
+ const meetingContext=<TaskSupport active={taskMode} title="פרטי השיחה והשלבים">
   <button className="ghost" onClick={back}>חזרה למסך הקודם</button>
   <header className="page-title call-title"><div><p className="eyebrow">שיחת נציג · {m.scheduled_at?new Date(m.scheduled_at).toLocaleString('he-IL',{dateStyle:'medium',timeStyle:'short'}):'מועד טרם נקבע'} · {{phone:'שיחה טלפונית',video:'שיחת וידאו',zoom:'שיחת וידאו',inperson:'פגישה פרונטלית'}[m.type||'']||'פרטי השיחה'}</p><h1>{family?.name||'שיחת נציג'}</h1></div>{family&&<button className="text-button" onClick={()=>openFamily(family.id)}>לתיק המשפחה</button>}</header>
   {edit&&<div className="call-contact-bar" aria-label="פרטי הלקוח והתקדמות השיחה"><div><div className="call-person"><strong>{family?.name||'המשפחה בשיחה'}</strong><small>{family?.contact_name||'איש קשר טרם הוגדר'}</small></div>{family?.phone?<bdi className="call-phone">{family.phone}</bdi>:<span>טלפון טרם הוגדר</span>}<Badge status={m.status}/></div><div className="call-progress"><span>{progress.decided} מתוך {progress.total} החלטות נשמרו</span>{progress.total>0&&<progress max={progress.total} value={progress.decided} aria-label="החלטות שנשמרו"/>}<small>{dirty||pendingDecisions.length>0?'יש טיוטות שטרם נשמרו בתיק':'מוצגים הנתונים שנשמרו'}</small></div></div>}
   {!edit&&<Badge status={m.status}/>}
   {edit&&<nav className="meeting-steps" aria-label="שלבי השיחה">{steps.map(([key,label],index)=><button key={key} aria-current={activeStage===key?'step':undefined} aria-label={key==='checklist'?'רשימת בדיקה · '+meetingTopics.length+' נושאים':undefined} className={activeStage===key?'selected':'ghost'} disabled={closed&&!['summary','checklist'].includes(key)} onClick={()=>{if(key!==activeStage)move(()=>setStage(key));}}><span>{index+1}</span>{label}{key==='checklist'&&<small>{checked}/{meetingTopics.length}</small>}</button>)}</nav>}
+  </TaskSupport>;
+ const familyContext=edit&&family&&<TaskSupport active={taskMode} title="פרטי המשפחה ומידע לשיחה"><CallContext w={w} family={family} meeting={m} refresh={refresh}/><CallReference family={family} w={w}/></TaskSupport>;
+ const meetingTools=edit&&w.workflowV2Enabled&&<TaskSupport active={taskMode} title="ניהול מועד ומצב הפגישה"><MeetingControls meeting={m} refresh={refresh} leave={leave}/></TaskSupport>;
+ const topicMenu=<TaskSupport active={taskMode} title="בחירת נושא אחר בשיחה"><nav className="meeting-agenda" aria-label="נושאי השיחה">{items.map((i,index)=><button key={i.id} aria-current={current?.id===i.id?'page':undefined} className={current?.id===i.id?'active':''} onClick={()=>{if(i.id!==current?.id)move(()=>onView({topic:i.id}));}}><span className="topic-number">{index+1}</span><span><strong>{i.title||'נושא לשיחה'}</strong><small>{i.visible_to_client?'גלוי ללקוח':'פנימי לצוות'}</small><Badge status={i.client_decision||'undecided'}/>{pendingDecisions.some(d=>d.key==='decision:'+m.id+':'+i.id)&&<span className="draft-dot">טיוטה</span>}</span></button>)}</nav></TaskSupport>;
+ return <div className={edit?'call-session':'meeting-summary-view'}>{!taskMode&&meetingContext}{taskMode&&<header className="task-surface-heading"><p>{family?.name}</p><h1>{steps.find(([key])=>key===activeStage)?.[1]||'סיכום השיחה'}</h1></header>}
   {edit&&<section className="call-guidance" aria-label="מה עושים עכשיו"><div><p className="eyebrow">{closed?'מצב הפגישה':'עכשיו בשיחה'}</p><h2>{guidance[0]}</h2><p>{guidance[1]}</p></div>{activeStage==='summary'&&!closed&&progress.missing[0]&&<button className="primary" onClick={()=>move(()=>onView({stage:'discussion',topic:progress.missing[0].id}))}>להחלטה הבאה שחסרה</button>}</section>}
   {notice&&<p className="success call-saved-notice" role="status">{notice}</p>}
-  {edit&&family&&<><CallContext w={w} family={family} meeting={m} refresh={refresh}/><CallReference family={family} w={w}/></>}
-  {edit&&w.workflowV2Enabled&&<MeetingControls meeting={m} refresh={refresh} leave={leave}/>}
+  {!taskMode&&familyContext}
+  {!taskMode&&meetingTools}
   {activeStage==='checklist'&&<TopicChecklist w={w} meeting={m} refresh={refresh} onDirtyChange={setDirty} leave={leave} onComplete={()=>move(()=>setStage('summary'))}/>}
   {activeStage==='prepare'&&<section className="card meeting-preparation">
    {w.profile.role!=='representative'&&<MeetingBrief items={items} w={w} familyId={m.family_id}/>}
@@ -117,7 +125,7 @@ export function MeetingSession({meeting:m,w,edit,refresh,onDirtyChange,leave,bac
   </section>}
  {edit&&pendingDecisions.length>0&&<section className="draft-tray" aria-label="טיוטות החלטה בשיחה"><strong>{pendingDecisions.length} טיוטות החלטה שטרם נשמרו בתיק</strong><span>אפשר לעבור בין נושאים ולחזור. סיום השיחה יתאפשר לאחר שמירה או ביטול של הטיוטות.</span>{pendingDecisions.map(d=><button className="ghost" key={d.key} onClick={()=>move(()=>onView({stage:'discussion',topic:d.key.slice(('decision:'+m.id+':').length)}))}>חזרה לטיוטה: {d.label}</button>)}</section>}
   {activeStage==='discussion'&&<>
-   <nav className="meeting-agenda" aria-label="נושאי השיחה">{items.map((i,index)=><button key={i.id} aria-current={current?.id===i.id?'page':undefined} className={current?.id===i.id?'active':''} onClick={()=>{if(i.id!==current?.id)move(()=>onView({topic:i.id}));}}><span className="topic-number">{index+1}</span><span><strong>{i.title||'נושא לשיחה'}</strong><small>{i.visible_to_client?'גלוי ללקוח':'פנימי לצוות'}</small><Badge status={i.client_decision||'undecided'}/>{pendingDecisions.some(d=>d.key==='decision:'+m.id+':'+i.id)&&<span className="draft-dot">טיוטה</span>}</span></button>)}</nav>
+   {!taskMode&&topicMenu}
    {current?<section className="meeting-topic call-topic"><header className="call-topic-heading"><p className="eyebrow">נושא {items.indexOf(current)+1} מתוך {items.length} · {current.visible_to_client?'משותף עם הלקוח':'פנימי לצוות'}</p><h2 ref={topicHeading} tabIndex={-1}>{current.title||'נושא לשיחה'}</h2></header><div className="call-topic-columns"><div className="call-explanation">
     <p className="call-question"><strong>{current.visible_to_client?'שאלה למשפחה: ':'לבדיקה פנימית: '}</strong>{current.visible_to_client?'״אחרי שעברנו על האפשרויות, איך תרצו להתקדם בנושא הזה?״':'מה צריך לתאם בצוות כדי לקדם את הטיפול?'}</p>
     <button className="call-decision-shortcut" onClick={()=>{decisionPanel.current?.scrollIntoView({block:'start',behavior:'instant'});decisionPanel.current?.querySelector('select')?.focus({preventScroll:true});}}>לתיעוד ההחלטה</button><TopicEvidence key={current.id} id={current.id}><ComparisonDetails value={current.financial?.comparison} currentSituation={current.current_situation} recommendation={current.recommendation}/>
@@ -125,6 +133,7 @@ export function MeetingSession({meeting:m,w,edit,refresh,onDirtyChange,leave,bac
    </div><aside ref={decisionPanel} className="call-decision" aria-label="תיעוד ההחלטה"><h3>מה סיכמנו?</h3><p className="call-decision-topic">{current.title||'נושא לשיחה'}</p>{m.status==='in_progress'?<DecisionEditor w={w} key={current.id} item={current} meetingId={m.id} refresh={refresh} onDirtyChange={setDirty} onSaved={continueAfterSave} nextLabel={nextTopic?'שמירה והמשך לנושא הבא':checksPending?'שמירה והמשך לרשימת הבדיקה':'שמירה והמשך לסיכום'}/>:<><p className="hint">אפשר לעיין בממצאים כעת. תיעוד החלטות זמין לאחר תחילת הפגישה.</p><AsyncButton className="primary" action={start}>התחלת פגישה</AsyncButton></>}</aside></div></section>:<Empty>אין נושאים להצגה.</Empty>}
    <div className="call-stage-actions">{w.topicChecksEnabled&&<button onClick={()=>move(()=>setStage('checklist'))}>להמשך בדיקת הנושאים</button>}<button className="ghost" onClick={()=>move(()=>setStage('summary'))}>לבדיקת הסיכום והמשך הטיפול</button></div>
   </>}
+  {activeStage==='discussion'&&taskMode&&topicMenu}
   {activeStage==='summary'&&<>
    {edit&&m.status==='in_progress'&&checksPending&&<p className="hint">ברשימת הבדיקה נבדקו {checked} מתוך {meetingTopics.length} נושאים. <button className="text-button" onClick={()=>move(()=>setStage('checklist'))}>להשלמת הבדיקה</button></p>}
    <section className="card"><p className="eyebrow">{edit?'תצוגת הסיכום הגלוי ללקוח':'סיכום השיחה'}</p>{m.status==='cancelled'&&<p className="hint">השיחה בוטלה. המשך הטיפול יתואם עם הנציג.</p>}{!closed&&<p className="hint">השיחה טרם הסתיימה. מוצגות רק ההחלטות שכבר נשמרו.</p>}<PublicSummary items={items}/>{family?.answers?.housing==='rent'&&<RentReminder/>}{w.resourceLibraryEnabled&&<details className="summary-resources"><summary>קישורים ופרטי קשר להמשך</summary><ResourceLibrary version={w}/></details>}</section>
@@ -133,5 +142,5 @@ export function MeetingSession({meeting:m,w,edit,refresh,onDirtyChange,leave,bac
    {edit&&m.status==='completed'&&<section className="card"><h2>המשך הטיפול באחריות הנציג</h2><button className="primary" onClick={()=>openFamily(m.family_id,'services')}>לשיוך בתחומי הטיפול</button><p>בדקו בתיק המשפחה אילו תחומים ממתינים לשיוך לביצוע ואילו נושאים ממתינים להחלטת המשפחה.</p><p className="muted">התיעוד הפנימי שנשמר נגיש כאן לצוות המורשה.</p>{items.filter(i=>i.decision_note||i.execution_instructions).map(i=><details key={i.id}><summary>{i.title} — תיעוד פנימי</summary><p>{i.decision_note}</p><p>{i.execution_instructions}</p></details>)}</section>}
    <FinalReportPanel w={w} meeting={m} refresh={refresh}/>
   </>}
- </div>;
+ {taskMode&&familyContext}{taskMode&&meetingTools}{taskMode&&meetingContext}</div>;
 }

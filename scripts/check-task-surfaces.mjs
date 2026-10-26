@@ -1,0 +1,22 @@
+import {chromium,expect} from '@playwright/test';
+import {mkdirSync,writeFileSync} from 'node:fs';
+const base=process.env.DEMO_URL||'http://127.0.0.1:5264/family360-preview/',out='test-results/task-surfaces';mkdirSync(out,{recursive:true});
+const browser=await chromium.launch(),results=[];
+try{for(const width of [1440,390,320]){
+ const page=await browser.newPage({viewport:{width,height:1000},reducedMotion:'reduce'}),errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
+ const go=path=>page.goto(base+'#/'+path),role=async value=>page.getByLabel('צפייה בתפקיד',{exact:true}).selectOption(value);
+ const capture=async name=>{expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);await page.screenshot({path:`${out}/${name}-${width}.png`,fullPage:true});};
+ await page.goto(base+'#workspace');await page.locator('.demo-roles>button').first().click();await go('families/f1/documents');
+ const request=page.locator('form').filter({has:page.getByRole('button',{name:'הוספת דרישת מסמך',exact:true})});await request.getByLabel('סוג מסמך').selectOption('dt1');await request.getByRole('button',{name:'הוספת דרישת מסמך',exact:true}).click();
+ await role('client');await page.locator('.focus-task button').click();await expect(page.locator('.record-focus')).toHaveAttribute('data-focused-record','d1');
+ await expect(page.locator('article.document:visible')).toHaveCount(1);await expect(page.getByRole('navigation',{name:'תוכן תיק המשפחה'})).toHaveCount(0);await capture('requested-document');
+ await page.locator('[data-record-id=d1]').getByRole('button',{name:'צירוף קובץ דוגמה בלבד',exact:true}).click();await expect(page.locator('[data-record-id=d1]')).toContainText('ממתין לבדיקה');await expect(page.locator('article.document:visible')).toHaveCount(1);
+ await go('families/f1/followups?focus=fu1');await expect(page.locator('.followup-row:visible')).toHaveCount(1);await expect(page.locator('[data-record-id=fu1]')).toBeFocused();await capture('requested-followup');
+ await page.locator('[data-record-id=fu1]').getByRole('button',{name:'סימון כהושלמה',exact:true}).click();await expect(page.locator('[data-record-id=fu1] .badge').first()).toHaveText('הושלמה');await expect(page.locator('.followup-row:visible')).toHaveCount(1);await capture('completed-followup');
+ await go('families/f1/documents?focus=not-loaded');await expect(page.locator('article.document:visible')).toHaveCount(0);await expect(page.locator('.record-focus')).toContainText('הפריט המבוקש אינו זמין');
+ await role('professional');await page.locator('.focus-task button').click();await expect(page.locator('.task-detail')).toBeVisible();await expect(page.getByRole('navigation',{name:'סוג המשימות'})).toHaveCount(0);await capture('professional-task');
+ await role('admin');await page.locator('.focus-task button').click();await expect(page.locator('article.document:visible')).toHaveCount(1);await capture('review-document');
+ await role('representative');await go('meetings/m3?focus=m3');await expect(page.getByRole('navigation',{name:'שלבי השיחה'})).toHaveCount(0);await page.getByRole('button',{name:'התחלת פגישה',exact:true}).click();await expect(page.getByRole('navigation',{name:'נושאי השיחה'})).toHaveCount(0);await capture('meeting-topic');await page.getByLabel('מה הלקוח החליט?').selectOption('no_action');await page.getByRole('button',{name:'שמירה והמשך לנושא הבא',exact:true}).click();await expect(page.getByRole('heading',{name:'בדיקת עמלות בחשבון הבנק',exact:true})).toBeVisible();
+ expect(errors).toEqual([]);results.push({width,passed:true});await page.close();
+}}finally{await browser.close();}
+writeFileSync(out+'/results.json',JSON.stringify(results,null,2));console.log(JSON.stringify(results,null,2));

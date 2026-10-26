@@ -1,3 +1,4 @@
+import {revealTaskContent} from './task-navigation.mjs';
 import {chromium,expect} from '@playwright/test';
 import {mkdirSync,writeFileSync} from 'node:fs';
 const base=process.env.DEMO_URL||'http://127.0.0.1:5250/family360-preview/';
@@ -18,13 +19,13 @@ try{for(const [device,width,height] of [['desktop',1440,1000],['tablet',820,900]
  await doc.getByRole('button',{name:'צירוף קובץ דוגמה בלבד',exact:true}).click();await expect(doc).toContainText('ממתין לבדיקה');
  await page.goto(base+'#/families/f1/followups');const followup=page.locator('[data-record-id="fu1"]');
  await expect(followup.getByRole('link',{name:/פתיחת המסמך/})).toBeVisible();await followup.getByRole('button',{name:'סימון כהושלמה',exact:true}).click();
- await page.getByRole('navigation',{name:'סינון משימות המשך'}).getByRole('button',{name:'הכול',exact:true}).click();
+ await revealTaskContent(page,'nav[aria-label="סינון משימות המשך"]');await page.getByRole('navigation',{name:'סינון משימות המשך'}).getByRole('button',{name:'הכול',exact:true}).click();
  await followup.getByRole('button',{name:'סימנתי בטעות — בקשת תיקון מהנציג',exact:true}).click();await expect(followup).toContainText('בקשת התיקון נרשמה');await expect(followup.locator('.badge')).toHaveText('הושלמה');
  await page.goto(base+'#/overview');await page.locator('.focus-more>summary').click();await page.locator('.client-help summary').click();await page.getByLabel('במה נוכל לעזור?').fill('נרצה הסבר לפני המשך הטיפול');
  await page.getByRole('button',{name:'רישום בקשת עזרה בדמו',exact:true}).click();await expect(page.locator('.client-help')).toContainText('בקשת העזרה רשומה במעקב');await expect(care).toContainText('נרצה הסבר לפני המשך הטיפול');await expect(care).toContainText('בקשה לתיקון:');
  await page.getByLabel('צפייה בתפקיד',{exact:true}).selectOption('representative');await page.goto(base+'#/notifications');await page.locator('section.card').filter({has:page.getByRole('heading',{name:'בקשת עזרה מהמשפחה',exact:true})}).getByRole('button',{name:'פתיחת הבקשה בתיק',exact:true}).click();await expect(page.locator('.family-activity')).toContainText('נרצה הסבר לפני המשך הטיפול');
  // Editing a linked follow-up must preserve the document relationship.
- await page.getByRole('navigation',{name:'סינון משימות המשך'}).getByRole('button',{name:'הכול',exact:true}).click();await followup.getByRole('button',{name:'פתיחה מחדש',exact:true}).click();await followup.getByRole('button',{name:/עדכון אחראי או מועד/}).click();await followup.getByRole('button',{name:'שמירת אחראי ומועד',exact:true}).click();await expect(followup.getByRole('link',{name:/פתיחת המסמך/})).toBeVisible();
+ await revealTaskContent(page,'nav[aria-label="סינון משימות המשך"]');await page.getByRole('navigation',{name:'סינון משימות המשך'}).getByRole('button',{name:'הכול',exact:true}).click();await followup.getByRole('button',{name:'פתיחה מחדש',exact:true}).click();await followup.getByRole('button',{name:/עדכון אחראי או מועד/}).click();await followup.getByRole('button',{name:'שמירת אחראי ומועד',exact:true}).click();await expect(followup.getByRole('link',{name:/פתיחת המסמך/})).toBeVisible();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1)).toBe(false);
  // Start a fresh synthetic intake in a new page: validate drafts and nested errors.
  const fresh=await browser.newPage({viewport:{width,height}});fresh.on('pageerror',e=>errors.push(e.message));await fresh.goto(base+'#workspace');await fresh.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();await fresh.getByRole('button',{name:'התחלת השאלון',exact:true}).click();

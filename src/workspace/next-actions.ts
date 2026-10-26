@@ -22,17 +22,18 @@ export function clientActions(w:Workspace):NextAction[]{
 export function staffActions(w:Workspace,now=new Date()):NextAction[]{
  const role=w.profile.role;
  if(!['representative','professional','admin'].includes(role))return [];
+ if(role==='professional'){
+  const ownIds=new Set(w.professionals.filter(p=>p.profile_id===w.profile.id&&p.active&&p.profile_active).map(p=>p.id));
+  return ([['analysis',w.analysisTasks],['execution',w.executionTasks]] as const).flatMap(([kind,tasks])=>tasks.filter(t=>ownIds.has(t.professional_id)&&(kind==='analysis'?['assigned','in_progress','returned']:['sent_execution','execution_in_progress','needs_info']).includes(t.status)).map(t=>({id:kind+':'+t.id,title:(kind==='analysis'?'בדיקה מקצועית':'ביצוע')+' — '+(w.services.find(s=>s.id===t.service_id)?.name||t.task_number),detail:'פותחים את החומר שהועבר למשימה, מתעדים את העבודה ושולחים לבדיקה כשהיא מוכנה.',familyId:t.family_id,familyName:w.families.find(f=>f.id===t.family_id)?.name,label:'פתיחת המשימה',target:{page:'tasks',kind,id:t.id,focus:t.id} as RouteState,due:t.due_at||undefined,reason:isLate({due:t.due_at||undefined},now)?'מועד הטיפול עבר':'באחריותך'}))).sort((a,b)=>Number(isLate(b,now))-Number(isLate(a,now))||sortActions(a,b));
+ }
+
  const rows=workQueue(w,now).filter(row=>{
   if(row.waiting)return false;
   if(role==='representative')return row.mine;
-  if(role==='professional'){
-   const id=row.target.id;const task=(row.target.kind==='execution'?w.executionTasks:w.analysisTasks).find(t=>t.id===id);
-   return !!task&&w.professionals.some(p=>p.id===task.professional_id&&p.profile_id===w.profile.id)&&!row.approval;
-  }
   return row.approval; // Routine execution belongs to the assigned worker, not the manager.
  });
- const actions:NextAction[]=rows.map((row:WorkItem)=>({id:row.id,familyId:row.familyId,familyName:row.familyName,title:row.title,detail:role==='admin'?`ממתין לבדיקה ולאישור. הנציג המטפל: ${row.owner}.`:role==='professional'?'פותחים את המשימה, בודקים את החומר וממשיכים מהמצב שבו נעצרתם.':'פותחים את הפריט ומטפלים בבקשה הבאה בתיק.',label:row.label,target:['family-task','followup','document'].includes(row.id.split(':')[0])?{...row.target,focus:row.id.slice(row.id.indexOf(':')+1)}:row.target,due:row.due,reason:isLate(row,now)?'מועד הטיפול עבר':row.approval?'ממתין לאישורכם':'באחריותכם'}));
- if(role==='admin'&&can(w,'families.edit'))for(const f of w.families.filter(f=>!['completed','archived'].includes(f.status)&&!w.representatives.some(r=>r.id===f.representative_id&&r.active)))actions.push({id:'unassigned:'+f.id,familyId:f.id,familyName:f.name,title:'שיוך נציג למשפחה',detail:'לתיק אין נציג פעיל שמרכז את הטיפול.',label:'לשיוך נציג',target:{page:'families',id:f.id,tab:'overview'},due:undefined,reason:'חסרה אחריות לטיפול'});
+ const actions:NextAction[]=rows.map((row:WorkItem)=>({id:row.id,familyId:row.familyId,familyName:row.familyName,title:row.title,detail:role==='admin'?`ממתין לבדיקה ולאישור. הנציג המטפל: ${row.owner}.`:'פותחים את הפריט ומטפלים בבקשה הבאה בתיק.',label:row.label,target:{...row.target,focus:row.id.startsWith('analysis:')&&row.target.page==='families'?w.analysisTasks.find(t=>t.id===row.id.slice(9))?.family_service_id:row.id.slice(row.id.indexOf(':')+1)},due:row.due,reason:isLate(row,now)?'מועד הטיפול עבר':row.approval?'ממתין לאישורכם':'באחריותכם'}));
+ if(role==='admin'&&can(w,'families.edit'))for(const f of w.families.filter(f=>!['completed','archived'].includes(f.status)&&!w.representatives.some(r=>r.id===f.representative_id&&r.active)))actions.push({id:'unassigned:'+f.id,familyId:f.id,familyName:f.name,title:'שיוך נציג למשפחה',detail:'לתיק אין נציג פעיל שמרכז את הטיפול.',label:'לשיוך נציג',target:{page:'families',id:f.id,tab:'overview',focus:'assignment'},due:undefined,reason:'חסרה אחריות לטיפול'});
  return actions.sort((a,b)=>Number(b.id.startsWith('unassigned:'))-Number(a.id.startsWith('unassigned:'))||Number(isLate(b,now))-Number(isLate(a,now))||sortActions(a,b));
 }
 export function nextActions(w:Workspace,now=new Date()){return w.profile.role==='client'?clientActions(w):staffActions(w,now);}
