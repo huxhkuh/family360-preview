@@ -1,3 +1,4 @@
+import {revealTaskContent} from './task-navigation.mjs';
 import {chromium,expect} from '@playwright/test';
 import {mkdirSync,writeFileSync} from 'node:fs';
 const base=process.env.DEMO_URL||'http://127.0.0.1:5250/family360-preview/';
@@ -45,7 +46,7 @@ try{for(const width of [1440,390,320]){
  const discussion=page.locator('.discussion-topic').filter({hasText:'עד כמה תמונת החסכונות'}); // optional knowledge not filled, no fabricated topic
  await expect(discussion).toHaveCount(0);
  const savings=page.locator('.discussion-topic').filter({hasText:'אילו חסכונות והשקעות יש לכם? · חסכונות'});
- await savings.locator('summary').click();await expect(savings).toContainText('לא יודעים');await savings.getByLabel('מה התברר או סוכם בשיחה?').fill('נברר את המוצרים יחד בשיחה');await savings.getByRole('button',{name:'שמירת סיכום הבירור',exact:true}).click();await expect(savings.locator('summary')).toContainText('נבדק בשיחה');
+ await revealTaskContent(page,'.discussion-topic');await savings.locator('summary').click();await expect(savings).toContainText('לא יודעים');await savings.getByLabel('מה התברר או סוכם בשיחה?').fill('נברר את המוצרים יחד בשיחה');await savings.getByRole('button',{name:'שמירת סיכום הבירור',exact:true}).click();await expect(savings.locator('summary')).toContainText('נבדק בשיחה');
  await page.screenshot({path:`${out}/${width}-representative.png`,fullPage:true});
  await page.getByLabel('צפייה בתפקיד',{exact:true}).selectOption('client');await route('/families/f1/questionnaire');await chapter('חסכונות והשקעות');await field('savings').getByLabel('אין חסכונות',{exact:true}).check();await save();
  await page.getByLabel('צפייה בתפקיד',{exact:true}).selectOption('representative');await route('/families/f1/overview');await expect(savings.locator('summary')).toContainText('לבירור');
