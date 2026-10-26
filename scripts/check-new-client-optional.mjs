@@ -26,7 +26,7 @@ try{for(const width of [1440,390,320]){
  await expect(page.locator('.client-completion')).toContainText('אין צורך לצרף מסמכי רשות כדי להתקדם');
  const home=page.getByRole('button',{name:'חזרה לבית שלי',exact:true});await expect(home).toBeVisible();const pos=await home.boundingBox();if(width<500)expect(pos.y+pos.height).toBeLessThan(844);
  await page.screenshot({path:`${out}/${width}-complete-no-documents.png`});await home.click();await expect(page).toHaveURL(/#\/overview$/);await expect(page.getByRole('button',{name:'התחלת השאלון',exact:true})).toHaveCount(0);
- await page.getByRole('button',{name:'כל המסמכים',exact:true}).click();const prep=page.locator('.document-preparation-more');await expect(prep).not.toHaveAttribute('open');await prep.locator(':scope > summary').click();
+ await page.locator('.focus-more>summary').click();await page.getByRole('button',{name:'כל המסמכים',exact:true}).click();const prep=page.locator('.document-preparation-more');await expect(prep).not.toHaveAttribute('open');await prep.locator(':scope > summary').click();
  // A deliberately deferred signature must stay optional and must not become an orange "missing" obligation.
  await prep.locator('[data-preparation-key=clearinghouse_auth_h]').getByRole('button',{name:'הוספת הרשאה להשלמה עם הנציג',exact:true}).click();
  await expect(page.locator('article.document .badge')).toHaveText('חתימה לפני פנייה למסלקה');await expect(page.locator('.client-completion')).toBeVisible();await expect(page.locator('article.document')).toContainText('קוראים וחותמים על ההרשאה');
