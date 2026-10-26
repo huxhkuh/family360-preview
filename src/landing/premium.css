@@ -86,3 +86,8 @@
  .premium-public.restored-home .public-process-steps{display:grid;grid-template-columns:1fr;gap:28px;margin:32px 0 36px}
  .premium-public.restored-home .public-process-steps li{margin:0}
 }
+
+/* Brand symbols stand on the page, like the logo, without generic icon tiles. */
+.premium-public.restored-home .public-benefit-icon{width:64px;height:64px;background:none;border-radius:0}
+.premium-public.restored-home .public-benefit-icon svg{display:block;width:64px;height:64px;overflow:visible}
+@media(max-width:700px){.premium-public.restored-home .public-benefit-icon,.premium-public.restored-home .public-benefit-icon svg{width:56px;height:56px}}
