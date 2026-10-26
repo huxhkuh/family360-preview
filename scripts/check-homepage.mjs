@@ -12,12 +12,14 @@ try{
   await page.goto(base+'#welcome');
   await page.getByRole('heading',{name:'את הצעד הראשון כבר עשיתם.',exact:true}).waitFor();
   for(const image of await page.locator('.welcome-page img').all())await image.evaluate(img=>img.decode());
-  assert.equal(await page.locator('.welcome-page .mesudarim-logo').count(),2);
+  assert.equal(await page.locator('.welcome-page .landing-brand-image').count(),2);
   assert.equal(await page.locator('.welcome-page main img').count(),3);
+  for(const text of ['אנחנו כאן כדי לעזור לכם להבין מה קורה עם הכסף שלכם, איפה אפשר לשפר, ומה כדאי לעשות קודם.','קצת יותר סדר. הרבה יותר בהירות.','כל ההוצאות האלה באמת נחוצות? אולי אנחנו משלמים יותר מדי? כשכל פרט נמצא במקום אחר, קשה לראות איך הכול מתחבר.'])assert.ok((await page.locator('.welcome-page main').innerText()).replace(/\s+/g,' ').includes(text));
+  for(const art of await page.locator('.integrated-art').all())assert.equal(await art.evaluate(el=>getComputedStyle(el).backgroundColor),'rgba(0, 0, 0, 0)');
   assert.equal(await page.locator('.public-intro').evaluate(el=>getComputedStyle(el).fontSize),width>700?'28px':'25px');
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
   await page.screenshot({path:`test-results/homepage-${width}.png`,fullPage:true});
-  await page.getByRole('button',{name:'כניסה למערכת',exact:true}).click();
+  await page.getByRole('button',{name:/^כניסה (לדמו המערכת|למערכת)/}).click();
   await page.getByRole('heading',{name:'התנסות במסודרים 360°',exact:true}).waitFor();
   assert.equal(await page.locator('.demo-roles>button').count(),5);
   await page.getByRole('button',{name:'פתיחת תיק מלא ודוח לדוגמה',exact:true}).waitFor();
@@ -33,9 +35,9 @@ try{
   const before=await nav.evaluate(el=>({color:getComputedStyle(el).color,font:getComputedStyle(el).fontSize}));
   await page.getByRole('button',{name:'דף הבית',exact:true}).click();
   await page.getByRole('heading',{name:'את הצעד הראשון כבר עשיתם.',exact:true}).waitFor();
-  await page.getByRole('button',{name:'איך זה עובד?',exact:true}).click();
+  await page.locator('.welcome-page .public-header').getByText('איך זה עובד?',{exact:true}).click();
   assert.equal(new URL(page.url()).hash,'#learn');
-  await page.getByRole('button',{name:'כניסה למערכת',exact:true}).click();
+  await page.getByRole('button',{name:/^כניסה (לדמו המערכת|למערכת)/}).click();
   await nav.waitFor();
   assert.equal(new URL(page.url()).hash,route);
   assert.equal(await page.getByLabel('חיפוש משפחה',{exact:true}).inputValue(),'פרידמן');
@@ -48,9 +50,9 @@ try{
    const currentRoute=new URL(page.url()).hash;
    const shellClass=await page.locator('.app-shell').getAttribute('class');
    await page.getByRole('button',{name:'דף הבית',exact:true}).click();
-   await page.getByRole('button',{name:'איך זה עובד?',exact:true}).click();
+   await page.locator('.welcome-page .public-header').getByText('איך זה עובד?',{exact:true}).click();
    assert.equal(new URL(page.url()).hash,'#learn');
-   await page.getByRole('button',{name:'כניסה למערכת',exact:true}).click();
+   await page.getByRole('button',{name:/^כניסה (לדמו המערכת|למערכת)/}).click();
    assert.equal(await page.getByLabel('צפייה בתפקיד',{exact:true}).inputValue(),role);
    assert.equal(new URL(page.url()).hash,currentRoute);
    assert.equal(await page.locator('.app-shell').getAttribute('class'),shellClass);
@@ -61,7 +63,7 @@ try{
   await page.getByRole('button',{name:'התחלת השאלון',exact:true}).click();
   await page.locator('[data-answer-key=city]').fill('טיוטה שנשמרת במעבר לדף הבית');
   await page.getByRole('button',{name:'דף הבית',exact:true}).click();
-  await page.getByRole('button',{name:'כניסה למערכת',exact:true}).click();
+  await page.getByRole('button',{name:/^כניסה (לדמו המערכת|למערכת)/}).click();
   assert.equal(await page.locator('[data-answer-key=city]').inputValue(),'טיוטה שנשמרת במעבר לדף הבית');
   assert.deepEqual(errors,[]);await page.close();
  }
