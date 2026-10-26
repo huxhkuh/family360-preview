@@ -6,7 +6,7 @@ let config:ReturnType<typeof configuration>=null;
 try{config=configuration(import.meta.env.VITE_SUPABASE_URL||'',import.meta.env.VITE_SUPABASE_ANON_KEY||'');}catch(e){configError=e;}
 export const backend=config?createClient(config.url,config.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage,flowType:'pkce'}}):null;
 export {configError};
-const api=String(import.meta.env.VITE_API_URL||'').replace(/\/$/,'');
+const api=import.meta.env.VITE_API_URL==='same-origin'?window.location.origin:String(import.meta.env.VITE_API_URL||'').replace(/\/$/,'');
 export class WorkspaceNetworkError extends Error{constructor(){super('WORKSPACE_NETWORK');}}
 async function request(path:string,init:RequestInit={}){
  if(!backend||!api||!/^https:\/\//.test(api)&&!/^http:\/\/127\.0\.0\.1:\d+$/.test(api))throw Error('CONFIG_INVALID');

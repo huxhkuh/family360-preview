@@ -13,6 +13,11 @@ const runtime=new Miniflare(convertV4MiniflareOptions({workers:[{
   bindings:{ENVIRONMENT:'test',AUTH_ENABLED:'true',SUPABASE_URL:'https://auth.example.invalid',SUPABASE_PUBLISHABLE_KEY:'synthetic-test-key',ALLOWED_ORIGINS:origin},
   d1Databases:['DB'],r2Buckets:['DOCUMENTS'],
   outboundService:()=>new Response('External requests disabled in runtime tests',{status:503}),
+},{
+  name:'pages-proxy',modules:true,compatibilityDate:'2026-10-26',
+  routes:['https://pages-runtime.invalid/*'],
+  scriptPath:fileURLToPath(new URL('../server/pages-proxy.js',import.meta.url)),
+  serviceBindings:{STAGING_API:'runtime',ASSETS:()=>new Response('synthetic asset')},
 }]}));
 try {
   const db=await runtime.getD1Database('DB');
@@ -39,6 +44,12 @@ try {
   const foreign=await call('/health',{headers:{Origin:'https://untrusted.example.invalid'}});
   assert.equal(foreign.status,403);
   assert.equal(foreign.headers.get('access-control-allow-origin'),null);
+  const pagesFetch=(path,init={})=>runtime.dispatchFetch('https://pages-runtime.invalid'+path,init);
+  const proxied=await pagesFetch('/api/rpc/rpc_workspace',{method:'POST',headers:{Origin:origin}});
+  assert.equal(proxied.status,401,await proxied.clone().text());
+  assert.equal((await proxied.json()).error.code,'UNAUTHENTICATED');
+  assert.equal((await pagesFetch('/health',{headers:{Origin:'https://untrusted.example.invalid'}})).status,403);
+  assert.equal(await (await pagesFetch('/')).text(),'synthetic asset');
   await assert.rejects(db.batch([
     db.prepare('INSERT INTO transaction_assertions(id,valid) VALUES (?,1)').bind('runtime-rollback'),
     db.prepare('INSERT INTO transaction_assertions(id,valid) VALUES (?,0)').bind('runtime-invalid'),
