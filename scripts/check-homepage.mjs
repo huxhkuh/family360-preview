@@ -15,7 +15,9 @@ try{
   assert.equal(await page.locator('.welcome-page .landing-brand-image').count(),2);
   assert.equal(await page.locator('.welcome-page .integrated-art').count(),3);
   for(const text of ['אנחנו כאן כדי לעזור לכם להבין מה קורה עם הכסף שלכם, איפה אפשר לשפר, ומה כדאי לעשות קודם.','קצת יותר סדר. הרבה יותר בהירות.','כל ההוצאות האלה באמת נחוצות? אולי אנחנו משלמים יותר מדי? כשכל פרט נמצא במקום אחר, קשה לראות איך הכול מתחבר.'])assert.ok((await page.locator('.welcome-page main').innerText()).replace(/\s+/g,' ').includes(text));
-  for(const art of await page.locator('.integrated-art').all())assert.equal(await art.evaluate(el=>getComputedStyle(el).backgroundColor),'rgba(0, 0, 0, 0)');
+  assert.equal(await page.locator('.public-hero').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(8, 46, 40)');
+  assert.equal(await page.locator('.hero-case-card').count(),0);
+  for(const art of await page.locator('.public-story .integrated-art').all())assert.equal(await art.evaluate(el=>getComputedStyle(el).backgroundColor),'rgba(0, 0, 0, 0)');
   assert.equal(await page.locator('.public-intro').evaluate(el=>getComputedStyle(el).fontSize),width>700?'28px':'25px');
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
   await page.screenshot({path:`test-results/homepage-${width}.png`,fullPage:true});

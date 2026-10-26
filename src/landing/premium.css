@@ -1,0 +1,88 @@
+/* Original public layout, dark opening and copper controls. */
+.premium-public.restored-home .public-header{max-width:none;margin:0;padding:28px max(48px,calc((100vw - 1184px)/2));background:#082e28;color:#faf7f2}
+.premium-public.restored-home .public-header nav a,.premium-public.restored-home .public-header nav>button{color:#faf7f2}
+.premium-public.restored-home .public-hero{max-width:none;margin:0;padding:35px max(48px,calc((100vw - 1184px)/2)) 85px;background:#082e28;color:#faf7f2}
+.premium-public.restored-home .public-hero h1{color:#faf7f2}
+.premium-public.restored-home .public-hero .brand-kicker{color:#d9b58d!important}
+.premium-public.restored-home .public-hero .public-intro{color:#f0f0e5!important}
+.premium-public.restored-home .public-hero>div>p:not(.brand-kicker):not(.public-intro){color:#c8d6cc}
+.premium-public.restored-home .public-hero .public-margin-note{color:#b5c9bd}
+/* Four rounded pieces and a circular centre echo the approved logo. */
+.premium-public.restored-home .art-welcome{position:relative;isolation:isolate}
+.premium-public .companion-backdrop{position:absolute;inset:18px 6px 18px 10px;z-index:-1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:7px;direction:ltr;filter:drop-shadow(0 18px 30px #001e1a30)}
+.premium-public .companion-backdrop i{background:linear-gradient(135deg,#fcf8ec,#e5dcc9);position:relative;overflow:hidden}
+.premium-public .companion-backdrop i:nth-child(1){border-radius:72px 5px 5px 5px}
+.premium-public .companion-backdrop i:nth-child(2){border-radius:5px 72px 5px 5px;background:linear-gradient(135deg,#eddfc7,#d6c3a3)}
+.premium-public .companion-backdrop i:nth-child(3){border-radius:5px 5px 5px 72px;background:linear-gradient(135deg,#e8d8bd,#f2e7d5)}
+.premium-public .companion-backdrop i:nth-child(4){border-radius:5px 5px 72px 5px}
+.premium-public .companion-backdrop::after{content:"";position:absolute;width:38%;aspect-ratio:1;border-radius:50%;background:#f8f3e6;border:7px solid #082e28;left:31%;top:50%;transform:translateY(-50%)}
+.premium-public.restored-home .public-hero .brand-companion-ground{background:#243b292b;filter:blur(3px)}
+/* Brushed copper bands and fine directional grain, with the original rounded shape. */
+.brand-public.premium-public .brand-primary,.premium-public.restored-home .public-header nav>button{--copper-sheen:linear-gradient(115deg,#b77c4b 0%,#cf9865 17%,#edc69a 36%,#d29c69 52%,#b87f4f 70%,#e2b486 88%,#c38a59 100%);background-image:repeating-linear-gradient(0deg,#ffffff0b 0px,#ffffff0b 1px,#72401a08 1px,#72401a08 2px),var(--copper-sheen);background-color:#ce9866;color:#2d2118;border:1px solid #d4a475;border-radius:18px 18px 5px 18px;box-shadow:inset 0 1px 0 #fff3dd9c,inset 0 -1px 0 #77451d45,0 4px 10px #1c130b14;text-shadow:0 1px 0 #ffe6bf70;font-weight:700}
+.premium-public.restored-home .public-header nav>button{padding:10px 20px}
+.brand-public.premium-public .brand-primary:hover,.premium-public.restored-home .public-header nav>button:hover{background-image:repeating-linear-gradient(0deg,#ffffff10 0px,#ffffff10 1px,#72401a08 1px,#72401a08 2px),linear-gradient(115deg,#c08a57,#f2cea5 36%,#d7a171 58%,#e6bb8e 88%,#c99260);background-color:#d5a16f;color:#2d2118;border-color:#e3b88a}
+.brand-public.premium-public .brand-primary:active{transform:translateY(0);box-shadow:inset 0 2px 5px #77451d35}
+.premium-public :focus-visible{outline:3px solid #d9a370;outline-offset:5px}
+/* Later illustrations share the text canvas. */
+.premium-public.restored-home .public-story{gap:45px}
+.premium-public.restored-home .public-story .integrated-art{background:transparent;border:0;box-shadow:none;border-radius:0;padding:0}
+.premium-public.restored-home .public-story .integrated-art>img{height:470px;object-fit:contain}
+@media(max-width:1000px) and (min-width:701px){.premium-public.restored-home .public-hero{padding-inline:30px;gap:30px}.premium-public.restored-home .public-header{padding-inline:30px}}
+@media(max-width:700px){.premium-public.restored-home .public-header{padding:20px 24px;gap:12px}.premium-public.restored-home .public-header nav{gap:10px}.premium-public.restored-home .public-header nav>button{padding:8px 12px}.premium-public.restored-home .public-hero{padding:30px 24px 35px;gap:0}.premium-public .companion-backdrop{inset:12px 22px 12px;gap:5px}.premium-public .companion-backdrop::after{border-width:5px}.premium-public .companion-backdrop i:nth-child(1){border-top-left-radius:52px}.premium-public .companion-backdrop i:nth-child(2){border-top-right-radius:52px}.premium-public .companion-backdrop i:nth-child(3){border-bottom-left-radius:52px}.premium-public .companion-backdrop i:nth-child(4){border-bottom-right-radius:52px}.premium-public.restored-home .public-story{gap:10px}.premium-public.restored-home .public-story .integrated-art>img{height:330px}}
+@media(prefers-reduced-motion:reduce){.premium-public *{animation:none!important;transition:none!important}}
+
+/* Native scroll: opaque pages slide over the page pinned behind them. */
+.premium-public.restored-home.page-stack {--stack-header-height:116px;overflow:clip;isolation:isolate}
+.premium-public.restored-home.page-stack>.public-header {position:fixed;inset:0 0 auto;z-index:20;padding-block:12px;min-height:108px;transform:translateY(0);transition:transform .24s ease}
+.premium-public.restored-home.page-stack>.public-header .landing-brand-image {width:110px;height:84px}
+.premium-public.restored-home.page-stack>.public-header[data-theme=light] {background:#faf7f2;color:#072c25;box-shadow:0 1px 0 #072c2515}
+.premium-public.restored-home.page-stack>.public-header[data-theme=light] nav a {color:#072c25}
+.premium-public.restored-home.page-stack>.public-header[data-theme=dark] {background:#082e28;color:#faf7f2}
+.premium-public.restored-home.page-stack>main>section {
+ position:sticky;top:var(--page-pin-top,0px);z-index:var(--page-order,1);
+ width:100%;max-width:none;margin:0;min-height:100svh;
+ padding:64px max(48px,calc((100vw - 1184px)/2));background:#faf7f2;
+ border-radius:0;box-shadow:0 -16px 40px #041e1912;
+}
+.premium-public.restored-home.page-stack>main>.public-hero {background:#082e28;padding-block:calc(var(--stack-header-height) + 35px) 65px;box-shadow:none}
+.premium-public.restored-home.page-stack>main>.public-benefits {display:flex;flex-direction:column;justify-content:center}
+.premium-public.restored-home.page-stack>main>.public-benefits>h2 {margin-bottom:45px}
+.premium-public.restored-home.page-stack>main>.public-process {background:#f1eee5}
+.premium-public.restored-home.page-stack>main>.public-faq {align-items:center}
+.premium-public.restored-home.page-stack>main>.public-join-strip {background:#082e28;align-content:center}
+.premium-public.restored-home.page-stack>.public-footer {position:relative;z-index:10;max-width:none;margin:0;background:#faf7f2;padding:40px max(48px,calc((100vw - 1184px)/2))}
+@media(max-width:1000px) and (min-width:701px){
+ .premium-public.restored-home.page-stack>main>section {padding-inline:30px}
+}
+@media(max-width:700px){
+ .premium-public.restored-home.page-stack>.public-header {padding:12px 24px;min-height:88px}
+ .premium-public.restored-home.page-stack>.public-header .landing-brand-image {width:85px;height:64px}
+ .premium-public.restored-home.page-stack>main>section {padding:42px 24px}
+ .premium-public.restored-home.page-stack>main>.public-hero {padding-block:calc(var(--stack-header-height) + 25px) 35px}
+ .premium-public.restored-home.page-stack>main>.public-benefits>h2 {margin-bottom:30px}
+ .premium-public.restored-home.page-stack>.public-footer {padding:30px 24px}
+}
+@media(prefers-reduced-motion:reduce){
+ .premium-public.restored-home.page-stack>main>section {position:relative;top:auto;box-shadow:none}
+}
+
+/* Retractable navigation frees the full canvas without shifting the pages. */
+.premium-public.restored-home.page-stack>.public-header[data-visible=false]:not(:has(:focus-visible)){transform:translateY(-101%);pointer-events:none}
+.premium-public.restored-home.page-stack>main>section:not([data-page-theme=dark]){background:radial-gradient(ellipse at 85% 12%,#fffdf9 0%,transparent 65%),linear-gradient(135deg,#faf7f2 0%,#f3eee4 60%,#eaece2 100%)}
+.premium-public.restored-home.page-stack>main>.public-process{background:radial-gradient(ellipse at 15% 20%,#fbf8ef 0%,transparent 60%),linear-gradient(135deg,#f4f0e6,#eeede3 55%,#e5e9df)}
+.premium-public.restored-home.page-stack>.public-header[data-theme=light],.premium-public.restored-home.page-stack>.public-footer{background:linear-gradient(110deg,#f4efe5,#fcfaf5 60%,#f0f1e9)}
+
+/* Give the four steps a broad reading area instead of a long vertical column. */
+@media(min-width:1001px){
+ .premium-public.restored-home.page-stack>main>.public-process{grid-template-columns:minmax(0,1.8fr) minmax(260px,1fr);gap:48px;padding-block:80px}
+ .premium-public.restored-home .public-process-steps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:36px;row-gap:34px;margin:38px 0 40px}
+ .premium-public.restored-home .public-process-steps li{margin:0;gap:12px;align-items:flex-start}
+ .premium-public.restored-home .public-process-steps li>div{min-width:0}
+ .premium-public.restored-home .public-process-steps h3{line-height:1.3;margin-bottom:9px}
+ .premium-public.restored-home .public-process-steps p{line-height:1.6}
+ .premium-public.restored-home .public-process .integrated-art>img{height:420px}
+}
+@media(max-width:1000px){
+ .premium-public.restored-home .public-process-steps{display:grid;grid-template-columns:1fr;gap:28px;margin:32px 0 36px}
+ .premium-public.restored-home .public-process-steps li{margin:0}
+}
