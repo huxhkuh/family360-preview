@@ -20,8 +20,16 @@ export async function saveTask(c:Context,a:Row,followup=false){
  requireThat(a.p_expected_revision==null||a.p_expected_revision===0,'CONFLICT',409);
  return c.insert(table,{id,family_id:family.id,...payload,...(meeting?{meeting_id:meeting.id,item_id:payload.item_id||null}:{}),status:'open',revision:1,created_by:c.actor.profile.id,updated_by:c.actor.profile.id,created_at:now(),updated_at:now()});
 }
-export const familyOperations=[ 'rpc_create_family','rpc_save_family','rpc_complete_onboarding','rpc_add_family_service','rpc_search_families','rpc_family_activity','rpc_save_family_task','rpc_save_meeting_followup','rpc_set_family_task_status','rpc_set_followup_status','rpc_record_family_contact','rpc_telephone_contact','rpc_review_questionnaire_topic','rpc_client_request'];
+export const familyOperations=[ 'rpc_assign_family_representative','rpc_create_family','rpc_save_family','rpc_complete_onboarding','rpc_add_family_service','rpc_search_families','rpc_family_activity','rpc_save_family_task','rpc_save_meeting_followup','rpc_set_family_task_status','rpc_set_followup_status','rpc_record_family_contact','rpc_telephone_contact','rpc_review_questionnaire_topic','rpc_client_request'];
 export async function families(c:Context,name:string,a:Row):Promise<unknown>{
+ if(name==='rpc_assign_family_representative'){
+  requireThat(c.actor.profile.role==='admin'&&has(c.actor,'families.edit'));
+  const p=parse(z.object({p_family_id:idSchema,p_representative_id:idSchema,p_expected_updated_at:timestamp}).strict(),a);
+  const f=await familyAccess(c.db,c.actor,p.p_family_id,'families.edit');expected(f.updated_at,p.p_expected_updated_at);
+  const rep=await c.db.required('representatives',p.p_representative_id);const profile=await c.db.required('profiles',rep.profile_id);
+  requireThat(rep.active&&profile.active&&profile.role==='representative','VALIDATION',400);
+  const result=c.patch('families',f,{representative_id:rep.id});c.event(f.id,'שויך נציג לטיפול בתיק');return result;
+ }
  if(name==='rpc_create_family'){
   requireThat(has(c.actor,'families.edit'));const p=parse(z.object({p_name:shortText,p_client_profile_id:idSchema.nullable(),p_representative_id:idSchema.nullable(),p_phone:z.string().max(40).nullable().optional(),p_email:z.email().nullable().optional()}),a);
   if(c.actor.profile.role!=='admin')requireThat(p.p_representative_id===c.actor.representative?.id);

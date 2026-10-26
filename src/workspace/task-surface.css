@@ -12,3 +12,7 @@
 .document[data-task-document=true]>.task-support,.document[data-task-document=true]>details{order:10}
 .document[data-task-document=true] .record-intro{font-size:18px;line-height:1.65;color:#526457}
 .record-focus>.document:focus,.record-focus>.followup-row:focus{outline:2px solid #aa784b;outline-offset:5px}
+
+.task-continuation{padding:24px 0;margin:20px 0;border-top:1px solid #dedbd0;order:5}.task-continuation p:first-child{font-weight:600;color:#244f43}.task-continuation a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 24px;border-radius:24px;text-decoration:none;background:#244f43;color:#fff}.task-continuation a:focus-visible{outline:3px solid #aa784b;outline-offset:4px}
+
+.task-detail>.task-context-title{order:-3}.task-detail>button{order:-2}.task-detail>.task-continuation{order:-1}

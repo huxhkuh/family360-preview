@@ -10,7 +10,8 @@ type Invitation=z.infer<typeof invitesSchema>[number];
 export function AgentInvitations(){
  const [items,setItems]=useState<Invitation[]>([]);const [link,setLink]=useState('');const [error,setError]=useState('');
  async function refresh(){setError('');try{setItems(invitesSchema.parse(await rpc('rpc_list_agent_invitations')));}catch(e){setError(safeMessage(e));}}
- useEffect(()=>{refresh();},[]);
+ useEffect(()=>{if(import.meta.env.VITE_LIVE_MODE)void refresh();},[]);
+ if(!import.meta.env.VITE_LIVE_MODE)return <Panel title="הזמנת סוכן באמצעות קישור"><p>יצירת חשבונות באמצעות קישור אינה זמינה בדמו. אפשר לעיין בחשבונות ובהרשאות בלשונית משתמשים, או לחזור לצעד הבא שלי.</p></Panel>;
  return <><Panel title="הזמנת סוכן באמצעות קישור"><p>כל קישור ניתן למימוש פעם אחת, במשך שבעה ימים. המוזמן חייב להירשם ולאמת דוא״ל. התפקיד נשמר בחשבון, עם עריכת תיקים שיוקצו אליו בלבד.</p>
  <RetainedForm draftKey="admin:invitations:new" draftLabel="הזמנת סוכן" label="יצירת קישור הזמנה" save={async d=>{
  const result=z.object({token:z.string(),expires_at:z.string()}).parse(await rpc('rpc_create_agent_invitation',{p_label:textValue(d,'label'),p_email:textValue(d,'email')||null}));

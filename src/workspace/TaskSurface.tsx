@@ -9,5 +9,5 @@ export function RecordFocus({focus,title,children}:{focus?:string;title:string;c
  if(!focus)return <>{children}</>;
  const primary=records.find(c=>isValidElement(c)&&((c.props as {'data-record-id'?:string;recordId?:string})['data-record-id']||(c.props as {recordId?:string}).recordId)===focus);
  const rest=records.filter(c=>c!==primary);
- return <div className="record-focus" data-focused-record={focus}>{primary||<p role="status" className="hint">הפריט המבוקש אינו זמין ברשימה שנטענה. אפשר לבדוק את יתר הפריטים או לחזור לצעד הבא.</p>}{rest.length>0&&<TaskSupport title={title}>{rest}</TaskSupport>}</div>;
+ return <div className="record-focus" data-focused-record={focus}>{primary||<p role="status" className="hint">הפריט המבוקש אינו זמין ברשימה שנטענה. אפשר לבדוק את יתר הפריטים או לחזור לצעד הבא. <a href="#/overview">חזרה לצעד הבא שלי</a></p>}{rest.length>0&&<TaskSupport title={title}>{rest}</TaskSupport>}</div>;
 }

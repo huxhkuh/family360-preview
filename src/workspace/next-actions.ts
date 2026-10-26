@@ -5,6 +5,7 @@ import {clientIntake} from '../lib/client-intake';
 export type NextAction={id:string;familyId?:string;familyName?:string;title:string;detail:string;label:string;target:RouteState;due?:string;reason:string};
 const sortActions=(a:NextAction,b:NextAction)=> (a.due||'9999').localeCompare(b.due||'9999')||a.id.localeCompare(b.id);
 const can=(w:Workspace,p:string)=>w.permissions.includes('*')||w.permissions.includes(p);
+export function activeRepresentative(w:Workspace,id?:string|null){return w.representatives.some(r=>r.id===id&&r.active&&(w.profile.role!=='admin'||w.profiles.some(p=>p.id===r.profile_id&&p.active&&p.role==='representative')));}
 export function clientActions(w:Workspace):NextAction[]{
  const actions:NextAction[]=[];
  for(const f of w.families){
@@ -33,7 +34,8 @@ export function staffActions(w:Workspace,now=new Date()):NextAction[]{
   return row.approval; // Routine execution belongs to the assigned worker, not the manager.
  });
  const actions:NextAction[]=rows.map((row:WorkItem)=>({id:row.id,familyId:row.familyId,familyName:row.familyName,title:row.title,detail:role==='admin'?`ממתין לבדיקה ולאישור. הנציג המטפל: ${row.owner}.`:'פותחים את הפריט ומטפלים בבקשה הבאה בתיק.',label:row.label,target:{...row.target,focus:row.id.startsWith('analysis:')&&row.target.page==='families'?w.analysisTasks.find(t=>t.id===row.id.slice(9))?.family_service_id:row.id.slice(row.id.indexOf(':')+1)},due:row.due,reason:isLate(row,now)?'מועד הטיפול עבר':row.approval?'ממתין לאישורכם':'באחריותכם'}));
- if(role==='admin'&&can(w,'families.edit'))for(const f of w.families.filter(f=>!['completed','archived'].includes(f.status)&&!w.representatives.some(r=>r.id===f.representative_id&&r.active)))actions.push({id:'unassigned:'+f.id,familyId:f.id,familyName:f.name,title:'שיוך נציג למשפחה',detail:'לתיק אין נציג פעיל שמרכז את הטיפול.',label:'לשיוך נציג',target:{page:'families',id:f.id,tab:'overview',focus:'assignment'},due:undefined,reason:'חסרה אחריות לטיפול'});
+ if(role==='representative'&&can(w,'families.edit'))for(const f of w.families.filter(f=>['new','waiting_review','waiting_docs'].includes(f.status)&&f.onboarding_pct===100&&w.representatives.some(r=>r.id===f.representative_id&&r.profile_id===w.profile.id&&r.active)&&!w.familyServices.some(s=>s.family_id===f.id)))actions.push({id:'review-intake:'+f.id,familyId:f.id,familyName:f.name,title:'בדיקת השאלון ובחירת תחומי טיפול',detail:'עברו על התשובות שנשלחו, ואז הוסיפו את התחום הראשון שצריך לבדוק.',label:'לבדיקת השאלון',target:{page:'families',id:f.id,tab:'questionnaire',focus:'intake-review'},reason:'השאלון הושלם וממתין לכם'});
+ if(role==='admin'&&can(w,'families.edit'))for(const f of w.families.filter(f=>!['completed','archived'].includes(f.status)&&!activeRepresentative(w,f.representative_id)))actions.push({id:'unassigned:'+f.id,familyId:f.id,familyName:f.name,title:'שיוך נציג למשפחה',detail:'לתיק אין נציג פעיל שמרכז את הטיפול.',label:'לשיוך נציג',target:{page:'families',id:f.id,tab:'overview',focus:'assignment'},due:undefined,reason:'חסרה אחריות לטיפול'});
  return actions.sort((a,b)=>Number(b.id.startsWith('unassigned:'))-Number(a.id.startsWith('unassigned:'))||Number(isLate(b,now))-Number(isLate(a,now))||sortActions(a,b));
 }
 export function nextActions(w:Workspace,now=new Date()){return w.profile.role==='client'?clientActions(w):staffActions(w,now);}

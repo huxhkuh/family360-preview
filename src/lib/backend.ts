@@ -100,7 +100,8 @@ function workspace(){
  if(role==='professional'){
   data.finalReports=[];
   data.analysisTasks=data.analysisTasks.filter(t=>t.professional_id==='pro1');data.executionTasks=data.executionTasks.filter(t=>t.professional_id==='pro1');
-  data.families=[];data.familyServices=[];data.documents=[];data.meetings=[];data.meetingItems=[];data.followUps=[];data.familyTasks=[];data.familyContacts=[];data.timeline=[];
+  data.documents=data.documents.filter(d=>(state.taskDocuments||[]).some(s=>!s.revoked_at&&s.document_id===d.id&&(s.kind==='analysis'?data.analysisTasks:data.executionTasks).some(t=>t.id===s.task_id&&t.family_id===d.family_id)));
+  data.families=[];data.familyServices=[];data.meetings=[];data.meetingItems=[];data.followUps=[];data.familyTasks=[];data.familyContacts=[];data.timeline=[];
  }
  if(role!=='admin'){data.profiles=[];data.audit=[];}
  return workspaceSchema.parse({...data,profile:{id:profileId,name:({client:state.profiles.find(p=>p.id==='client')?.name||'לקוח לדוגמה',representative:'נציג לדוגמה',professional:'מומחה א׳ לדוגמה',admin:'מנהל לדוגמה',marketer:'משווק לדוגמה'})[role],email:role==='client'?state.profiles.find(p=>p.id==='client')?.email:undefined,role,active:true},permissions:role==='admin'?['*']:role==='representative'?state.representatives[0].permissions:[]});

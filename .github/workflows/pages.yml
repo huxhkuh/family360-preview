@@ -67,6 +67,7 @@ jobs:
           npm run test:completed-example
           npm run test:customer-journey
           npm run test:task-surfaces
+          npm run test:role-handoffs
           npm run test:focused-home
           npm run test:workspace-brand
           npm run test:hero-gaze

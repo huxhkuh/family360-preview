@@ -1,0 +1,10 @@
+import {beforeEach,afterEach,test,expect} from 'vitest';
+import {fixture} from './fixture';
+import {dispatch} from '../src/index';
+let f:ReturnType<typeof fixture>;
+beforeEach(()=>{f=fixture();});afterEach(()=>f.sqlite.close());
+const run=async(user:string,args:Record<string,unknown>)=>dispatch(f.db,await f.actor(user),await f.db.version(),'rpc_assign_family_representative',args);
+const args=async()=>({p_family_id:'f1',p_representative_id:'r2',p_expected_updated_at:(await f.db.required('families','f1')).updated_at});
+test('administrator assigns an active representative, removes old visibility and grants new case access',async()=>{await run('admin',await args());expect((await f.db.required('families','f1')).representative_id).toBe('r2');});
+test.each(['client','rep','pro','marketer'])('%s cannot reassign a case',async user=>{await expect(run(user,await args())).rejects.toThrow('PERMISSION_DENIED');expect((await f.db.required('families','f1')).representative_id).toBe('r1');});
+test('rejects disabled representatives and stale revisions without changing ownership',async()=>{const a=await args();f.sqlite.exec("UPDATE profiles SET active=0 WHERE id='otherrep'");await expect(run('admin',a)).rejects.toThrow('VALIDATION');f.sqlite.exec("UPDATE profiles SET active=1 WHERE id='otherrep'");await expect(run('admin',{...a,p_expected_updated_at:'2000-01-01T00:00:00Z'})).rejects.toThrow('CONFLICT');expect((await f.db.required('families','f1')).representative_id).toBe('r1');});
