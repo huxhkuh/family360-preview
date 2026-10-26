@@ -27,4 +27,15 @@ describe('untrusted files',()=>{
  it('rejects content that is not actually a PDF',async()=>{await expect(validateUpload(new File(['<script>'],'x.pdf',{type:'application/pdf'}))).rejects.toThrow();});
  it('accepts a PDF signature',async()=>{await expect(validateUpload(new File(['%PDF-1.7\n'],'x.pdf',{type:'application/pdf'}))).resolves.toBeUndefined();});
  it('does not expose raw server details',()=>{expect(safeMessage(new Error('secret password and SQL stack'))).not.toContain('secret');expect(safeMessage({message:'CONFLICT: revision'})).toContain('הנתונים השתנו');});
+ it('explains Auth failures without exposing server messages or personal details',()=>{
+  expect(safeMessage({code:'weak_password',message:'private server detail'})).toContain('12 תווים');
+  expect(safeMessage({code:'over_email_send_rate_limit',message:'private address'})).toContain('מגבלת שליחת');
+  expect(safeMessage({code:'email_address_not_authorized',message:'private address'})).toContain('שירות הדוא״ל');
+  expect(safeMessage({code:'unknown_private_code',message:'private detail'})).not.toContain('private');
+  expect(safeMessage({code:'constructor',message:'private detail'})).toBeTypeOf('string');
+ });
+ it('recognizes legacy Supabase password rejection without leaking raw requirements',()=>{
+  const message=safeMessage(new Error('Password should be at least 1212 characters.'));
+  expect(message).toContain('דרישות האבטחה');expect(message).not.toContain('1212');
+ });
 });

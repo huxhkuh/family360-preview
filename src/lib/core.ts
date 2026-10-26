@@ -47,6 +47,19 @@ export async function validateUpload(file:File) {
 }
 export function safeMessage(error:unknown) {
   const raw=error&&typeof error==='object'&&'message' in error?String(error.message):'';
+  const authCode=error&&typeof error==='object'&&'code' in error?String(error.code):'';
+  const authMessages:Record<string,string>={
+    weak_password:'הסיסמה אינה עומדת בדרישות האבטחה. יש לבחור סיסמה חזקה באורך 12 תווים לפחות.',
+    email_address_invalid:'יש לבדוק שכתובת הדוא״ל הוזנה נכון.',
+    email_address_not_authorized:'שירות הדוא״ל אינו מוגדר לשליחה לכתובת זו. יש לפנות למנהל המערכת.',
+    over_email_send_rate_limit:'הגעת למגבלת שליחת הודעות האימות. יש להמתין לפני ניסיון נוסף.',
+    over_request_rate_limit:'בוצעו יותר מדי ניסיונות. יש להמתין לפני ניסיון נוסף.',
+    signup_disabled:'ההרשמה אינה זמינה כרגע. יש לפנות למנהל המערכת.',
+    email_not_confirmed:'יש לאמת את כתובת הדוא״ל דרך ההודעה שנשלחה אליך לפני הכניסה.',
+    invalid_credentials:'פרטי הכניסה שגויים.',
+  };
+  if(Object.prototype.hasOwnProperty.call(authMessages,authCode))return authMessages[authCode];
+  if(/^Password should be at least \d+ characters\.$/.test(raw))return authMessages.weak_password;
   const messages:Record<string,string>={
     UNSAVED_EXECUTION_UPDATE:'יש טיוטת עדכון שלא נשמרה. חזרו ללשונית העדכון ושמרו או בטלו אותה לפני דיווח הסיום.',
  DEMO_UNAVAILABLE:'פעולה זו אינה מופעלת בדמו. אין משלוח הודעות, שינוי חשבונות, חיוב או העברת קבצים לשרת.',
