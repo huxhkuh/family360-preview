@@ -11,11 +11,10 @@ const paths:Record<string,string>={
  documents:'M14 2H5v20h14V7z M14 2v5h5 M8 12h8 M8 16h6',
  work:'M3 7h18v14H3z M8 7V3h8v4 M3 12h18 M10 12v3h4v-3',
  housing:'M3 11l9-8 9 8 M5 9v12h14V9 M9 21v-8h6v8',
- savings:'M3 18l6-6 4 3 8-11 M15 4h6v6 M3 22h18',
+ savings:'M4 20v-7h4v7z M10 20V8h4v12z M16 20V3h4v17z',
  insurance:'M12 2l8 4v6c0 5-8 10-8 10S4 17 4 12V6z M8 12l3 3 5-6',
  banks:'M3 9l9-6 9 6z M5 9v10 M10 9v10 M14 9v10 M19 9v10 M3 21h18',
  check:'M5 12l4 4L19 6',
- arrow:'M20 12H4 M10 6l-6 6 6 6',
  help:'M9 9a3 3 0 1 1 5 2c-2 1-2 2-2 3 M12 18h.01 M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0',
  clock:'M12 8v5l3 2 M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0',
 };

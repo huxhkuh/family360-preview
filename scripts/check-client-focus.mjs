@@ -18,7 +18,7 @@ try{for(const width of [1440,820,390,320]){
  await page.screenshot({path:`${out}/${width}-start.png`});
  await openClientNavigation(page);await page.locator('.focus-case-context>summary').focus();await page.keyboard.press('Enter');
  await expect(page.locator('.focus-case-context')).toContainText('נציג מטפל:');
- await expect(page.getByRole('button',{name:'→ חזרה למסך הקודם',exact:true})).toBeVisible();
+ await expect(page.getByRole('button',{name:'חזרה למסך הקודם',exact:true})).toBeVisible();
  await page.keyboard.press('Enter');
  const closeMenu=page.getByRole('button',{name:'סגירת התפריט',exact:true});if(await closeMenu.isVisible())await closeMenu.click();
  await field('marital').selectOption('married');

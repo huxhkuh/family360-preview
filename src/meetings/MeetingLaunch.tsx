@@ -18,7 +18,7 @@ export function MeetingLaunch({w,open}:{w:Workspace;open:(route:RouteState)=>voi
  const enter=(meeting:Meeting)=>open({page:'meetings',id:meeting.id,family:meeting.family_id});
  if(!current)return <section className="meeting-launch meeting-launch-empty" aria-label="כניסה לפגישה">
   <div><p className="eyebrow">מתכוננים לשיחה הבאה</p><h2>אין כרגע פגישה פתוחה</h2><p>פותחים את תיק המשפחה כדי להשלים את ההכנה ולתאם פגישה.</p></div>
-  <button onClick={()=>open({page:'families'})}>בחירת משפחה<Icon name="arrow"/></button>
+  <button onClick={()=>open({page:'families'})}>בחירת משפחה</button>
  </section>;
  const inProgress=current.status==='in_progress';
  const late=!inProgress&&!!current.scheduled_at&&Date.parse(current.scheduled_at)<Date.now();
@@ -32,10 +32,10 @@ export function MeetingLaunch({w,open}:{w:Workspace;open:(route:RouteState)=>voi
    </div>
    <div className="meeting-launch-action">
     <p>{inProgress?'ממשיכים מההחלטות שכבר נשמרו.':'נכנסים, בודקים את ההכנה ומתחילים.'}</p>
-    <button className="primary" onClick={()=>enter(current)}>{inProgress?'המשך הפגישה':'הכנה וכניסה לפגישה'}<Icon name="arrow"/></button>
+    <button className="primary" onClick={()=>enter(current)}>{inProgress?'המשך הפגישה':'הכנה וכניסה לפגישה'}</button>
     <span>פרטי הלקוח, הנושאים וההחלטות במקום אחד</span>
    </div>
   </div>
-  {meetings.length>1&&<div className="meeting-launch-more"><span>עוד פגישות פתוחות</span>{meetings.slice(1,3).map(m=><button className="ghost" key={m.id} onClick={()=>enter(m)}><strong>{w.families.find(f=>f.id===m.family_id)?.name||'פגישה עם המשפחה'}</strong><small>{m.status==='in_progress'?'בתהליך · ':''}{meetingDate(m)}</small><Icon name="arrow"/></button>)}{meetings.length>3&&<button className="text-button" onClick={()=>open({page:'meetings'})}>לכל הפגישות ({meetings.length})</button>}</div>}
+  {meetings.length>1&&<div className="meeting-launch-more"><span>עוד פגישות פתוחות</span>{meetings.slice(1,3).map(m=><button className="ghost" key={m.id} onClick={()=>enter(m)}><strong>{w.families.find(f=>f.id===m.family_id)?.name||'פגישה עם המשפחה'}</strong><small>{m.status==='in_progress'?'בתהליך · ':''}{meetingDate(m)}</small></button>)}{meetings.length>3&&<button className="text-button" onClick={()=>open({page:'meetings'})}>לכל הפגישות ({meetings.length})</button>}</div>}
  </section>;
 }

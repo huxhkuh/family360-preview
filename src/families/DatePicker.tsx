@@ -63,10 +63,10 @@ export function DatePicker({value,onValueChange,label,...props}:Props){
   }} onBlur={e=>{if(e.relatedTarget&&!e.currentTarget.contains(e.relatedTarget as Node)&&e.relatedTarget!==trigger.current)close();}}>
    <header className="date-calendar-heading"><div><span>בחירת תאריך</span><strong>{label}</strong></div><button type="button" aria-label="סגירת לוח שנה" onClick={()=>close(true)}>×</button></header>
    <div className="date-calendar-controls">
-    <button type="button" aria-label="החודש הקודם" disabled={!!min&&isoDate(new Date(cursor.getFullYear(),cursor.getMonth(),0))<min} onClick={()=>navigate(moveMonth(cursor,-1))}>‹</button>
     <label><span className="date-calendar-sr">חודש</span><select aria-label="חודש" value={cursor.getMonth()} onChange={e=>navigate(moveMonth(cursor,Number(e.target.value)-cursor.getMonth()))}>{months.map((month,i)=><option key={month} value={i}>{month}</option>)}</select></label>
     <label><span className="date-calendar-sr">שנה</span><select aria-label="שנה" value={cursor.getFullYear()} onChange={e=>navigate(moveMonth(cursor,(Number(e.target.value)-cursor.getFullYear())*12))}>{Array.from({length:lastYear-firstYear+1},(_,i)=>firstYear+i).filter(y=>(!min||y>=Number(min.slice(0,4)))&&(!max||y<=Number(max.slice(0,4)))).reverse().map(y=><option key={y} value={y}>{y}</option>)}</select></label>
-    <button type="button" aria-label="החודש הבא" disabled={!!max&&isoDate(new Date(cursor.getFullYear(),cursor.getMonth()+1,1))>max} onClick={()=>navigate(moveMonth(cursor,1))}>›</button>
+    <button type="button" aria-label="החודש הקודם" disabled={!!min&&isoDate(new Date(cursor.getFullYear(),cursor.getMonth(),0))<min} onClick={()=>navigate(moveMonth(cursor,-1))}>הקודם</button>
+    <button type="button" aria-label="החודש הבא" disabled={!!max&&isoDate(new Date(cursor.getFullYear(),cursor.getMonth()+1,1))>max} onClick={()=>navigate(moveMonth(cursor,1))}>הבא</button>
    </div>
    <p className="date-calendar-sr" aria-live="polite">{months[cursor.getMonth()]} {cursor.getFullYear()}</p>
    <div className="date-calendar-grid" role="grid" aria-label={`${months[cursor.getMonth()]} ${cursor.getFullYear()}`}>

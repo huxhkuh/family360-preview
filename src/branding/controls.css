@@ -1,0 +1,12 @@
+/* No directional decoration: labels for actions, plus/minus for disclosure, dots for menus. */
+summary{list-style:none}summary::-webkit-details-marker{display:none}summary::marker{content:''}
+details:not(.question-help):not(.term-help)>summary{display:flex;align-items:center;gap:12px}
+details:not(.question-help):not(.term-help)>summary::after{content:'';display:inline-grid;place-items:center;flex:0 0 22px;width:22px;height:22px;border-radius:50%;background-color:#e8ecdf;background-image:linear-gradient(#12483d,#12483d),linear-gradient(#12483d,#12483d);background-size:10px 2px,2px 10px;background-position:center;background-repeat:no-repeat;color:#12483d;font-size:18px;line-height:1;font-weight:500;margin-inline-start:auto}
+details[open]:not(.question-help):not(.term-help)>summary::after{background-size:10px 2px,0 0}
+.speech-bubble::before{content:none}
+select:not([multiple]):not([size]),.brand-public select:not([multiple]):not([size]),.customer-flow select:not([multiple]):not([size]),.brand-workspace select:not([multiple]):not([size]),.demo-bar select:not([multiple]):not([size]),.date-calendar select:not([multiple]):not([size]){appearance:none;-webkit-appearance:none;padding-inline-end:32px;background-image:radial-gradient(circle,#62715d 1.5px,transparent 2px),radial-gradient(circle,#62715d 1.5px,transparent 2px),radial-gradient(circle,#62715d 1.5px,transparent 2px);background-size:4px 4px;background-position:12px calc(50% - 6px),12px 50%,12px calc(50% + 6px);background-repeat:no-repeat}
+select[dir=ltr]:not([multiple]):not([size]){background-position:calc(100% - 12px) calc(50% - 6px),calc(100% - 12px) 50%,calc(100% - 12px) calc(50% + 6px)}
+input[type=number]{appearance:textfield;-moz-appearance:textfield}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.date-calendar .date-calendar-controls{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}.date-calendar .date-calendar-controls>button{font-size:14px;padding:6px 12px;min-height:38px;width:auto}.date-calendar .date-calendar-controls select{padding-inline-end:32px}
+
+input[type=date]::-webkit-inner-spin-button{-webkit-appearance:none;display:none}

@@ -22,3 +22,4 @@ createRoot(document.getElementById('root')!).render(<React.StrictMode><Boundary>
 
 import './landing/welcome.css';
 import './branding/workspaces.css';
+import './branding/controls.css';
