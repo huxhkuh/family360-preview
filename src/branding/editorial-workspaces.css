@@ -1,0 +1,104 @@
+/* Editorial workspace. Same forest / paper / copper hierarchy as the public home.
+   No layout or routing changes: data-dense views keep their existing structure. */
+.brand-icon{--icon-copper:#b5794f;--icon-paper:#faf7f2;stroke:none;overflow:visible;flex-shrink:0}
+.brand-icon .icon-accent{fill:var(--icon-copper);stroke:none}
+.brand-icon .icon-cutout{fill:none;stroke:var(--icon-paper);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.brand-workspace.app-shell{--green:#0b3d32;--dark:#082e28;--border:#dedbd0;--soft:#f1eee5;--muted:#616e65;background:#faf7f2}
+.brand-workspace.app-shell .sidebar{background:#082e28;color:#faf7f2;border:0;padding:30px 20px}
+.brand-workspace .sidebar .brand{padding:0 16px 28px;border-bottom:1px solid #ffffff21;margin-bottom:22px}
+.brand-workspace .sidebar .brand .mesudarim-logo{max-width:160px;margin:auto}
+.brand-workspace .sidebar nav{gap:6px}
+.brand-workspace .sidebar nav button{color:#d5e1d9;background:transparent;border:1px solid transparent;min-height:51px;gap:13px;font-size:17px;border-radius:18px 18px 5px 18px}
+.brand-workspace .sidebar nav button:hover{background:#ffffff0c;color:#fff}
+.brand-workspace .sidebar nav button.active{background:#f3eddf;color:#082e28;border-color:#f3eddf}
+.brand-workspace .sidebar .brand-icon{width:25px;height:25px;--icon-copper:#d9a575;--icon-paper:#082e28}
+.brand-workspace .sidebar button.active .brand-icon{--icon-copper:#ac6b40;--icon-paper:#f3eddf}
+.brand-workspace .sidebar footer{color:#faf7f2;border-color:#ffffff21;margin-top:24px;padding:22px 10px 0}
+.brand-workspace .sidebar footer>span{color:#b7cabc}
+.brand-workspace .sidebar footer button{background:transparent;color:#f4ecde;border-color:#ffffff35}
+.brand-workspace .client-account{background:#ffffff0a;color:#f4ecde;border:1px solid #ffffff21}
+.brand-workspace .client-account footer{margin-top:12px}
+.brand-workspace .topbar{background:#faf7f2;border-color:#dedbd0;min-height:92px}
+.brand-workspace .workspace-identity>span{font-weight:650}
+.brand-workspace .content{padding:42px clamp(24px,3.4vw,54px);max-width:1480px;margin-inline:auto;width:100%;box-sizing:border-box}
+.brand-workspace h1{font-size:clamp(32px,3vw,46px);line-height:1.15;font-weight:750;letter-spacing:-.035em}
+.brand-workspace h2{font-size:26px;line-height:1.3;letter-spacing:-.025em}
+.brand-workspace .eyebrow{font-size:14px;font-weight:550;color:#6a776c;letter-spacing:0}
+.brand-workspace :is(.page-title,.rep-page-heading){padding-bottom:26px;margin-bottom:30px;align-items:center}
+.brand-workspace button.primary,.customer-flow button.primary,.auth-card button.primary{background:linear-gradient(115deg,#c18a59,#ebc49a 38%,#d5a16f 65%,#c58d5d);color:#302219;border:1px solid #ba8556;box-shadow:inset 0 1px 0 #fff2d8a0;font-weight:700;border-radius:18px 18px 5px 18px}
+.brand-workspace button.primary:hover,.customer-flow button.primary:hover,.auth-card button.primary:hover{background:linear-gradient(115deg,#d4a06b,#f3d4ad 38%,#e5b889 65%,#d4a06b);color:#302219;border-color:#a96d42}
+.brand-workspace button.primary:active{transform:translateY(1px)}
+.brand-workspace button:disabled,.customer-flow button:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.brand-workspace :is(.card,.document,.table-wrap,.client-meeting,.client-priorities,.client-care,.client-intake){background:#fffdf8;border-color:#dedbd0;border-radius:25px 25px 8px 25px}
+.brand-workspace .card{padding:28px}
+.brand-workspace .card>h2:first-child{padding-bottom:18px;margin-bottom:22px;border-bottom:1px solid #e4dfd3}
+.brand-workspace .kpis{gap:18px}
+.brand-workspace .kpis article{background:transparent;border:1px solid #dedbd0;padding:24px;border-radius:24px 24px 7px 24px}
+.brand-workspace .kpis article>span{display:flex;align-items:center;gap:11px;color:#526658}
+.brand-workspace .kpis .brand-icon{width:28px;height:28px}
+.brand-workspace .kpis b{font-size:46px;line-height:1.3;letter-spacing:-.04em}
+.brand-workspace .rep-priorities{gap:0;border-block:1px solid #dedbd0;margin-block:30px}
+.brand-workspace .rep-priorities button{position:relative;background:transparent;border:0;border-inline-end:1px solid #dedbd0;border-radius:0;padding:24px 22px;text-align:start;color:#506254}
+.brand-workspace .rep-priorities button:last-child{border-inline-end:0}
+.brand-workspace .rep-priorities button strong{color:#123f32;font-size:42px;line-height:1.2}
+.brand-workspace .rep-priorities button.active{background:#eeeade;color:#103d31}
+.brand-workspace .rep-priorities button.active strong{color:#103d31}
+.brand-workspace .rep-priorities button.active::after{content:'';position:absolute;bottom:0;inset-inline:22px;height:3px;background:#a97046;border-radius:3px}
+.brand-workspace .priority-symbol{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:10px}
+.brand-workspace .priority-symbol .brand-icon{width:28px;height:28px;color:#17483b}
+.brand-workspace .meeting-launch{background:#082e28;color:#f9f4e9;border:0;padding:32px;border-radius:30px 30px 8px 30px}
+.brand-workspace .meeting-launch :is(h2,.meeting-launch-contact,.meeting-launch-date){color:#f9f4e9}
+.brand-workspace .meeting-launch :is(p,.eyebrow,.meeting-launch-action>span){color:#c3d2c6}
+.brand-workspace .meeting-launch .brand-icon{--icon-paper:#082e28;--icon-copper:#e0ac7c;color:#f0e8d6}
+.brand-workspace .meeting-launch-more{border-color:#ffffff26}
+.brand-workspace .meeting-launch-more :is(button,strong,small){color:#f3eadc}
+.brand-workspace .meeting-launch-more button{background:transparent;border-color:#ffffff30}
+.brand-workspace .meeting-launch-empty>button{background:#f0e7d6;color:#153d31}
+.brand-workspace .tabs{padding-bottom:13px;border-bottom:1px solid #dedbd0;gap:8px}
+.brand-workspace .tabs button{border-color:transparent;background:transparent;color:#526658}
+.brand-workspace .tabs button.active,.brand-workspace .tabs button[aria-selected=true],.brand-workspace button.selected{background:#0d3c31;color:#faf7f2;border-color:#0d3c31}
+.brand-workspace :is(input,select,textarea){background:#fffdf8;border:1px solid #cfcfc2;border-radius:14px;transition:border-color .18s,box-shadow .18s}
+.brand-workspace :is(input,select,textarea):hover{border-color:#879780}
+.brand-workspace :is(input,select,textarea):focus{border-color:#9d6b43;box-shadow:0 0 0 3px #b67b4515}
+.brand-workspace :is(input,select,textarea)[aria-invalid=true]{border-color:#a43f36;background:#fff9f6}
+.brand-workspace :focus-visible{outline:3px solid #a96d42;outline-offset:4px}
+.brand-workspace th{background:#efede3;color:#526455;font-weight:650;padding-block:16px}
+.brand-workspace td{padding-block:18px}
+.brand-workspace tbody tr:hover{background:#f2f1e7}
+.brand-workspace .empty{background:transparent;border:1px dashed #d4cebe;border-radius:18px;padding:24px;color:#697163}
+.brand-workspace .badge{font-size:13px;font-weight:600}
+.brand-workspace .work-row{padding-block:25px}
+.brand-workspace .work-row h3{font-size:20px}
+.brand-workspace .questionnaire-status,.brand-workspace .hint{background:#eeeee2;color:#455e4b}
+.brand-workspace .chapter-progress button[aria-current=step]{background:#0d3c31;color:#fff}
+.brand-workspace .question-section{border-radius:20px 20px 6px 20px}
+.demo-welcome .demo-roles>button{background:#fffdf8;border-color:#dedbd0}
+.demo-welcome .demo-roles>button:hover{background:#f0eddf;border-color:#a97046}
+@media(max-width:1000px){.brand-workspace .content{padding:30px 24px}.brand-workspace .rep-priorities button{padding:22px 15px}}
+@media(max-width:800px){
+ .brand-workspace.app-shell .sidebar{padding:18px 16px;border-bottom:1px solid #ffffff20}
+ .brand-workspace .sidebar .brand{margin:0;padding:0;border:0}
+ .brand-workspace .sidebar .brand .mesudarim-logo{max-width:100px}
+ .brand-workspace .sidebar nav{gap:6px}
+ .brand-workspace .sidebar nav button{min-height:44px;font-size:15px;padding:9px 12px;gap:8px}
+ .brand-workspace .sidebar .brand-icon{width:21px;height:21px}
+ .brand-workspace .sidebar footer{margin-top:12px;padding-top:12px}
+ .brand-workspace .topbar{min-height:74px;padding:12px 16px}
+ .brand-workspace .content{padding:26px 16px}
+ .brand-workspace h1{font-size:34px}.brand-workspace h2{font-size:24px}
+ .brand-workspace .card{padding:22px 18px}
+ .brand-workspace .meeting-launch{padding:26px 20px}
+ .brand-workspace .rep-priorities{gap:0;margin-block:24px}
+ .brand-workspace .rep-priorities button{padding:18px 14px;border-bottom:1px solid #dedbd0}
+ .brand-workspace .rep-priorities button:nth-child(2n){border-inline-end:0}
+ .brand-workspace .rep-priorities button:nth-last-child(-n+2){border-bottom:0}
+ .brand-workspace .rep-priorities button strong{font-size:34px}
+ .brand-workspace .priority-symbol .brand-icon{width:24px;height:24px}
+ .brand-workspace .kpis{gap:10px}.brand-workspace .kpis article{padding:18px 14px}.brand-workspace .kpis b{font-size:36px}
+ .brand-workspace :is(.page-title,.rep-page-heading){gap:18px;flex-wrap:wrap}
+}
+@media(prefers-reduced-motion:reduce){.brand-workspace *,.customer-flow button{transition:none!important;animation:none!important}}
+.brand-workspace .sidebar footer strong{color:#f9f4e9}
+.brand-workspace .page-title{background:transparent;border-radius:0;padding-inline:0}
+.brand-workspace .chapter-actions .action>button{background:linear-gradient(115deg,#c18a59,#ebc49a 38%,#d5a16f 65%,#c58d5d);border-color:#ba8556;color:#302219;font-weight:700}
+.brand-workspace .chapter-actions .action>button:hover{background:#e8bc8e}

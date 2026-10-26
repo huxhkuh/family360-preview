@@ -25,3 +25,5 @@ import './branding/workspaces.css';
 import './branding/controls.css';
 
 import './landing/premium.css';
+
+import './branding/editorial-workspaces.css';

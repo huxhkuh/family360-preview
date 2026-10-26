@@ -19,3 +19,5 @@ import './branding/controls.css';
 import './landing/premium.css';
 import './live.css';
 createRoot(document.getElementById('root')!).render(<React.StrictMode><Live/></React.StrictMode>);
+
+import './branding/editorial-workspaces.css';

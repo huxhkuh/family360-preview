@@ -54,7 +54,7 @@ try{
   await expect(page.locator('.welcome-logo')).toHaveAttribute('src',/concept-5-light.svg$/);
   await expect(page.locator('link[rel=icon]')).toHaveAttribute('href',/concept-5-light-mark.svg$/);
   await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();
-  await expect(page.locator('.sidebar .mesudarim-logo')).toHaveAttribute('src',/concept-5-light.svg$/);
+  await expect(page.locator('.sidebar .mesudarim-logo')).toHaveAttribute('src',/concept-5-dark.svg$/);
   await expect.poll(()=>page.locator('.sidebar .mesudarim-logo').evaluate(el=>el.complete&&el.naturalWidth>0)).toBe(true);
   await page.screenshot({path:`${output}/${device}-fixed-home.png`});
   await page.getByRole('button',{name:'התחלת השאלון',exact:true}).click();
@@ -65,7 +65,7 @@ try{
    await expect(page.locator('.client-shell.client-focus-mode')).toBeVisible();
    const compactBrand=page.locator('.sidebar .mesudarim-logo');
    await expect(compactBrand).toBeVisible();
-   await expect(compactBrand).toHaveAttribute('src',/concept-5-light.svg$/);
+   await expect(compactBrand).toHaveAttribute('src',/concept-5-dark.svg$/);
    await expect(compactBrand).toHaveAttribute('alt','מסודרים 360° — עושים לך סדר בכסף.');
    await expect(compactBrand).toHaveCSS('width','76px');
    await expect.poll(()=>compactBrand.evaluate(el=>el.complete&&el.naturalWidth>0)).toBe(true);
