@@ -11,6 +11,7 @@ import {questionnaireDiscussion} from "../families/questionnaire-discussion";
 // No network, persistence, credentials or production service initialization.
 import type {SupabaseClient} from '@supabase/supabase-js';
 import seed from './demo-seed';
+import {registrationSchema} from '../customer/registration';
 import {questionnaireIssues} from '../families/questionnaire-validation';
 import {operationRpc} from './demo-operations';
 import {meetingRpc} from './demo-meeting';
@@ -52,6 +53,13 @@ export function startClientIntake(code?:string){
  Object.assign(state.families.find(f=>f.id==='f1'),{status:'new',onboarding_pct:0,answers:{},contact_name:'לקוח לדוגמה',phone:'0500000000'});
  for(const key of ['familyServices','documents','meetings','meetingItems','followUps','familyTasks','familyContacts','executionTasks'])state[key]=state[key].filter(x=>x.family_id!=='f1');
  if(code)registerReferral(growth,code,'f1');
+}
+export function registerClientIntake(input:unknown,code?:string){
+ const account=registrationSchema.parse(input);startClientIntake(code);
+ const family=state.families.find(f=>f.id==='f1'),name=account.first+' '+account.last;
+ Object.assign(family,{name:'משפחת '+account.last,contact_name:name,email:account.email,phone:account.phone,answers:{h_first:account.first,h_last:account.last,h_email:account.email,h_phone:account.phone}});
+ Object.assign(state.profiles.find(p=>p.id==='client'),{name,email:account.email});
+ return account;
 }
 export function loadCompletedFamilyExample(){
  startClientIntake();selectRole('representative');const at=now();const family=state.families.find(f=>f.id==='f1');
@@ -95,7 +103,7 @@ function workspace(){
   data.families=[];data.familyServices=[];data.documents=[];data.meetings=[];data.meetingItems=[];data.followUps=[];data.familyTasks=[];data.familyContacts=[];data.timeline=[];
  }
  if(role!=='admin'){data.profiles=[];data.audit=[];}
- return workspaceSchema.parse({...data,profile:{id:profileId,name:({client:'לקוח לדוגמה',representative:'נציג לדוגמה',professional:'מומחה א׳ לדוגמה',admin:'מנהל לדוגמה',marketer:'משווק לדוגמה'})[role],role,active:true},permissions:role==='admin'?['*']:role==='representative'?state.representatives[0].permissions:[]});
+ return workspaceSchema.parse({...data,profile:{id:profileId,name:({client:state.profiles.find(p=>p.id==='client')?.name||'לקוח לדוגמה',representative:'נציג לדוגמה',professional:'מומחה א׳ לדוגמה',admin:'מנהל לדוגמה',marketer:'משווק לדוגמה'})[role],email:role==='client'?state.profiles.find(p=>p.id==='client')?.email:undefined,role,active:true},permissions:role==='admin'?['*']:role==='representative'?state.representatives[0].permissions:[]});
 }
 export async function loadWorkspace(familyId?:string){const w=workspace();if(familyId&&w.families.some(f=>f.id===familyId))w.scopedFamilyId=familyId;return w;}
 export class WorkspaceNetworkError extends Error{}

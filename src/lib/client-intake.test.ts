@@ -1,6 +1,6 @@
 import {beforeEach,describe,expect,it} from 'vitest';
 import {clientIntake} from './client-intake';
-import {loadWorkspace,resetDemo,rpc,selectRole,startClientIntake} from './backend';
+import {loadWorkspace,resetDemo,rpc,selectRole,startClientIntake,registerClientIntake} from './backend';
 import {validDemoAnswers} from '../families/questionnaire-fixture';
 
 beforeEach(()=>{resetDemo();selectRole('client');});
@@ -35,4 +35,9 @@ describe('client intake guidance and demo boundaries',()=>{
   w.families[0].status='archived';w.families[0].onboarding_pct=0;
   expect(clientIntake(w.families[0],w)).toMatchObject({terminal:true,action:{title:'התיק בארכיון'}});
  });
+});
+
+describe('customer registration at checkout',()=>{
+ it('creates the client identity and seeds questionnaire contact details',async()=>{registerClientIntake({first:'ישראל',last:'לדוגמה',email:'DEMO@example.invalid',phone:'0500000000'});const w=await loadWorkspace();expect(w.profile.name).toBe('ישראל לדוגמה');expect(w.profile.email).toBe('demo@example.invalid');expect(w.families[0].answers).toMatchObject({h_first:'ישראל',h_last:'לדוגמה',h_email:'demo@example.invalid',h_phone:'0500000000'});expect(w.families[0].onboarding_pct).toBe(0);});
+ it('rejects invalid signup without resetting existing client work',async()=>{const before=await loadWorkspace();expect(()=>registerClientIntake({first:'ישראל',last:'לדוגמה',email:'invalid',phone:'123'})).toThrow();expect((await loadWorkspace()).families).toEqual(before.families);});
 });

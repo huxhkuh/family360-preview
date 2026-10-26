@@ -4,8 +4,8 @@ import {safeMessage,statusLabels} from './lib/core';
 const ValidationContext=createContext<Record<string,string>>({});
 export function Badge({status}:{status:string}){return <span className={`badge ${status}`}>{statusLabels[status]||status}</span>;}
 export function Field({label,children,help,error:explicitError}:{label:string;children:ReactNode;help?:ReactNode;error?:string}){
- const id=useId();const errors=useContext(ValidationContext);const error=explicitError||errors[id];
- const child=children as ReactElement<{id:string;'aria-invalid'?:boolean;'aria-describedby'?:string}>;
+ const generatedId=useId();const child=children as ReactElement<{id?:string;'aria-invalid'?:boolean;'aria-describedby'?:string}>;
+ const id=isValidElement(children)&&child.props.id?child.props.id:generatedId;const errors=useContext(ValidationContext);const error=explicitError||errors[id];
  return <div className="field">{help?<div className="question-heading"><label htmlFor={id}>{label}</label>{help}</div>:<label htmlFor={id}>{label}</label>}{isValidElement(children)?cloneElement(child,{id,...(error?{'aria-invalid':true,'aria-describedby':[child.props['aria-describedby'],id+'-error'].filter(Boolean).join(' ')}:{})}):children}{error&&<p className="field-error" id={id+'-error'}>{error}</p>}</div>;
 }
 export function Panel({title,children}:{title:string;children:ReactNode}){return <section className="card"><h2>{title}</h2>{children}</section>;}
@@ -27,7 +27,7 @@ export function SaveForm({save,children,label='שמירה',noValidate=false,busy
   }
   setFields({});const data=new FormData(form);mark(true);setBusy(true);try{await save(data,submitter?.value);mark(false);setMessage(successMessage);}catch(e){setError(safeMessage(e));}finally{setBusy(false);}
  }
- return <ValidationContext.Provider value={fields}><form onSubmit={submit} noValidate onChange={e=>{mark(true);setMessage('');const target=e.target as HTMLElement;if(target instanceof HTMLInputElement||target instanceof HTMLTextAreaElement)target.setCustomValidity('');if(target.id)setFields(old=>{const next={...old};delete next[target.id];return next;});}}><fieldset disabled={busy}>{children}{submitActions||<button className="primary" type="submit">{busy?busyLabel:label}</button>}</fieldset>{registry&&edited&&<p className="muted" role="status">{busy?'השמירה בתהליך…':'יש שינויים שלא נשמרו'}</p>}{error&&<p className="error" role="alert">{error}</p>}{message&&<p role="status" className="success">{message}</p>}</form></ValidationContext.Provider>;
+ return <ValidationContext.Provider value={fields}><form onSubmit={submit} noValidate onChange={e=>{mark(true);setMessage('');const target=e.target as HTMLElement;if(target instanceof HTMLInputElement||target instanceof HTMLTextAreaElement)target.setCustomValidity('');if(error==='יש לתקן את השדות המסומנים. התוכן שהוזן נשמר במסך.'&&[...e.currentTarget.querySelectorAll<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>('input,select,textarea')].every(el=>!el.willValidate||el.validity.valid))setError('');if(target.id)setFields(old=>{const next={...old};delete next[target.id];return next;});}}><fieldset disabled={busy}>{children}{submitActions||<button className="primary" type="submit">{busy?busyLabel:label}</button>}</fieldset>{registry&&edited&&<p className="muted" role="status">{busy?'השמירה בתהליך…':'יש שינויים שלא נשמרו'}</p>}{error&&<p className="error" role="alert">{error}</p>}{message&&<p role="status" className="success">{message}</p>}</form></ValidationContext.Provider>;
 }
 export const textValue=(data:FormData,key:string)=>String(data.get(key)||'').trim();
 export function Empty({children='אין פריטים להצגה'}:{children?:ReactNode}){return <p className="empty">{children}</p>;}

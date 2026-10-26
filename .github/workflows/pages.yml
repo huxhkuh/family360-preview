@@ -59,6 +59,7 @@ jobs:
           npm run test:representative
           npm run test:completed-example
           npm run test:customer-journey
+          npm run test:workspace-brand
       - uses: actions/upload-pages-artifact@v4
         with:
           path: dist

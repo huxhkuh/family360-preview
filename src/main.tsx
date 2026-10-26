@@ -21,3 +21,4 @@ class Boundary extends React.Component<{children:React.ReactNode},{failed:boolea
 createRoot(document.getElementById('root')!).render(<React.StrictMode><Boundary><Demo/></Boundary></React.StrictMode>);
 
 import './landing/welcome.css';
+import './branding/workspaces.css';
