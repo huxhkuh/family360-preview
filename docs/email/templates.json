@@ -1,0 +1,122 @@
+[
+  {
+    "slug": "confirm-sign-up",
+    "file": "confirm-signup.html",
+    "subject": "אימות כתובת הדוא״ל | מסודרים 360",
+    "subjectId": "MAILER_SUBJECTS_CONFIRMATION",
+    "variables": [
+      "{{ .ConfirmationURL }}"
+    ]
+  },
+  {
+    "slug": "reset-password",
+    "file": "reset-password.html",
+    "subject": "שחזור הסיסמה | מסודרים 360",
+    "subjectId": "MAILER_SUBJECTS_RECOVERY",
+    "variables": [
+      "{{ .ConfirmationURL }}"
+    ]
+  },
+  {
+    "slug": "invite-user",
+    "file": "invite-user.html",
+    "subject": "הזמנה למסודרים 360 | מסודרים 360",
+    "subjectId": "MAILER_SUBJECTS_INVITE",
+    "variables": [
+      "{{ .ConfirmationURL }}"
+    ]
+  },
+  {
+    "slug": "magic-link-or-otp",
+    "file": "magic-link-or-otp.html",
+    "subject": "כניסה לחשבון | מסודרים 360",
+    "subjectId": "MAILER_SUBJECTS_MAGIC_LINK",
+    "variables": [
+      "{{ .ConfirmationURL }}"
+    ]
+  },
+  {
+    "slug": "change-email-address",
+    "file": "change-email-address.html",
+    "subject": "אישור כתובת דוא״ל חדשה | מסודרים 360",
+    "subjectId": "MAILER_SUBJECTS_EMAIL_CHANGE",
+    "variables": [
+      "{{ .NewEmail }}",
+      "{{ .ConfirmationURL }}"
+    ]
+  },
+  {
+    "slug": "reauthentication",
+    "file": "reauthentication.html",
+    "subject": "קוד לאימות הזהות | מסודרים 360",
+    "subjectId": "MAILER_SUBJECTS_REAUTHENTICATION",
+    "variables": [
+      "{{ .Token }}"
+    ]
+  },
+  {
+    "slug": "password-changed",
+    "file": "password-changed.html",
+    "subject": "הסיסמה שלך שונתה | מסודרים 360",
+    "subjectId": "MAILER_SUBJECTS_PASSWORD_CHANGED_NOTIFICATION",
+    "variables": []
+  },
+  {
+    "slug": "email-address-changed",
+    "file": "email-address-changed.html",
+    "subject": "כתובת הדוא״ל שונתה | מסודרים 360",
+    "subjectId": "MAILER_SUBJECTS_EMAIL_CHANGED_NOTIFICATION",
+    "variables": [
+      "{{ .OldEmail }}",
+      "{{ .Email }}"
+    ]
+  },
+  {
+    "slug": "phone-number-changed",
+    "file": "phone-number-changed.html",
+    "subject": "מספר הטלפון שונה | מסודרים 360",
+    "subjectId": "MAILER_SUBJECTS_PHONE_CHANGED_NOTIFICATION",
+    "variables": [
+      "{{ .OldPhone }}",
+      "{{ .Phone }}"
+    ]
+  },
+  {
+    "slug": "sign-in-method-linked",
+    "file": "sign-in-method-linked.html",
+    "subject": "נוספה דרך כניסה לחשבון | מסודרים 360",
+    "subjectId": "MAILER_SUBJECTS_IDENTITY_LINKED_NOTIFICATION",
+    "variables": [
+      "{{ .Provider }}",
+      "{{ .Email }}"
+    ]
+  },
+  {
+    "slug": "sign-in-method-removed",
+    "file": "sign-in-method-removed.html",
+    "subject": "הוסרה דרך כניסה לחשבון | מסודרים 360",
+    "subjectId": "MAILER_SUBJECTS_IDENTITY_UNLINKED_NOTIFICATION",
+    "variables": [
+      "{{ .Provider }}",
+      "{{ .Email }}"
+    ]
+  },
+  {
+    "slug": "mfa-method-added",
+    "file": "mfa-method-added.html",
+    "subject": "נוסף אמצעי אימות דו־שלבי | מסודרים 360",
+    "subjectId": "MAILER_SUBJECTS_MFA_FACTOR_ENROLLED_NOTIFICATION",
+    "variables": [
+      "{{ .FactorType }}"
+    ]
+  },
+  {
+    "slug": "mfa-method-removed",
+    "file": "mfa-method-removed.html",
+    "subject": "הוסר אמצעי אימות דו־שלבי | מסודרים 360",
+    "subjectId": "MAILER_SUBJECTS_MFA_FACTOR_UNENROLLED_NOTIFICATION",
+    "variables": [
+      "{{ .FactorType }}"
+    ]
+  }
+]
