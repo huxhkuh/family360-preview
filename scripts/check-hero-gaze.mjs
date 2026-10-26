@@ -1,32 +1,38 @@
 import {chromium,expect} from '@playwright/test';
 import {mkdirSync,writeFileSync} from 'node:fs';
-const base=process.env.DEMO_URL||'http://127.0.0.1:5263/family360-preview/',out='test-results/hero-gaze';mkdirSync(out,{recursive:true});
+import {createHash} from 'node:crypto';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+const base=process.env.DEMO_URL||'http://127.0.0.1:5263/family360-preview/';
+const out=process.env.MASCOT_EVIDENCE_DIR||join(tmpdir(),'family360-mascot-rig-qa');mkdirSync(out,{recursive:true});
 const browser=await chromium.launch(),results=[];
+const hash=buffer=>createHash('sha256').update(buffer).digest('hex');
 try{
- const page=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[],requests=[];
- page.on('pageerror',error=>errors.push(error.message));page.on('request',request=>{if(request.url().includes('/companion/gaze/'))requests.push(request.url());});
- await page.goto(base);const hero=page.locator('.hero-gaze');await expect(hero).toHaveAttribute('data-ready','true');await expect(hero).toHaveAttribute('data-enabled','true');
- await page.locator('.public-hero .brand-companion-person').evaluate(el=>Promise.all(el.getAnimations().map(animation=>animation.finished)));
- const box=await hero.boundingBox(),face={x:box.x+box.width*.475,y:box.y+box.height*.16};
- const radius=Math.min(210,face.x-12,face.y-12,1428-face.x,988-face.y);
- const bodyBox=await hero.locator('.gaze-body').boundingBox();
- for(const [direction,x,y] of [['right',1,0],['down-right',1,1],['down',0,1],['down-left',-1,1],['left',-1,0],['up-left',-1,-1],['up',0,-1],['up-right',1,-1]]){
-  await page.mouse.move(face.x+radius*x,face.y+radius*y,{steps:14});await expect(hero).toHaveAttribute('data-direction',direction);
-  const active=hero.locator(`[data-pose="${direction}"]`);await expect.poll(()=>active.evaluate(el=>Number(getComputedStyle(el).opacity))).toBe(1);
-  await expect.poll(()=>hero.locator('.gaze-head:not([data-current=true])').evaluateAll(elements=>elements.reduce((sum,el)=>sum+Number(getComputedStyle(el).opacity),0))).toBe(0);
-  expect(await hero.locator('.gaze-body').boundingBox()).toEqual(bodyBox);await hero.screenshot({path:`${out}/${direction}.png`});
+ for(const options of [{viewport:{width:1440,height:1000}},{viewport:{width:390,height:1100},isMobile:true,hasTouch:true},{viewport:{width:1440,height:1000},reducedMotion:'reduce'}]){
+  const page=await browser.newPage(options),errors=[],directions=[];
+  page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(r.url().includes('/companion/gaze/'))directions.push(r.url());});
+  await page.goto(base+'#welcome');const hero=page.locator('.hero-gaze');
+  await expect(hero).toHaveAttribute('data-rig-status','ready');await expect(hero.locator('[data-rig-head]')).toHaveCount(1);
+  await expect(hero.locator('[data-rig-pupil]')).toHaveCount(2);await expect(hero.locator('img')).toHaveCount(0);
+  const box=await hero.boundingBox();expect(box).not.toBeNull();
+  // Clothing/hands/legs below the neck must remain pixel-identical.
+  const clip={x:box.x,y:box.y+box.height*.34,width:box.width,height:Math.min(box.height*.66,options.viewport.height-box.y-box.height*.34)};
+  expect(clip.height).toBeGreaterThan(20);const body=hash(await page.screenshot({clip}));
+  const pose=()=>hero.locator('[data-rig-head]').getAttribute('transform');
+  const first=await pose();
+  for(const steps of [1,30]){await page.mouse.move(1,1,{steps});await page.mouse.move(options.viewport.width-1,options.viewport.height-1,{steps});}
+  for(let i=0;i<32;i++)await page.mouse.move(options.viewport.width/2+Math.cos(i/16*Math.PI)*options.viewport.width*.4,options.viewport.height/2+Math.sin(i/16*Math.PI)*options.viewport.height*.4);
+  await page.waitForTimeout(300);expect(hash(await page.screenshot({clip}))).toBe(body);
+  if(!options.reducedMotion)expect(await pose()).not.toBe(first);
+  if(options.isMobile)await expect(hero).toHaveAttribute('data-mode','idle');
+  await page.emulateMedia({reducedMotion:'reduce'});await expect(hero).toHaveAttribute('data-mode','reduced');
+  const still=hash(await hero.screenshot());await page.mouse.move(50,50);await page.waitForTimeout(350);expect(hash(await hero.screenshot())).toBe(still);
+  expect(await hero.locator('[data-rig-head]').getAttribute('transform')).toBe('translate(0 0) rotate(0 587 301)');
+  expect(await hero.evaluate(e=>getComputedStyle(e.parentElement).transform)).toBe('none');
+  expect(directions).toEqual([]);expect(errors).toEqual([]);
+  const label=options.isMobile?'mobile':options.reducedMotion?'reduced':'desktop';await page.screenshot({path:join(out,label+'.png')});results.push({label,bodyPixelsStable:true,reducedPixelsStable:true,errors});await page.close();
  }
- await page.mouse.move(face.x,face.y);await expect(hero).toHaveAttribute('data-direction','neutral');
- await page.mouse.move(1400,800);await page.locator('html').dispatchEvent('pointerleave');await expect(hero).toHaveAttribute('data-direction','neutral');
- await page.getByRole('link',{name:'בואו נראה איך זה עובד',exact:true}).click();await expect(hero).toHaveAttribute('data-enabled','false');
- await page.getByRole('button',{name:/בחזרה לדף הבית/}).click();await expect(hero).toHaveAttribute('data-enabled','true');expect(new Set(requests).size).toBe(8);expect(requests.length).toBe(8);
- await page.emulateMedia({reducedMotion:'reduce'});await expect(hero).toHaveAttribute('data-enabled','false');await expect(hero).toHaveAttribute('data-direction','neutral');expect(await hero.locator('.gaze-body').evaluate(el=>getComputedStyle(el).maskImage)).toBe('none');expect(errors).toEqual([]);await page.close();
- results.push({desktop:true,checks:'eight directions, settled crossfades, stable body geometry, resting region, pointer leave, hidden page pause, cached preload, live reduced-motion change'});
- for(const options of [{viewport:{width:390,height:844},isMobile:true,hasTouch:true},{viewport:{width:1440,height:1000},reducedMotion:'reduce'}]){
-  const page=await browser.newPage(options),loads=[];page.on('request',request=>{if(request.url().includes('/companion/gaze/'))loads.push(request.url());});await page.goto(base);await page.locator('.hero-gaze').scrollIntoViewIfNeeded();await expect(page.locator('.gaze-body')).toBeVisible();await expect(page.locator('.hero-gaze')).toHaveAttribute('data-enabled','false');expect(loads).toEqual([]);await page.close();
- }
- const fallback=await browser.newPage({viewport:{width:1440,height:1000}});await fallback.route('**/companion/gaze/down.webp',route=>route.abort());
- const failed=fallback.waitForEvent('requestfailed',{predicate:request=>request.url().endsWith('/gaze/down.webp')});await fallback.goto(base);await failed;await expect(fallback.locator('.gaze-body')).toBeVisible();await expect(fallback.locator('.hero-gaze')).toHaveAttribute('data-ready','false');expect(await fallback.locator('.gaze-body').evaluate(el=>getComputedStyle(el).maskImage)).toBe('none');await fallback.close();
- results.push({fallbacks:true,checks:'touch and reduced motion keep static illustration without directional downloads; failed asset preserves the complete original'});
+ const failure=await browser.newPage();await failure.route('**/companion/rig/head.png',route=>route.abort());await failure.goto(base);
+ await expect(failure.locator('.hero-gaze')).toHaveAttribute('data-rig-status','asset-error');await expect(failure.locator('.hero-gaze img')).toBeVisible();await expect(failure.locator('.gaze-rig')).toHaveCount(0);await failure.close();
 }finally{await browser.close();}
-writeFileSync(out+'/results.json',JSON.stringify(results,null,2));console.log(JSON.stringify(results,null,2));
+writeFileSync(join(out,'results.json'),JSON.stringify(results,null,2));console.log(JSON.stringify(results,null,2));
