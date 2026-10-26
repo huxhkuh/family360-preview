@@ -2,6 +2,7 @@ node_modules/
 dist/
 dist-live/
 artifacts/live/
+artifacts/runtime/
 backups/
 server/.dev.vars
 server/artifacts/
