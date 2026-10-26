@@ -30,7 +30,8 @@
     "test:homepage": "node scripts/check-homepage.mjs",
     "test:completed-example": "node scripts/check-completed-example.mjs",
     "test:customer-journey": "node scripts/check-customer-journey.mjs",
-    "test:workspace-brand": "node scripts/check-workspace-brand.mjs"
+    "test:workspace-brand": "node scripts/check-workspace-brand.mjs",
+    "test:hero-gaze": "node scripts/check-hero-gaze.mjs"
   },
   "dependencies": {
     "@fontsource-variable/assistant": "5.3.0",
