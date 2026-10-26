@@ -7,11 +7,11 @@ try{for(const [device,width,height] of [['desktop',1440,1000],['mobile',390,844]
  const page=await browser.newPage({viewport:{width,height},reducedMotion:'reduce'});page.setDefaultTimeout(10000);const errors=[];
  page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
  const nav=()=>page.getByRole('navigation',{name:'ניווט ראשי'});
- const role=async value=>{await page.getByLabel('צפייה בתפקיד',{exact:true}).selectOption(value);};
+ const role=async value=>{await page.getByLabel('צפייה בתפקיד',{exact:true}).selectOption(value);if(value==='marketer')await page.locator('.focus-more>summary').click();};
  const noOverflow=async()=>{expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);if(width<600)expect(await page.locator('.growth-page .table-wrap').evaluateAll(elements=>elements.every(el=>el.scrollWidth<=el.clientWidth+1))).toBe(true);};
  await page.goto(base+'#workspace');await expect(page.getByText(/מחיר השירות:.*490/)).toBeVisible();
  await page.getByRole('button',{name:/^05 משווק /}).click();await expect(page.getByRole('heading',{name:'ההפניות שלי',exact:true})).toBeVisible();
- await expect(nav().getByRole('button')).toHaveCount(1);await expect(page.getByText('REF-101',{exact:true})).toBeVisible();await expect(page.getByText('REF-201',{exact:true})).toHaveCount(0);await expect(page.getByText('משפחת פרידמן',{exact:true})).toHaveCount(0);
+ await page.locator('.focus-more>summary').click();await expect(nav().getByRole('button')).toHaveCount(1);await expect(page.getByText('REF-101',{exact:true})).toBeVisible();await expect(page.getByText('REF-201',{exact:true})).toHaveCount(0);await expect(page.getByText('משפחת פרידמן',{exact:true})).toHaveCount(0);
  const link=await page.getByLabel('הקישור השיווקי שלי').inputValue();expect(link).toContain('?ref=mesudarim-demo-a');await noOverflow();
  await page.goto(base+'#/families/f3');await expect(page.getByText('הרשומה אינה זמינה',{exact:true})).toBeVisible();
  await role('admin');await nav().getByRole('button',{name:'משווקים ועמלות',exact:true}).click();

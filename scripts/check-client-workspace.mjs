@@ -7,8 +7,9 @@ try{for(const [device,width,height] of [['desktop',1440,1000],['tablet',820,900]
  const page=await browser.newPage({viewport:{width,height},reducedMotion:'reduce'});page.setDefaultTimeout(10000);const errors=[],external=[];
  page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());page.on('request',r=>{if(!r.url().startsWith(base)&&!r.url().startsWith('data:'))external.push(r.url());});
  await page.goto(base+'#workspace');await page.locator('.demo-roles button').filter({has:page.locator('strong', {hasText:'לקוח'})}).click();
- await expect(page.getByRole('heading',{name:'מה נדרש ממני · 2',exact:true})).toBeVisible();
- const mine=page.locator('.client-priorities'),care=page.locator('.client-care');
+ await expect(page.getByRole('region',{name:'הפעולה הבאה שלי'}).getByRole('heading',{name:'להעלות דוח חיסכון עדכני',exact:true})).toBeVisible();
+ await page.locator('.focus-more>summary').click();
+ const mine=page.locator('.focus-task'),care=page.locator('.client-care');
  await expect(mine).toContainText('להעלות דוח חיסכון עדכני');await expect(mine).not.toContainText('לתאם שיחת מעקב');await expect(care).toContainText('לתאם שיחת מעקב');
  await expect(page.locator('.client-process-reference')).not.toHaveAttribute('open','');
  await page.screenshot({path:`${out}/${device}-home.png`,fullPage:true});
@@ -19,7 +20,7 @@ try{for(const [device,width,height] of [['desktop',1440,1000],['tablet',820,900]
  await expect(followup.getByRole('link',{name:/פתיחת המסמך/})).toBeVisible();await followup.getByRole('button',{name:'סימון כהושלמה',exact:true}).click();
  await page.getByRole('navigation',{name:'סינון משימות המשך'}).getByRole('button',{name:'הכול',exact:true}).click();
  await followup.getByRole('button',{name:'סימנתי בטעות — בקשת תיקון מהנציג',exact:true}).click();await expect(followup).toContainText('בקשת התיקון נרשמה');await expect(followup.locator('.badge')).toHaveText('הושלמה');
- await page.goto(base+'#/overview');await page.locator('.client-help summary').click();await page.getByLabel('במה נוכל לעזור?').fill('נרצה הסבר לפני המשך הטיפול');
+ await page.goto(base+'#/overview');await page.locator('.focus-more>summary').click();await page.locator('.client-help summary').click();await page.getByLabel('במה נוכל לעזור?').fill('נרצה הסבר לפני המשך הטיפול');
  await page.getByRole('button',{name:'רישום בקשת עזרה בדמו',exact:true}).click();await expect(page.locator('.client-help')).toContainText('בקשת העזרה רשומה במעקב');await expect(care).toContainText('נרצה הסבר לפני המשך הטיפול');await expect(care).toContainText('בקשה לתיקון:');
  await page.getByLabel('צפייה בתפקיד',{exact:true}).selectOption('representative');await page.goto(base+'#/notifications');await page.locator('section.card').filter({has:page.getByRole('heading',{name:'בקשת עזרה מהמשפחה',exact:true})}).getByRole('button',{name:'פתיחת הבקשה בתיק',exact:true}).click();await expect(page.locator('.family-activity')).toContainText('נרצה הסבר לפני המשך הטיפול');
  // Editing a linked follow-up must preserve the document relationship.

@@ -7,11 +7,13 @@ try{for(const [device,width,height] of [['desktop',1440,1000],['tablet',820,900]
  const page=await browser.newPage({viewport:{width,height}});const errors=[],external=[];
  page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());page.on('request',r=>{if(!r.url().startsWith(base)&&!r.url().startsWith('data:'))external.push(r.url());});
  await page.goto(base+'#workspace');await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();
+ await expect(page.getByRole('region',{name:'הפעולה הבאה שלי'}).getByRole('button')).toHaveCount(1);
+ await page.locator('.focus-more>summary').click();await page.locator('.questionnaire-context>summary').click();
  const journey=page.getByRole('region',{name:'המסלול שלכם, צעד אחר צעד'});
  await expect(journey.getByRole('list',{name:'שלבי התהליך'}).getByRole('listitem')).toHaveCount(4);await expect(journey.getByRole('heading',{name:'השאלון המשפחתי',exact:true})).toBeVisible();
  await journey.getByText('מה כולל המחיר?',{exact:true}).click();await expect(journey.locator('.intake-payment')).toContainText('מחיר השירות הוא 490 ₪, כולל הכול.');await expect(journey).not.toContainText('אין כאן חיוב או אישור תשלום');
  await page.screenshot({path:`test-results/client-intake/${device}-start.png`,fullPage:true});
- await journey.getByRole('button',{name:'התחלת השאלון',exact:true}).click();
+ await page.getByRole('region',{name:'הפעולה הבאה שלי'}).getByRole('button',{name:'התחלת השאלון',exact:true}).click();
  await page.getByRole('button',{name:'שליחת השאלון לבדיקה',exact:true}).click();await expect(page.locator('.validation-summary')).toContainText('נותרו');
  const chapter=page.getByRole('navigation',{name:'פרקי השאלון'});
  await chapter.getByRole('button',{name:'פרטי משפחה',exact:true}).click();

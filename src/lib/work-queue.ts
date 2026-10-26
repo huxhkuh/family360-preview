@@ -4,7 +4,7 @@ import type {RouteState} from './navigation';
 export type WorkItem={id:string;familyId:string;familyName:string;title:string;owner:string;mine:boolean;waiting:boolean;approval:boolean;due?:string;target:RouteState;label:string};
 export const workFilters=[['all','הכול'],['mine','שלי'],['today','היום'],['late','באיחור'],['approval','ממתינים לאישור'],['waiting','ממתינים לאחרים']] as const;
 export const israelDay=(date=new Date())=>date.toLocaleDateString('sv-SE',{timeZone:'Asia/Jerusalem'});
-export function isLate(item:WorkItem,now=new Date()){return !!item.due&&(item.due.length===10?item.due<israelDay(now):Date.parse(item.due)<now.getTime());}
+export function isLate(item:{due?:string},now=new Date()){return !!item.due&&(item.due.length===10?item.due<israelDay(now):Date.parse(item.due)<now.getTime());}
 export function workQueue(w:Workspace,now=new Date()):WorkItem[]{
  const rows:WorkItem[]=[];const staff=['admin','representative'].includes(w.profile.role);
  const can=(p:string)=>w.permissions.includes('*')||w.permissions.includes(p);

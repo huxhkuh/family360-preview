@@ -1,3 +1,4 @@
+import {FocusedHome} from './workspace/FocusedHome';
 import {RepresentativeHome} from './representative/RepresentativeHome';
 import {MeetingLaunch} from './meetings/MeetingLaunch';
 import {BrandLogo} from './branding/Brand';
@@ -23,6 +24,10 @@ export function Journey({family,w,onNavigate,compact=false,activeTarget}:{family
 }
 
 export function Overview({w,openFamily,navigate,openRecord,filter,onFilter,refresh}:{refresh:()=>Promise<void>;w:Workspace;openFamily:(id:string,target?:Destination)=>void;navigate:(target:string)=>void;openRecord:(r:RouteState)=>void;filter:string;onFilter:(value:string)=>void}){
+ return <FocusedHome w={w} open={openRecord} refresh={refresh}><WorkspaceDetail w={w} openFamily={openFamily} navigate={navigate} openRecord={openRecord} filter={filter} onFilter={onFilter} refresh={refresh}/></FocusedHome>;
+}
+
+function WorkspaceDetail({w,openFamily,navigate,openRecord,filter,onFilter,refresh}:{refresh:()=>Promise<void>;w:Workspace;openFamily:(id:string,target?:Destination)=>void;navigate:(target:string)=>void;openRecord:(r:RouteState)=>void;filter:string;onFilter:(value:string)=>void}){
  if(w.profile.role==='representative')return <RepresentativeHome w={w} open={openRecord} filter={filter} onFilter={onFilter}/>;
  const staff=['admin','representative'].includes(w.profile.role);
  const client=w.profile.role==='client';
@@ -32,7 +37,7 @@ export function Overview({w,openFamily,navigate,openRecord,filter,onFilter,refre
  const updates=w.timeline.filter(t=>new Date(t.created_at).toDateString()===new Date().toDateString()).sort((a,b)=>b.created_at.localeCompare(a.created_at));
  const followUpPanel=w.followUpsEnabled&&followUps.some(isOpen)&&<Panel title="משימות המשך מהשיחות"><p className="muted">פעולות פתוחות לפי מועד.</p>{orderedFollowUps(followUps.filter(isOpen)).slice(0,4).map(t=><div className="followup-overview" key={t.id}><div><strong>{t.title}</strong><p><button className="text-button" onClick={()=>openFamily(t.family_id)}>{w.families.find(f=>f.id===t.family_id)?.name||'לתיק המשפחה'}</button> · {t.owner_name} · עד {dueLabel(t.due_on)} · {deadline(t)}</p></div><button onClick={()=>openFamily(t.family_id,'followups')}>למעקב</button></div>)}<button className="ghost" onClick={()=>navigate('followups')}>לכל משימות ההמשך</button></Panel>;
  return <>{client?<header className="client-welcome"><p>שלום, {w.profile.name} · {today}</p></header>:<header className="page-title"><div><p className="eyebrow">{today} · {client?'האזור האישי':'סביבת העבודה'}</p><h1>שלום, {w.profile.name}</h1></div><BrandLogo mark className="overview-mark"/></header>}
- {client?<>{w.families.map(f=><ClientHome key={f.id} family={f} w={w} open={openRecord} refresh={refresh}/>)}{!w.families.length&&<Empty>עדיין לא שויך לחשבון תיק משפחה. יש לפנות לנציג המטפל כדי להתחיל.</Empty>}</>:<>
+ {client?<>{w.families.map(f=><ClientHome supplemental key={f.id} family={f} w={w} open={openRecord} refresh={refresh}/>)}{!w.families.length&&<Empty>עדיין לא שויך לחשבון תיק משפחה. יש לפנות לנציג המטפל כדי להתחיל.</Empty>}</>:<>
  {staff&&<MeetingLaunch w={w} open={openRecord}/>}
  <div className="kpis"><article><span><Icon name="family"/> תיקים בגישה שלך</span><b>{w.families.length}</b><small>לפי הרשאות החשבון</small></article><article><span><Icon name="tasks"/> {staff?'פעולות צוות לטיפול':'פעולות שלי'}</span><b>{work.filter(r=>!r.waiting).length}</b><small>{'פעולות נפרדות בתיקים שבגישה שלך'}</small></article><article><span><Icon name="meetings"/> פגישות פתוחות</span><b>{w.meetings.filter(m=>['scheduled','in_progress'].includes(m.status)).length}</b><small>מתוכננות או בתהליך</small></article></div>
  {staff?<div className="dashboard-grid"><WorkQueue w={w} open={openRecord} filter={filter} onFilter={onFilter}/><Panel title="מה התחדש היום">{updates.length?updates.slice(0,8).map(t=><article className="timeline-entry" key={t.id}><time>{new Date(t.created_at).toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})}</time><div><p>{t.title}</p><button className="text-button" onClick={()=>openFamily(t.family_id)}>{w.families.find(f=>f.id===t.family_id)?.name||'פתיחת תיק'}</button></div></article>):<Empty>אין פעילות חדשה היום בתיקים שבגישה שלך.</Empty>}<button className="ghost" onClick={()=>navigate('notifications')}>לכל ההתראות</button></Panel></div>:<WorkQueue w={w} open={openRecord} filter={filter} onFilter={onFilter}/>}
