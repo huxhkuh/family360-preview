@@ -1,5 +1,10 @@
 node_modules/
 dist/
+dist-live/
+artifacts/live/
+backups/
+server/.dev.vars
+server/artifacts/
 .env*
 .wrangler/
 test-results/

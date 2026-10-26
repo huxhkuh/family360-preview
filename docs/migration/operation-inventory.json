@@ -1,0 +1,665 @@
+{
+  "generated": "2026-10-26T13:20:14.208Z",
+  "uiRepository": "huxhkuh/family360-preview",
+  "legacyRepository": "huxhkuh/family360",
+  "migrations": [
+    {
+      "file": "0001_schema.sql",
+      "sha256": "f48a00d49f6868cf3c4d5d65421c39f83ebb792334b8bcab4095a0fa87e23307"
+    },
+    {
+      "file": "0002_functions.sql",
+      "sha256": "208d36be5e796f25941155345b91e5f319b719709b0243dc4b0f4c0307613297"
+    },
+    {
+      "file": "0003_rls.sql",
+      "sha256": "bcaec093d500894026c01a6dc923ecf9839529d582df2df2b3bac48fdb181f04"
+    },
+    {
+      "file": "0004_business_rpc.sql",
+      "sha256": "26d1ff2451c70400133d474dfdca85a670546f891b545fc71c8fba2058172916"
+    },
+    {
+      "file": "0005_storage.sql",
+      "sha256": "2084378d152904f4858aa26b121f005e70995c05ecdc52eb604851e9d3b327c1"
+    },
+    {
+      "file": "0006_security.sql",
+      "sha256": "5d1535e4b65eb29a04e2eb8efca2142c0cf280f815a20434a747eabcdf3532b8"
+    },
+    {
+      "file": "0007_workspace.sql",
+      "sha256": "e31c79a5cf1ed32e871f5ab276010c9d37a3f778d6af89112f2e6f51cead690b"
+    },
+    {
+      "file": "0008_operations.sql",
+      "sha256": "80d427d2dbe5483ebd453e5a29b1ae454fb1a1d42623351749c46a5e7720845b"
+    },
+    {
+      "file": "0009_admin.sql",
+      "sha256": "c3059e8a9791ca08b51dd31e5de9e4ed3051403ece48dc04368c62ecc4ede040"
+    },
+    {
+      "file": "0009_reminders.sql",
+      "sha256": "b83e06ab68931ddac6c0f762ad23ac00fabe84284e95771e00193fed0e52e8fe"
+    },
+    {
+      "file": "0009_validation.sql",
+      "sha256": "fb89b98bfb7b11da26aed5b4fa6810300e61ce4245962994826d3cee1b8336b3"
+    },
+    {
+      "file": "0010_rpc_boundary.sql",
+      "sha256": "70fa391a6a1244ebe24894f9c67265420fc5040509b9e191297c2a5adf66bb2c"
+    },
+    {
+      "file": "0011_agent_invitations.sql",
+      "sha256": "663d33def07643a9ba9d269782523696627f915f33c595d251e2a31d9963ae69"
+    },
+    {
+      "file": "0012_meeting_followups.sql",
+      "sha256": "c46d3abefda0260a758510452cb9546d1f78f4a4f8cd969819565cb11524f8ca"
+    },
+    {
+      "file": "0013_meeting_topic_checks.sql",
+      "sha256": "0918e4dcf6a9a601bf0832a78aeafb20ea4b258189ddd9a530801ca9c797d527"
+    },
+    {
+      "file": "0014_household_validation.sql",
+      "sha256": "8be122824f8c37a15efcc70745255e60adc1b7425c82e194fbe6ac6794243c67"
+    },
+    {
+      "file": "0015_workflow_actions.sql",
+      "sha256": "a7f8f6dc92a4c7b33d0d53ea70aa30c7f3e44dd09a275a1f5181bbd2528bd75e"
+    },
+    {
+      "file": "0016_questionnaire_employment.sql",
+      "sha256": "0823861b294aae4501419ad8b2823210d47e477580523f3a3597c2879fa5ffbe"
+    },
+    {
+      "file": "0017_family_work.sql",
+      "sha256": "206dae18eba67eba86a5c822a2ce2e4f2c5658527ae541432ba73d2d698f26c1"
+    },
+    {
+      "file": "0018_family_directory.sql",
+      "sha256": "1bcb8403c6c4b180478a90caf22337cadb72593fa03b384c6917e8c805cc123f"
+    },
+    {
+      "file": "0019_family_activity_feed.sql",
+      "sha256": "d3edc426e0d3d4f2ed060123fe5cca14e70b781651174599b4e28439c86fa5f9"
+    },
+    {
+      "file": "0020_resource_library.sql",
+      "sha256": "6abc30833a82449df80c04e83f4ad84ebea4f770a3647663e63463cb582f9e68"
+    },
+    {
+      "file": "0021_professional_pool.sql",
+      "sha256": "9dae040c5c3c21e32c7a273d8a2c4ec36cebc28aee8d44d9cbb0c97d5c61c7ed"
+    }
+  ],
+  "operations": [
+    {
+      "name": "rpc_accept_agent_invitation",
+      "inPostgres": true,
+      "uiFiles": [
+        "auth/AgentInvitation.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_add_family_service",
+      "inPostgres": true,
+      "uiFiles": [
+        "families/FamilyView.tsx",
+        "lib/backend.ts"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_admin_save",
+      "inPostgres": true,
+      "uiFiles": [
+        "admin/Admin.tsx",
+        "lib/demo-operations.ts"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_approve_analysis",
+      "inPostgres": true,
+      "uiFiles": [
+        "families/FamilyView.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_approve_execution",
+      "inPostgres": true,
+      "uiFiles": [
+        "lib/demo-operations.ts",
+        "tasks/ExecutionEditor.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_approve_final_report",
+      "inPostgres": false,
+      "uiFiles": [
+        "lib/backend.ts",
+        "reports/FinalReportPanel.tsx",
+        "reports/report-operations.ts"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_assign_analysis",
+      "inPostgres": false,
+      "uiFiles": [
+        "lib/backend.ts"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_assign_execution",
+      "inPostgres": false,
+      "uiFiles": [
+        "lib/backend.ts"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_cancel_execution_send",
+      "inPostgres": true,
+      "uiFiles": [],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_cancel_professional_offer",
+      "inPostgres": true,
+      "uiFiles": [
+        "lib/backend.ts",
+        "tasks/ProfessionalPool.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_claim_professional_offer",
+      "inPostgres": true,
+      "uiFiles": [
+        "lib/backend.ts",
+        "tasks/ProfessionalPool.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_client_request",
+      "inPostgres": false,
+      "uiFiles": [
+        "ClientRequests.tsx",
+        "lib/backend.ts"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_close_not_completed",
+      "inPostgres": true,
+      "uiFiles": [],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_complete_onboarding",
+      "inPostgres": true,
+      "uiFiles": [
+        "families/Questionnaire.tsx",
+        "lib/backend.ts"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_create_agent_invitation",
+      "inPostgres": true,
+      "uiFiles": [
+        "admin/AgentInvitations.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_create_family",
+      "inPostgres": true,
+      "uiFiles": [
+        "App.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_create_professional_offer",
+      "inPostgres": true,
+      "uiFiles": [
+        "lib/backend.ts",
+        "tasks/ProfessionalPool.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_demo_attach_example",
+      "inPostgres": false,
+      "uiFiles": [
+        "families/FamilyView.tsx",
+        "lib/backend.ts"
+      ],
+      "status": "replaced-by-authorized-file-route-or-prepare-document"
+    },
+    {
+      "name": "rpc_demo_prepare_document",
+      "inPostgres": false,
+      "uiFiles": [
+        "companion/DocumentCompanion.tsx",
+        "lib/backend.ts"
+      ],
+      "status": "replaced-by-authorized-file-route-or-prepare-document"
+    },
+    {
+      "name": "rpc_execution_history",
+      "inPostgres": true,
+      "uiFiles": [
+        "lib/demo-operations.ts",
+        "tasks/ExecutionEditor.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_execution_note",
+      "inPostgres": true,
+      "uiFiles": [
+        "lib/demo-operations.ts",
+        "tasks/ExecutionEditor.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_family_activity",
+      "inPostgres": true,
+      "uiFiles": [
+        "families/ActivityFeed.tsx",
+        "lib/backend.ts"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_family_workspace",
+      "inPostgres": true,
+      "uiFiles": [],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_finish_meeting",
+      "inPostgres": true,
+      "uiFiles": [
+        "lib/demo-meeting.ts",
+        "meetings/MeetingSession.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_list_agent_invitations",
+      "inPostgres": true,
+      "uiFiles": [
+        "admin/AgentInvitations.tsx",
+        "lib/backend.ts"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_list_professional_offers",
+      "inPostgres": true,
+      "uiFiles": [
+        "lib/backend.ts",
+        "tasks/ProfessionalPool.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_list_resources",
+      "inPostgres": true,
+      "uiFiles": [
+        "lib/backend.ts",
+        "resources/ResourceLibrary.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_manage_meeting",
+      "inPostgres": true,
+      "uiFiles": [
+        "lib/backend.ts",
+        "meetings/MeetingControls.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_mark_notifications_read",
+      "inPostgres": true,
+      "uiFiles": [
+        "App.tsx",
+        "lib/backend.ts"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_meeting_action",
+      "inPostgres": true,
+      "uiFiles": [
+        "lib/demo-meeting.ts",
+        "meetings/MeetingSession.tsx",
+        "meetings/TopicChecklist.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_reassign_execution",
+      "inPostgres": true,
+      "uiFiles": [],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_record_commission",
+      "inPostgres": false,
+      "uiFiles": [
+        "growth/growth-operations.ts",
+        "growth/MarketerPortal.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_record_family_contact",
+      "inPostgres": true,
+      "uiFiles": [
+        "families/FamilyActivity.tsx",
+        "lib/backend.ts"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_reopen_final_report",
+      "inPostgres": false,
+      "uiFiles": [
+        "reports/FinalReportPanel.tsx",
+        "reports/report-operations.ts"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_replace_document_file",
+      "inPostgres": true,
+      "uiFiles": [],
+      "status": "replaced-by-authorized-file-route-or-prepare-document"
+    },
+    {
+      "name": "rpc_report_execution_complete",
+      "inPostgres": true,
+      "uiFiles": [
+        "lib/demo-operations.ts",
+        "tasks/ExecutionEditor.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_request_document",
+      "inPostgres": true,
+      "uiFiles": [
+        "families/FamilyView.tsx",
+        "lib/backend.ts"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_return_analysis",
+      "inPostgres": true,
+      "uiFiles": [
+        "families/FamilyView.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_return_execution",
+      "inPostgres": true,
+      "uiFiles": [
+        "lib/demo-operations.ts",
+        "tasks/ExecutionEditor.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_review_document",
+      "inPostgres": true,
+      "uiFiles": [
+        "families/FamilyView.tsx",
+        "lib/backend.ts"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_review_questionnaire_topic",
+      "inPostgres": false,
+      "uiFiles": [
+        "families/QuestionnaireDiscussion.tsx",
+        "lib/backend.ts"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_revoke_agent_invitation",
+      "inPostgres": true,
+      "uiFiles": [
+        "admin/AgentInvitations.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_run_reminders",
+      "inPostgres": true,
+      "uiFiles": [],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_save_analysis_draft",
+      "inPostgres": true,
+      "uiFiles": [
+        "lib/demo-operations.ts",
+        "tasks/AnalysisEditor.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_save_decision_followup",
+      "inPostgres": true,
+      "uiFiles": [
+        "lib/backend.ts",
+        "meetings/MeetingSession.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_save_family",
+      "inPostgres": true,
+      "uiFiles": [
+        "families/ContactDetails.tsx",
+        "families/Questionnaire.tsx",
+        "lib/demo-meeting.ts"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_save_family_task",
+      "inPostgres": true,
+      "uiFiles": [
+        "families/FamilyActivity.tsx",
+        "lib/backend.ts"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_save_final_report",
+      "inPostgres": false,
+      "uiFiles": [
+        "lib/backend.ts",
+        "reports/FinalReportPanel.tsx",
+        "reports/report-operations.ts"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_save_meeting_followup",
+      "inPostgres": true,
+      "uiFiles": [
+        "followups/FollowUps.tsx",
+        "followups/InlineFollowup.tsx",
+        "lib/demo-meeting.ts"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_save_meeting_topic",
+      "inPostgres": true,
+      "uiFiles": [
+        "lib/demo-meeting.ts",
+        "meetings/TopicChecklist.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_save_resource",
+      "inPostgres": true,
+      "uiFiles": [
+        "lib/backend.ts",
+        "resources/ResourceLibrary.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_schedule_meeting",
+      "inPostgres": true,
+      "uiFiles": [
+        "meetings/Meetings.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_search_families",
+      "inPostgres": true,
+      "uiFiles": [
+        "families/FamilyDirectory.tsx",
+        "lib/backend.ts"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_send_to_analysis",
+      "inPostgres": true,
+      "uiFiles": [
+        "families/FamilyView.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_send_to_execution",
+      "inPostgres": true,
+      "uiFiles": [
+        "families/FamilyView.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_set_family_task_status",
+      "inPostgres": true,
+      "uiFiles": [
+        "families/FamilyActivity.tsx",
+        "lib/backend.ts"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_set_followup_status",
+      "inPostgres": true,
+      "uiFiles": [
+        "followups/FollowUps.tsx",
+        "lib/demo-meeting.ts"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_set_professional_service",
+      "inPostgres": true,
+      "uiFiles": [
+        "admin/Admin.tsx",
+        "lib/demo-operations.ts"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_set_setting",
+      "inPostgres": true,
+      "uiFiles": [
+        "admin/Admin.tsx",
+        "lib/demo-operations.ts"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_share_document",
+      "inPostgres": true,
+      "uiFiles": [
+        "families/FamilyView.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_sign_document",
+      "inPostgres": true,
+      "uiFiles": [
+        "families/ClearinghouseConsent.tsx",
+        "families/FamilyView.tsx",
+        "lib/backend.ts"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_start_execution",
+      "inPostgres": true,
+      "uiFiles": [
+        "lib/demo-operations.ts",
+        "tasks/ExecutionEditor.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_submit_analysis",
+      "inPostgres": true,
+      "uiFiles": [
+        "lib/demo-operations.ts",
+        "tasks/AnalysisEditor.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_telephone_contact",
+      "inPostgres": false,
+      "uiFiles": [
+        "growth/telephone-operations.ts",
+        "growth/TelephoneDesk.tsx"
+      ],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    },
+    {
+      "name": "rpc_workspace",
+      "inPostgres": true,
+      "uiFiles": [],
+      "status": "worker-implemented-awaiting-full-acceptance"
+    }
+  ],
+  "verification": {
+    "security": "server/tests/security.test.ts",
+    "authentication": "server/tests/auth.test.ts",
+    "backup": "server/tests/backup.test.ts",
+    "liveAcceptance": "pending"
+  }
+}

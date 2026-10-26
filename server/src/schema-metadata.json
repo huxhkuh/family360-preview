@@ -1,0 +1,669 @@
+{
+  "agent_invitations": {
+    "json": [],
+    "boolean": [],
+    "columns": [
+      "id",
+      "token_hash",
+      "label",
+      "email",
+      "created_by",
+      "created_at",
+      "expires_at",
+      "revoked_at",
+      "accepted_at",
+      "accepted_by"
+    ]
+  },
+  "family_contacts": {
+    "json": [],
+    "boolean": [],
+    "columns": [
+      "id",
+      "family_id",
+      "kind",
+      "summary",
+      "occurred_at",
+      "created_by",
+      "created_at",
+      "next_task_id"
+    ]
+  },
+  "family_tasks": {
+    "json": [],
+    "boolean": [
+      "visible_to_client"
+    ],
+    "columns": [
+      "id",
+      "family_id",
+      "title",
+      "details",
+      "owner_role",
+      "due_on",
+      "visible_to_client",
+      "status",
+      "revision",
+      "created_by",
+      "updated_by",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "meeting_followups": {
+    "json": [],
+    "boolean": [
+      "visible_to_client"
+    ],
+    "columns": [
+      "id",
+      "meeting_id",
+      "family_id",
+      "item_id",
+      "title",
+      "details",
+      "owner_role",
+      "due_on",
+      "visible_to_client",
+      "status",
+      "revision",
+      "created_by",
+      "updated_by",
+      "created_at",
+      "updated_at",
+      "completed_at"
+    ]
+  },
+  "meeting_topic_catalog": {
+    "json": [],
+    "boolean": [],
+    "columns": [
+      "key",
+      "title"
+    ]
+  },
+  "meeting_topic_checks": {
+    "json": [],
+    "boolean": [],
+    "columns": [
+      "id",
+      "meeting_id",
+      "topic_key",
+      "result",
+      "note",
+      "followup_id",
+      "revision",
+      "updated_by",
+      "updated_at"
+    ]
+  },
+  "professional_offers": {
+    "json": [
+      "candidates"
+    ],
+    "boolean": [],
+    "columns": [
+      "id",
+      "family_service_id",
+      "kind",
+      "candidates",
+      "note",
+      "source_analysis_task_id",
+      "source_execution_task_id",
+      "created_by",
+      "created_at",
+      "expires_at",
+      "status",
+      "claimed_by",
+      "task_id"
+    ]
+  },
+  "reminder_receipts": {
+    "json": [],
+    "boolean": [],
+    "columns": [
+      "task_id",
+      "profile_id",
+      "day"
+    ]
+  },
+  "resources": {
+    "json": [],
+    "boolean": [
+      "active"
+    ],
+    "columns": [
+      "id",
+      "title",
+      "description",
+      "url",
+      "phone",
+      "chapter",
+      "verified_at",
+      "verified_by",
+      "active",
+      "revision",
+      "updated_at"
+    ]
+  },
+  "analysis_tasks": {
+    "json": [
+      "findings",
+      "financial",
+      "actions",
+      "result_values",
+      "snapshot",
+      "attachments",
+      "info_requests",
+      "return_history"
+    ],
+    "boolean": [],
+    "columns": [
+      "id",
+      "task_number",
+      "family_id",
+      "family_service_id",
+      "service_id",
+      "professional_id",
+      "representative_id",
+      "status",
+      "due_at",
+      "assigned_at",
+      "opened_at",
+      "started_at",
+      "completed_at",
+      "rep_note",
+      "current_situation",
+      "findings",
+      "result_tone",
+      "recommendation",
+      "financial",
+      "actions",
+      "client_summary",
+      "internal_note",
+      "result_values",
+      "snapshot",
+      "attachments",
+      "info_requests",
+      "return_history",
+      "prior_task_id",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "audit_log": {
+    "json": [
+      "metadata"
+    ],
+    "boolean": [],
+    "columns": [
+      "id",
+      "actor_profile_id",
+      "actor_role",
+      "action",
+      "entity_type",
+      "entity_id",
+      "entity_name",
+      "description",
+      "metadata",
+      "created_at"
+    ]
+  },
+  "automations": {
+    "json": [
+      "settings"
+    ],
+    "boolean": [
+      "active"
+    ],
+    "columns": [
+      "id",
+      "key",
+      "name",
+      "event_key",
+      "active",
+      "delay_minutes",
+      "channel",
+      "template_id",
+      "settings",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "counters": {
+    "json": [],
+    "boolean": [],
+    "columns": [
+      "key",
+      "value"
+    ]
+  },
+  "document_types": {
+    "json": [],
+    "boolean": [
+      "active"
+    ],
+    "columns": [
+      "id",
+      "key",
+      "name",
+      "type",
+      "description",
+      "active",
+      "sort_order",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "documents": {
+    "json": [],
+    "boolean": [],
+    "columns": [
+      "id",
+      "family_id",
+      "document_type_id",
+      "service_id",
+      "key",
+      "name",
+      "who",
+      "type",
+      "status",
+      "storage_path",
+      "file_name",
+      "file_size",
+      "mime_type",
+      "reject_reason",
+      "uploaded_at",
+      "approved_at",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "email_logs": {
+    "json": [],
+    "boolean": [],
+    "columns": [
+      "id",
+      "family_id",
+      "recipient_profile_id",
+      "recipient_email",
+      "subject",
+      "body",
+      "template_id",
+      "event_key",
+      "status",
+      "created_at"
+    ]
+  },
+  "execution_messages": {
+    "json": [],
+    "boolean": [],
+    "columns": [
+      "id",
+      "execution_task_id",
+      "sender_profile_id",
+      "sender_role",
+      "recipient_role",
+      "body",
+      "read_at",
+      "created_at"
+    ]
+  },
+  "execution_tasks": {
+    "json": [
+      "approved_actions",
+      "snapshot",
+      "info_requests",
+      "return_history",
+      "reassignment_history"
+    ],
+    "boolean": [],
+    "columns": [
+      "id",
+      "task_number",
+      "family_id",
+      "family_service_id",
+      "service_id",
+      "professional_id",
+      "representative_id",
+      "source_meeting_id",
+      "source_meeting_item_id",
+      "analysis_task_id",
+      "prior_task_id",
+      "status",
+      "due_at",
+      "sent_at",
+      "opened_at",
+      "started_at",
+      "reported_at",
+      "completed_at",
+      "client_name",
+      "client_phone",
+      "client_email",
+      "client_decision_at",
+      "instructions",
+      "approved_actions",
+      "urgency",
+      "contact_window",
+      "snapshot",
+      "representative_note",
+      "waiting_reason",
+      "waiting_follow_up_at",
+      "outcome",
+      "outcome_summary",
+      "outcome_result",
+      "outcome_value",
+      "outcome_note",
+      "close_reason",
+      "cancel_reason",
+      "info_requests",
+      "return_history",
+      "reassignment_history",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "execution_updates": {
+    "json": [],
+    "boolean": [],
+    "columns": [
+      "id",
+      "execution_task_id",
+      "author_profile_id",
+      "author_name",
+      "kind",
+      "contact_result",
+      "text",
+      "created_at"
+    ]
+  },
+  "families": {
+    "json": [
+      "answers"
+    ],
+    "boolean": [
+      "meeting_held"
+    ],
+    "columns": [
+      "id",
+      "case_number",
+      "representative_id",
+      "client_profile_id",
+      "status",
+      "name",
+      "contact_name",
+      "phone",
+      "email",
+      "answers",
+      "onboarding_pct",
+      "meeting_held",
+      "internal_notes",
+      "joined_at",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "family_services": {
+    "json": [],
+    "boolean": [],
+    "columns": [
+      "id",
+      "family_id",
+      "service_id",
+      "status",
+      "professional_id",
+      "analysis_task_id",
+      "execution_task_id",
+      "result_tone",
+      "internal_note",
+      "sent_at",
+      "completed_at",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "meeting_items": {
+    "json": [
+      "financial",
+      "actions",
+      "attachments",
+      "approved_actions"
+    ],
+    "boolean": [
+      "visible_to_client"
+    ],
+    "columns": [
+      "id",
+      "meeting_id",
+      "family_id",
+      "family_service_id",
+      "service_id",
+      "analysis_task_id",
+      "sort_order",
+      "visible_to_client",
+      "result_tone",
+      "title",
+      "icon",
+      "client_summary",
+      "current_situation",
+      "recommendation",
+      "financial",
+      "actions",
+      "attachments",
+      "professional_name",
+      "representative_note",
+      "client_decision",
+      "decision_note",
+      "approved_actions",
+      "execution_instructions",
+      "contact_window",
+      "urgency",
+      "follow_up_at",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "meetings": {
+    "json": [],
+    "boolean": [],
+    "columns": [
+      "id",
+      "family_id",
+      "representative_id",
+      "status",
+      "type",
+      "duration_min",
+      "note",
+      "cancel_reason",
+      "scheduled_at",
+      "started_at",
+      "completed_at",
+      "current_item_index",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "message_templates": {
+    "json": [],
+    "boolean": [
+      "active"
+    ],
+    "columns": [
+      "id",
+      "key",
+      "name",
+      "subject",
+      "body",
+      "active",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "notifications": {
+    "json": [],
+    "boolean": [],
+    "columns": [
+      "id",
+      "profile_id",
+      "family_id",
+      "title",
+      "body",
+      "type",
+      "read_at",
+      "created_at"
+    ]
+  },
+  "professional_services": {
+    "json": [],
+    "boolean": [
+      "analysis_enabled",
+      "execution_enabled"
+    ],
+    "columns": [
+      "id",
+      "professional_id",
+      "service_id",
+      "analysis_enabled",
+      "execution_enabled",
+      "created_at"
+    ]
+  },
+  "professionals": {
+    "json": [
+      "analysis_sla_overrides",
+      "execution_sla_overrides"
+    ],
+    "boolean": [
+      "active",
+      "analysis_enabled",
+      "execution_enabled"
+    ],
+    "columns": [
+      "id",
+      "profile_id",
+      "business_name",
+      "active",
+      "analysis_enabled",
+      "execution_enabled",
+      "analysis_sla_hours",
+      "execution_sla_hours",
+      "analysis_sla_overrides",
+      "execution_sla_overrides",
+      "agreement_type",
+      "commercial_note",
+      "internal_note",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "profiles": {
+    "json": [],
+    "boolean": [
+      "active"
+    ],
+    "columns": [
+      "id",
+      "auth_user_id",
+      "role",
+      "name",
+      "email",
+      "phone",
+      "active",
+      "created_at",
+      "updated_at",
+      "agent_invitation_id",
+      "invited_by",
+      "joined_as_agent_at"
+    ]
+  },
+  "representatives": {
+    "json": [
+      "permissions"
+    ],
+    "boolean": [
+      "active"
+    ],
+    "columns": [
+      "id",
+      "profile_id",
+      "active",
+      "permissions",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "services": {
+    "json": [
+      "trigger_conditions",
+      "client_fields",
+      "required_documents",
+      "professional_fields",
+      "analysis_result_fields",
+      "automation_settings"
+    ],
+    "boolean": [
+      "active"
+    ],
+    "columns": [
+      "id",
+      "key",
+      "name",
+      "icon",
+      "category",
+      "description",
+      "active",
+      "sort_order",
+      "analysis_sla_hours",
+      "execution_sla_hours",
+      "trigger_conditions",
+      "client_fields",
+      "required_documents",
+      "professional_fields",
+      "analysis_result_fields",
+      "automation_settings",
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "system_settings": {
+    "json": [
+      "value"
+    ],
+    "boolean": [],
+    "columns": [
+      "key",
+      "value",
+      "updated_at",
+      "updated_by"
+    ]
+  },
+  "task_documents": {
+    "json": [],
+    "boolean": [],
+    "columns": [
+      "id",
+      "document_id",
+      "analysis_task_id",
+      "execution_task_id",
+      "shared_at",
+      "shared_by",
+      "revoked_at"
+    ]
+  },
+  "timeline_events": {
+    "json": [
+      "metadata"
+    ],
+    "boolean": [],
+    "columns": [
+      "id",
+      "family_id",
+      "event_type",
+      "title",
+      "description",
+      "metadata",
+      "actor_profile_id",
+      "created_at"
+    ]
+  }
+}

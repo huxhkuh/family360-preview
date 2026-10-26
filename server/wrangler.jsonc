@@ -1,0 +1,17 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "mesudarim360-api-staging",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-26",
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": { "enabled": false },
+  "vars": {
+    "ENVIRONMENT": "staging",
+    "SUPABASE_URL": "https://vrswvpvygmjhcarzvuqf.supabase.co",
+    "ALLOWED_ORIGINS": "http://127.0.0.1:5174",
+    "AUTH_ENABLED": "false"
+  },
+  "d1_databases": [{"binding":"DB","database_name":"mesudarim360-staging","database_id":"e1c4565a-c666-4859-84dd-39d30061cc26","migrations_dir":"migrations"}],
+  "r2_buckets": [{"binding":"DOCUMENTS","bucket_name":"mesudarim360-documents-staging"}]
+}

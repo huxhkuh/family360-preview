@@ -1,0 +1,8 @@
+import {test,expect} from 'vitest';
+import {mkdtemp,writeFile,mkdir,readFile,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import path from 'node:path';
+import {randomBytes} from 'node:crypto';
+// @ts-expect-error Standalone operational script is deliberately usable without a build step.
+import {backup,restore,verify} from '../../scripts/migration/secure-backup.mjs';
+test('encrypted database and file backup restores exactly and detects tampering before restore',async()=>{const root=await mkdtemp(path.join(tmpdir(),'m360-backup-'));try{const source=path.join(root,'source'),archive=path.join(root,'archive'),target=path.join(root,'restored'),key=randomBytes(32).toString('hex');await mkdir(source);await mkdir(path.join(source,'files'));await writeFile(path.join(source,'database.sql'),'CREATE TABLE synthetic(id TEXT);');await writeFile(path.join(source,'files','file.pdf'),'%PDF-synthetic');expect((await backup(source,archive,key)).files).toBe(2);expect((await restore(archive,target,key)).files).toBe(2);expect(await readFile(path.join(target,'database.sql'),'utf8')).toBe('CREATE TABLE synthetic(id TEXT);');expect(await readFile(path.join(target,'files','file.pdf'),'utf8')).toBe('%PDF-synthetic');await expect(restore(archive,target,key)).rejects.toThrow('refusing overwrite');await expect(verify(archive,randomBytes(32).toString('hex'))).rejects.toThrow();const file=path.join(archive,'00000000.enc'),data=await readFile(file);data[20]^=1;await writeFile(file,data);await expect(restore(archive,path.join(root,'tampered'),key)).rejects.toThrow();}finally{await rm(root,{recursive:true,force:true});}});
