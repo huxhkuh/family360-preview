@@ -1,6 +1,6 @@
 import {useEffect,useRef,useState} from 'react';
 
-export function usePageStack(){
+export function usePageStack(stack=true){
  const rootRef=useRef<HTMLDivElement>(null);
  const [headerVisible,setHeaderVisible]=useState(true);
  const [headerTheme,setHeaderTheme]=useState<'dark'|'light'>('dark');
@@ -9,6 +9,7 @@ export function usePageStack(){
   if(!root)return;
   const header=root.querySelector<HTMLElement>(':scope > .public-header');
   const panels=Array.from(root.querySelectorAll<HTMLElement>(':scope > main > section'));
+  const steps=Array.from(root.querySelectorAll<HTMLElement>('.editorial-steps li'));
   const footer=root.querySelector<HTMLElement>(':scope > footer');
   if(!header)return;
   let frame=0;
@@ -22,10 +23,11 @@ export function usePageStack(){
    const headerHeight=header.offsetHeight;
    root.style.setProperty('--stack-header-height',`${headerHeight}px`);
    // Tall pages must scroll to their end before the next page covers them.
-   panels.forEach((panel,index)=>{
+   if(stack)panels.forEach((panel,index)=>{
     panel.style.setProperty('--page-pin-top',`${Math.min(0,innerHeight-panel.offsetHeight)}px`);
     panel.style.setProperty('--page-order',String(index+1));
    });
+   steps.forEach(step=>{step.dataset.reached=String(step.getBoundingClientRect().top<=innerHeight*.62);});
    setHeaderVisible(window.scrollY<40||pointerAtTop||touchReveal);
    const line=headerHeight+2;
    let theme:'dark'|'light'='dark';
@@ -56,7 +58,7 @@ export function usePageStack(){
   window.addEventListener('resize',schedule,{passive:true});
   schedule();
   return()=>{cancelAnimationFrame(frame);observer.disconnect();window.removeEventListener('scroll',onScroll);window.removeEventListener('pointermove',onPointerMove);document.documentElement.removeEventListener('pointerleave',onPointerLeave);window.removeEventListener('resize',schedule);};
- },[]);
+ },[stack]);
  return {rootRef,headerTheme,headerVisible};
 }
 

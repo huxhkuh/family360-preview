@@ -11,10 +11,10 @@ try{
   page.on('dialog',dialog=>dialog.accept());
   await page.goto(base+'#welcome');
   await page.getByRole('heading',{name:'את הצעד הראשון כבר עשיתם.',exact:true}).waitFor();
-  for(const image of await page.locator('.welcome-page img').all())await image.evaluate(img=>img.decode());
+  for(const image of await page.locator('.welcome-page img').all())await image.evaluate(img=>{img.loading='eager';return img.decode();});
   assert.equal(await page.locator('.welcome-page .landing-brand-image').count(),2);
   assert.equal(await page.locator('.welcome-page .integrated-art').count(),3);
-  for(const text of ['אנחנו כאן כדי לעזור לכם להבין מה קורה עם הכסף שלכם, איפה אפשר לשפר, ומה כדאי לעשות קודם.','קצת יותר סדר. הרבה יותר בהירות.','כל ההוצאות האלה באמת נחוצות? אולי אנחנו משלמים יותר מדי? כשכל פרט נמצא במקום אחר, קשה לראות איך הכול מתחבר.'])assert.ok((await page.locator('.welcome-page main').innerText()).replace(/\s+/g,' ').includes(text));
+  for(const text of ['עכשיו אנחנו כאן כדי לעזור לכם להחזיר את הכסף הביתה.','עושים סדר בכסף שלכם','המסמכים שלי בטוחים אצלכם?'])assert.ok((await page.locator('.welcome-page main').innerText()).replace(/\s+/g,' ').replace(/\s*יכול/, ' יכול').includes(text));
   assert.equal(await page.locator('.public-hero').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(8, 46, 40)');
   assert.equal(await page.locator('.hero-case-card').count(),0);
   for(const art of await page.locator('.public-story .integrated-art').all())assert.equal(await art.evaluate(el=>getComputedStyle(el).backgroundColor),'rgba(0, 0, 0, 0)');
@@ -38,7 +38,9 @@ try{
   await page.getByRole('button',{name:'דף הבית',exact:true}).click();
   await page.getByRole('heading',{name:'את הצעד הראשון כבר עשיתם.',exact:true}).waitFor();
   await page.locator('.welcome-page .public-header').getByText('איך זה עובד?',{exact:true}).click();
-  assert.equal(new URL(page.url()).hash,'#learn');
+  await page.locator('#welcome-how h2').waitFor();
+  assert.ok(await page.evaluate(()=>window.scrollY>0));
+  await page.mouse.move(100,5);
   await page.getByRole('button',{name:/^כניסה (לדמו המערכת|למערכת)/}).click();
   await nav.waitFor();
   assert.equal(new URL(page.url()).hash,route);
@@ -53,7 +55,9 @@ try{
    const shellClass=await page.locator('.app-shell').getAttribute('class');
    await page.getByRole('button',{name:'דף הבית',exact:true}).click();
    await page.locator('.welcome-page .public-header').getByText('איך זה עובד?',{exact:true}).click();
-   assert.equal(new URL(page.url()).hash,'#learn');
+   await page.locator('#welcome-how h2').waitFor();
+  assert.ok(await page.evaluate(()=>window.scrollY>0));
+  await page.mouse.move(100,5);
    await page.getByRole('button',{name:/^כניסה (לדמו המערכת|למערכת)/}).click();
    assert.equal(await page.getByLabel('צפייה בתפקיד',{exact:true}).inputValue(),role);
    assert.equal(new URL(page.url()).hash,currentRoute);
@@ -67,6 +71,9 @@ try{
   await page.getByRole('button',{name:'דף הבית',exact:true}).click();
   await page.getByRole('button',{name:/^כניסה (לדמו המערכת|למערכת)/}).click();
   assert.equal(await page.locator('[data-answer-key=city]').inputValue(),'טיוטה שנשמרת במעבר לדף הבית');
+  await page.goto(base+'?landing=reserve#welcome');
+  assert.equal(await page.locator('.editorial-home').count(),0);
+  assert.ok((await page.locator('.public-intro').innerText()).includes('נכנסתם לכאן'));
   assert.deepEqual(errors,[]);await page.close();
  }
  console.log('PASS: brand homepage, logo, five roles including marketer, current representative design, route/search/draft retention on return, desktop/mobile.');

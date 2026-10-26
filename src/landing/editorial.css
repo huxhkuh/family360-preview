@@ -1,0 +1,161 @@
+/* Editorial landing variant. All rules are scoped so the reserve stays intact. */
+.editorial-home{--editorial-line:#143c2926}
+.premium-public.editorial-home.page-stack>main>section:not(.public-hero){padding-block:88px;display:grid;align-content:center;gap:64px}
+.editorial-home .editorial-heading h2{margin:18px 0 24px}
+.editorial-home .editorial-heading>p:not(.brand-kicker),.editorial-home .editorial-process-intro>p:not(.brand-kicker){font-size:21px;line-height:1.7;max-width:560px}
+.premium-public.editorial-home .public-hero{grid-template-columns:1.1fr .9fr;gap:60px}
+.premium-public.editorial-home .public-hero h1{font-size:clamp(52px,5.5vw,80px);line-height:1.12;letter-spacing:-.035em;margin:20px 0 26px}
+.premium-public.editorial-home .public-hero .public-intro{font-size:28px;line-height:1.5}
+.premium-public.editorial-home .public-hero>div>p:not(.brand-kicker):not(.public-intro){font-size:20px;line-height:1.7;max-width:520px;margin-top:20px}
+.editorial-home .editorial-benefit-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:32px}
+.editorial-home .editorial-benefit-grid article{border-top:1px solid var(--editorial-line);padding-top:26px}
+.editorial-home .editorial-benefit-grid h3{font-size:25px;margin:22px 0 12px}
+.editorial-home .editorial-benefit-grid p{font-size:19px;line-height:1.65}
+.premium-public.editorial-home.page-stack>main>.editorial-process{grid-template-columns:.9fr 1.1fr;background:linear-gradient(130deg,#f0ecdf,#f7f5ee 60%,#e8eadd);gap:90px;align-items:start}
+.editorial-home .editorial-process-intro h2{font-size:clamp(34px,3.1vw,46px);margin:20px 0 24px}
+.editorial-home .editorial-process-intro .integrated-art{margin-top:30px}
+.editorial-home .editorial-process-intro .integrated-art img{height:270px;object-position:center}
+.editorial-home .editorial-caption{display:block;text-align:center;color:#627065;font-size:15px;margin-top:12px}
+.editorial-home .editorial-steps{list-style:none;padding:0;margin:0}
+.editorial-home .editorial-steps li{display:grid;grid-template-columns:48px 1fr;gap:20px;padding:28px 0;border-top:1px solid var(--editorial-line)}
+.editorial-home .editorial-step-number{font-size:30px;line-height:1.3;color:#a56b43;font-weight:500;direction:ltr}
+.editorial-home .editorial-steps h3{font-size:25px;margin-bottom:12px}
+.editorial-home .editorial-steps p{font-size:19px;line-height:1.7}
+.premium-public.editorial-home.page-stack>main>.editorial-deliverable{grid-template-columns:1fr 1fr;gap:100px}
+.editorial-home .editorial-report{background:#fffdf8;border:1px solid #d9d5c8;border-radius:28px 28px 8px 28px;padding:36px;box-shadow:0 24px 60px #18332810;order:2}
+.editorial-home .editorial-report-top{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--editorial-line);padding-bottom:22px;margin-bottom:26px}
+.editorial-home .editorial-report-top img{width:95px;height:75px;object-fit:contain}
+.editorial-home .editorial-report-top>span{font-size:14px;line-height:1.6;color:#7b8075}
+.editorial-home .editorial-report h3{font-size:34px;line-height:1.2;margin:10px 0 24px}
+.editorial-home .editorial-report-row{display:grid;grid-template-columns:10px 1fr auto;gap:12px;align-items:center;border-top:1px solid var(--editorial-line);padding:19px 0}
+.editorial-home .editorial-report-row b{font-size:17px;font-weight:650}
+.editorial-home .editorial-report-row small{display:block;font-size:14px;color:#777d70;margin-top:5px}
+.editorial-home .editorial-report-row>span:last-child{font-size:12px;color:#627065}
+.editorial-home .editorial-report-dot{width:8px;height:8px;border-radius:50%;background:#39735c}
+.editorial-home .editorial-report-dot.check{background:#b77c46}.editorial-home .editorial-report-dot.next{background:#8c6e54}
+.editorial-home .editorial-report-action{background:#edf0e7;padding:20px;display:flex;gap:18px;margin-top:18px;border-radius:16px 16px 4px 16px}
+.editorial-home .editorial-report-action>span{color:#a56b43;font-size:22px}.editorial-home .editorial-report-action p{font-size:15px;margin-top:7px;line-height:1.5}
+.editorial-home .editorial-checklist{list-style:none;padding:0;margin:28px 0 36px}
+.editorial-home .editorial-checklist li{font-size:20px;padding:12px 0;border-bottom:1px solid var(--editorial-line)}
+.editorial-home .editorial-checklist li::before{content:'✓';color:#a16a43;margin-inline-end:14px}
+.premium-public.editorial-home.page-stack>main>.editorial-coverage{grid-template-columns:.8fr 1.2fr;gap:90px}
+.editorial-home .editorial-domains details{border-top:1px solid var(--editorial-line)}
+.editorial-home .editorial-domains details:last-child{border-bottom:1px solid var(--editorial-line)}
+.editorial-home .editorial-domains summary{display:flex;gap:20px;align-items:center;list-style:none;cursor:pointer;padding:25px 0}
+.editorial-home .editorial-domains summary::-webkit-details-marker{display:none}
+.editorial-home .editorial-domains summary .public-benefit-icon{flex-shrink:0;width:52px;height:52px}
+.editorial-home .editorial-domains svg{width:52px;height:52px}
+.editorial-home .editorial-domains b{font-size:24px;font-weight:650}.editorial-home .editorial-domains small{display:block;color:#7c8073;font-size:16px;margin-top:8px}
+.editorial-home .domain-toggle{margin-inline-start:auto;color:#a16a43;font-size:27px;font-weight:400;transition:transform .2s}
+.editorial-home details[open] .domain-toggle{transform:rotate(45deg)}
+.editorial-home .editorial-domains details>p{font-size:18px;line-height:1.7;padding:0 72px 26px 15px}
+.premium-public.editorial-home.page-stack>main>.editorial-price{background:#082e28;color:#faf7f2;grid-template-columns:1.1fr .9fr;gap:110px}
+.editorial-home .editorial-price .brand-kicker{color:#d8ab80!important}
+.editorial-home .editorial-price h2{font-size:clamp(42px,4.5vw,65px);margin:24px 0 30px}
+.editorial-home .editorial-price h2 em{color:#d8ab80}
+.editorial-home .editorial-price>div>p:not(.brand-kicker){font-size:21px;line-height:1.7;color:#c3d0c7;max-width:460px}
+.editorial-home .editorial-offer{border-inline-start:1px solid #cfaa8050;padding-inline-start:60px}
+.editorial-home .offer-label{display:block;font-size:18px;color:#d8dfd6}
+.editorial-home .offer-amount{font-size:110px;line-height:1.2;font-weight:550;letter-spacing:-.05em;margin:15px 0 0}
+.editorial-home .offer-amount>span{font-size:46px;font-weight:400}
+.editorial-home .editorial-offer ul{list-style:none;padding:24px 0;margin:22px 0;border-block:1px solid #ffffff22}
+.editorial-home .editorial-offer li{font-size:19px;padding:9px 0}.editorial-home .editorial-offer li::before{content:'✓';color:#d8ab80;margin-inline-end:14px}
+.editorial-home .editorial-offer .brand-primary{width:100%}
+.editorial-home .editorial-offer>small{display:block;margin-top:16px;font-size:14px;color:#b6c5ba}
+.premium-public.editorial-home.page-stack>main>.editorial-faq{grid-template-columns:.85fr 1.15fr;align-items:start;gap:80px}
+.editorial-home .editorial-faq .public-faq-items summary{font-size:22px}
+.editorial-home .editorial-faq .public-faq-items p{line-height:1.7;font-size:18px}
+.premium-public.editorial-home.page-stack>main>.editorial-closing{grid-template-columns:250px 1fr;min-height:65svh;gap:65px}
+.editorial-home .editorial-closing .integrated-art>img{height:260px}
+.editorial-home .editorial-closing h2{font-size:clamp(32px,3.4vw,48px);margin:20px 0 30px}
+@media(max-width:1000px){
+ .premium-public.editorial-home.page-stack>main>section:not(.public-hero){gap:40px;padding-block:60px}
+ .editorial-home .editorial-benefit-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:35px}
+ .premium-public.editorial-home.page-stack>main>.editorial-deliverable{gap:40px}
+ .editorial-home .editorial-offer{padding-inline-start:30px}
+ .editorial-home .editorial-report{padding:24px}
+}
+@media(max-width:700px){
+ .premium-public.editorial-home .public-hero{grid-template-columns:1fr;gap:10px}
+ .premium-public.editorial-home .public-hero h1{font-size:48px}
+ .premium-public.editorial-home .public-hero .public-intro{font-size:25px}
+ .premium-public.editorial-home .public-hero>div>p:not(.brand-kicker):not(.public-intro){font-size:19px}
+ .editorial-home .desktop-break{display:none}
+ .premium-public.editorial-home.page-stack>main>section:not(.public-hero){grid-template-columns:1fr;padding:52px 24px;gap:36px}
+ .editorial-home .editorial-heading h2{font-size:35px}
+ .editorial-home .editorial-heading>p:not(.brand-kicker),.editorial-home .editorial-process-intro>p:not(.brand-kicker){font-size:19px}
+ .editorial-home .editorial-benefit-grid{gap:28px 24px}
+ .editorial-home .editorial-benefit-grid h3{font-size:23px}
+ .editorial-home .editorial-benefit-grid p{font-size:18px}
+ .editorial-home .editorial-process-intro .integrated-art img{height:210px}
+ .editorial-home .editorial-steps li{grid-template-columns:34px 1fr;gap:14px;padding:24px 0}
+ .editorial-home .editorial-steps p{font-size:18px}
+ .editorial-home .editorial-report{padding:22px;order:2}
+ .editorial-home .editorial-report-row{gap:8px;grid-template-columns:8px 1fr}.editorial-home .editorial-report-row>span:last-child{grid-column:2}
+ .editorial-home .editorial-domains summary{gap:14px}.editorial-home .editorial-domains b{font-size:22px}
+ .editorial-home .editorial-domains details>p{padding-inline:0}
+ .editorial-home .editorial-offer{border-inline-start:0;border-top:1px solid #cfaa8050;padding:32px 0 0}
+ .editorial-home .editorial-price h2{font-size:46px}.editorial-home .offer-amount{font-size:90px}
+ .editorial-home .editorial-closing .integrated-art{order:2}.editorial-home .editorial-closing h2{font-size:34px}
+}
+
+/* Continuous reading; the reserve retains its original stacked behavior. */
+.premium-public.restored-home.editorial-home.page-stack>main>section{position:relative;top:auto;min-height:0;box-shadow:none}
+.premium-public.editorial-home.page-stack>main>.public-hero{min-height:100svh}
+.editorial-home .editorial-heading h2,.editorial-home .editorial-process-intro h2{margin-top:0;text-wrap:balance}
+.editorial-home .editorial-steps li{grid-template-columns:52px 1fr}
+.editorial-home .editorial-step-number{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:#e5e9df;color:#637566;font-size:22px;transition:background-color .3s,color .3s}
+.editorial-home .editorial-steps li[data-reached=true] .editorial-step-number{background:#0b382d;color:#faf7f2}
+.editorial-home .editorial-domains summary::after{content:none!important;display:none!important}
+.editorial-home .editorial-report-action .public-benefit-icon,.editorial-home .editorial-report-action svg{width:32px;height:32px;flex-shrink:0}
+@media(max-width:700px){.editorial-home .editorial-steps li{grid-template-columns:44px 1fr}.editorial-home .editorial-step-number{width:40px;height:40px}}
+/* Center paired content vertically while preserving the mobile reading order. */
+@media(min-width:701px){
+ .premium-public.editorial-home.page-stack>main>:is(.editorial-process,.editorial-deliverable,.editorial-coverage,.editorial-price,.editorial-faq,.editorial-closing){align-items:center}
+}
+/* Space for the supplied, unabridged copy. */
+.editorial-home .nissan-pain-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:36px 56px}
+.editorial-home .nissan-pain-grid article{padding-top:25px;border-top:1px solid var(--editorial-line)}
+.editorial-home .nissan-pain-grid h3{margin-bottom:15px}
+.editorial-home .nissan-pain-grid p,.editorial-home .nissan-objections p{font-size:20px;line-height:1.75}
+.editorial-home .nissan-conclusion{font-size:23px;line-height:1.6;max-width:850px;color:#17483b}
+.premium-public.editorial-home.page-stack>main>.editorial-objections{grid-template-columns:.7fr 1.3fr;align-items:center}
+.editorial-home .nissan-objections article{border-top:1px solid var(--editorial-line);padding:28px 0}
+.editorial-home .nissan-objections h3{font-size:25px;line-height:1.4;margin-bottom:15px}
+.editorial-home .nissan-savings{margin:28px 0}
+.editorial-home .nissan-savings>div{padding:20px 0;border-top:1px solid #ffffff26}
+.editorial-home .nissan-savings dt{font-size:19px;color:#d5e0d8;line-height:1.5}
+.editorial-home .nissan-savings dd{font-size:24px;color:#e3b88d;line-height:1.5;margin:8px 0 0}
+.editorial-home .nissan-savings-end{white-space:pre-line}
+.editorial-home .editorial-offer>p{font-size:21px;line-height:1.7;color:#d5e0d8;margin:22px 0 30px}
+.editorial-home .editorial-closing>div>p{font-size:21px;line-height:1.7;margin:22px 0 28px}
+.editorial-home .nissan-closing-note{display:block;margin-top:18px;font-size:15px;color:#72796d}
+.editorial-home .public-hero .brand-primary{max-width:100%;white-space:normal}
+@media(max-width:700px){
+ .editorial-home .nissan-pain-grid{grid-template-columns:1fr;gap:28px}
+ .premium-public.editorial-home.page-stack>main>.editorial-objections{grid-template-columns:1fr}
+ .editorial-home .nissan-pain-grid p,.editorial-home .nissan-objections p{font-size:18px}
+ .editorial-home .editorial-closing h2{font-size:32px}
+}
+
+/* A reading column opposite four illustrated diagnostic rows. */
+.premium-public.editorial-home.page-stack>main>.editorial-pain{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);column-gap:88px;row-gap:48px;align-items:center}
+.editorial-home .editorial-pain .editorial-heading h2{font-size:clamp(36px,3.5vw,51px);line-height:1.18}
+.editorial-home .editorial-pain .editorial-heading>p{font-size:20px;line-height:1.8}
+.editorial-home .editorial-pain .nissan-pain-grid{grid-template-columns:1fr;gap:0}
+.editorial-home .nissan-pain-grid article{display:grid;grid-template-columns:64px minmax(0,1fr);gap:24px;padding:28px 0}
+.editorial-home .nissan-pain-grid article:last-child{border-bottom:1px solid var(--editorial-line)}
+.editorial-home .nissan-pain-grid h3{font-size:25px;margin:0 0 10px}
+.editorial-home .nissan-pain-grid p{font-size:19px;line-height:1.7}
+.editorial-home .editorial-pain .nissan-conclusion{grid-column:1/-1;max-width:none;border-top:1px solid var(--editorial-line);padding-top:30px;margin:0;font-size:23px;line-height:1.7;text-align:center}
+.editorial-home .nissan-conclusion em{font-weight:650}
+@media(max-width:1000px) and (min-width:701px){.premium-public.editorial-home.page-stack>main>.editorial-pain{column-gap:40px}.editorial-home .nissan-pain-grid article{grid-template-columns:48px minmax(0,1fr);gap:18px}.editorial-home .nissan-pain-grid .public-benefit-icon,.editorial-home .nissan-pain-grid svg{width:48px;height:48px}}
+@media(max-width:700px){
+ .premium-public.editorial-home.page-stack>main>.editorial-pain{grid-template-columns:1fr;gap:34px}
+ .editorial-home .editorial-pain .editorial-heading h2{font-size:35px}
+ .editorial-home .editorial-pain .editorial-heading>p{font-size:19px}
+ .editorial-home .nissan-pain-grid article{grid-template-columns:48px minmax(0,1fr);gap:17px;padding:25px 0}
+ .editorial-home .nissan-pain-grid .public-benefit-icon,.editorial-home .nissan-pain-grid svg{width:48px;height:48px}
+ .editorial-home .nissan-pain-grid p{font-size:18px}
+ .editorial-home .editorial-pain .nissan-conclusion{font-size:21px;text-align:start;padding-top:24px}
+}
