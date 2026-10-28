@@ -11,7 +11,7 @@ try{
   page.on('dialog',dialog=>dialog.accept());
   await page.goto(base+'#welcome');
   await page.getByRole('heading',{name:'את הצעד הראשון כבר עשיתם.',exact:true}).waitFor();
-  for(const image of await page.locator('.welcome-page img').all())await image.evaluate(img=>{img.loading='eager';return img.decode();});
+  await page.locator('.welcome-page img').evaluateAll(images=>Promise.all(images.map(img=>{img.loading='eager';return img.decode();})));
   assert.equal(await page.locator('.welcome-page .landing-brand-image').count(),2);
   assert.equal(await page.locator('.welcome-page .integrated-art').count(),3);
   for(const text of ['עכשיו אנחנו כאן כדי לעזור לכם להחזיר את הכסף הביתה.','עושים סדר בכסף שלכם','המסמכים שלי בטוחים אצלכם?'])assert.ok((await page.locator('.welcome-page main').innerText()).replace(/\s+/g,' ').replace(/\s*יכול/, ' יכול').includes(text));
@@ -23,7 +23,8 @@ try{
   await page.screenshot({path:`test-results/homepage-${width}.png`,fullPage:true});
   await page.getByRole('button',{name:/^כניסה (לדמו המערכת|למערכת)/}).click();
   await page.getByRole('heading',{name:'התנסות במסודרים 360°',exact:true}).waitFor();
-  assert.equal(await page.locator('.demo-roles>button').count(),5);
+  assert.equal(await page.locator('.demo-roles>button').count(),6);
+  assert.equal(await page.locator('.demo-roles>button').last().locator('strong').textContent(),'אזור אישי מסוג אחר');
   await page.getByRole('button',{name:'פתיחת תיק מלא ודוח לדוגמה',exact:true}).waitFor();
   await page.getByRole('button',{name:/^01 נציג /}).click();
   const nav=page.getByRole('navigation',{name:'ניווט ראשי'});
@@ -76,5 +77,5 @@ try{
   assert.ok((await page.locator('.public-intro').innerText()).includes('נכנסתם לכאן'));
   assert.deepEqual(errors,[]);await page.close();
  }
- console.log('PASS: brand homepage, logo, five roles including marketer, current representative design, route/search/draft retention on return, desktop/mobile.');
+ console.log('PASS: brand homepage, logo, five roles including marketer plus alternative personal-area demo, current representative design, route/search/draft retention on return, desktop/mobile.');
 }finally{await browser.close();}
