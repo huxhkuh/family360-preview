@@ -1,0 +1,484 @@
+{
+  "schemaVersion": 1,
+  "reviewer": "יצחק",
+  "updatedAt": "2026-10-29T00:17:16.109Z",
+  "entries": {
+    "chapter:family": {
+      "meaning": "נתחיל בהיכרות בסיסית - ההרכב המשפחתי, הפרטים האישיים והילדים.",
+      "notes": "הערות והארות כלליות:\nצריך להחליט האם פונים בגוף ראשון או שלא,\nוהאם לשון רישמית או יותר קלילה.\nלעשות מקו - קצר ולא ארוך של ai",
+      "checked": true,
+      "wording": "פרטי משפחה"
+    },
+    "family:marital": {
+      "requirement": "required",
+      "checked": true
+    },
+    "family:city": {
+      "requirement": "required",
+      "checked": true
+    },
+    "family:address": {
+      "requirement": "optional",
+      "meaning": "רחוב, מספר בית במקום המגורים הנוכחי.",
+      "checked": true
+    },
+    "family:h_first": {
+      "requirement": "required",
+      "checked": true
+    },
+    "family:h_last": {
+      "requirement": "required"
+    },
+    "family:h_id": {
+      "requirement": "required",
+      "meaning": "מספר תעודת הזהות נועד לזהות את האדם בעת הכנת הבקשה לסוכן הביטוח להוצאת מידע מהמסלקה הפנסיונית. צילום התעודה וחתימה על הרשאה מטופלים בנפרד; המילוי כאן אינו הסכמה לשליחה.",
+      "checked": true
+    },
+    "family:h_dob": {
+      "requirement": "required",
+      "checked": true
+    },
+    "family:h_phone": {
+      "requirement": "required",
+      "notes": "לתת אפשרות רשות לטלפון נוסף למי שמעוניין.",
+      "checked": true
+    },
+    "family:h_email": {
+      "requirement": "required",
+      "checked": true
+    },
+    "family:w_first": {
+      "requirement": "required"
+    },
+    "family:w_id": {
+      "requirement": "required"
+    },
+    "family:w_dob": {
+      "requirement": "required"
+    },
+    "family:w_phone": {
+      "requirement": "required"
+    },
+    "family:children": {
+      "requirement": "optional",
+      "checked": true
+    },
+    "family:children.name": {
+      "requirement": "optional",
+      "checked": true
+    },
+    "family:children.hmo": {
+      "requirement": "optional",
+      "notes": "לתת אופציה בלחיצה אחת למלאות למי שכולם באתו הקופה\nאיפה ממלא קופח אצל הבעל והאשה?",
+      "checked": true
+    },
+    "chapter:work": {
+      "more": "למה צריך את פרטי ההכנסות?\nלהרחיב.",
+      "checked": true
+    },
+    "work:h_emp": {
+      "requirement": "required",
+      "meaning": "סוג העיסוק הנוכחי: אברך לומד בכולל, שכיר מקבל תלוש ממעסיק; עצמאי מפעיל עסק; אברך לומד בכולל.",
+      "notes": "אברך ראשון.",
+      "checked": true
+    },
+    "work:h_kollel_monthly": {
+      "requirement": "optional",
+      "notes": "כמה מתקבל מהכולל בחודש (כולל דתות, קרן עולם התורה, שמירת סדרים, מלגות וכו') ?\nלגבי אברכים - אפשר לברר האם עריק ואולי לחשוב איך ומה ניתן לסייע, אפילו אולי רק בידע ככה יעשיר את מה שמקבלים.",
+      "checked": true
+    },
+    "work:h_work": {
+      "requirement": "optional",
+      "checked": true
+    },
+    "work:h_tenure": {
+      "requirement": "optional",
+      "notes": "אולי להוריד.... מתלבט.",
+      "checked": true
+    },
+    "work:h_gross": {
+      "requirement": "optional",
+      "checked": true
+    },
+    "work:h_net": {
+      "requirement": "optional"
+    },
+    "work:h_employers": {
+      "requirement": "optional",
+      "checked": true
+    },
+    "work:h_job_change": {
+      "requirement": "optional",
+      "meaning": "האם עברתם ממעסיק אחד לאחר במהלך השנה הנוכחית.\nלהסביר מה יכולים להרוויח",
+      "notes": "משמעותי עד 6 שנים אחורה.",
+      "checked": true
+    },
+    "work:h_biz_type": {
+      "requirement": "optional",
+      "guidance": "כתבו בקצרה במה העסק עוסק, למשל הוראה פרטית, עיצוב או מכירת מוצרים.",
+      "checked": true
+    },
+    "work:h_biz_income": {
+      "requirement": "optional",
+      "checked": true
+    },
+    "work:h_biz_years": {
+      "requirement": "optional"
+    },
+    "work:h_biz_registration": {
+      "requirement": "optional",
+      "notes": "לצין ליד השאלה מומלץ.\nאולי בכללי בשאלות רשות בתחום העסק שיהיה שאלות נוספות ומי שרוצה יכנס....",
+      "checked": true
+    },
+    "work:h_work_continuity": {
+      "requirement": "required",
+      "checked": true
+    },
+    "work:h_stopped": {
+      "requirement": "optional",
+      "checked": true
+    },
+    "work:w_emp": {
+      "requirement": "required",
+      "notes": "כנל בבעל לגבי כל האפשרויות.\nשהמערכת תזהה האם הגבר ממלא או האשה ותשים את האברך במקום המתאים.\nאם עונה אלמן או גרוש לא לשאול שאלות על הבן זוג....\nאברך בהתחלה.",
+      "checked": true
+    },
+    "work:extra_income": {
+      "requirement": "optional"
+    },
+    "work:extra_rent_monthly": {
+      "requirement": "optional"
+    },
+    "work:extra_allowance_monthly": {
+      "requirement": "optional"
+    },
+    "work:extra_biz_monthly": {
+      "requirement": "optional"
+    },
+    "work:extra_income_other": {
+      "requirement": "optional",
+      "checked": true
+    },
+    "housing:housing": {
+      "requirement": "required",
+      "checked": true
+    },
+    "housing:owns_property": {
+      "requirement": "optional"
+    },
+    "housing:property_name": {
+      "requirement": "optional"
+    },
+    "housing:prop_value": {
+      "requirement": "optional",
+      "notes": "נראה לי קצת נסחפנו עם התעניינות.... לא? ",
+      "checked": true
+    },
+    "housing:prop_count": {
+      "requirement": "optional"
+    },
+    "housing:properties": {
+      "requirement": "optional"
+    },
+    "housing:rent_amount": {
+      "requirement": "optional"
+    },
+    "housing:rent_aid_now": {
+      "requirement": "optional",
+      "checked": true
+    },
+    "chapter:mortgage": {
+      "more": "איך פרטי המשכנתא עוזרים? מעולה וחובה זה כסף גדול מאוד.",
+      "checked": true
+    },
+    "mortgage:has_mortgage": {
+      "requirement": "required"
+    },
+    "mortgage:mort_property": {
+      "requirement": "optional",
+      "checked": true
+    },
+    "mortgage:mort_bank": {
+      "requirement": "optional",
+      "checked": true
+    },
+    "mortgage:mort_balance": {
+      "requirement": "optional",
+      "checked": true
+    },
+    "mortgage:mort_monthly": {
+      "requirement": "optional",
+      "checked": true
+    },
+    "mortgage:mort_date": {
+      "wording": "מועד לקיחה משוער — שנה או חודש ושנה",
+      "notes": "הנוסח בכותרת לא מדוייק",
+      "checked": true
+    },
+    "mortgage:mort_refi": {
+      "requirement": "required",
+      "notes": "במידה ונעשה לציין באיזה שנה או לא זוכר.",
+      "checked": true
+    },
+    "mortgage:mort_count": {
+      "requirement": "optional",
+      "checked": true
+    },
+    "mortgage:mortgages": {
+      "requirement": "optional"
+    },
+    "mortgage:mortgages.mort_property": {
+      "notes": "לא ברור מספיק."
+    },
+    "mortgage:mortgages.mort_bank": {
+      "requirement": "optional"
+    },
+    "mortgage:mortgages.mort_balance": {
+      "requirement": "optional"
+    },
+    "mortgage:mortgages.mort_monthly": {
+      "requirement": "optional"
+    },
+    "mortgage:mortgages.mort_date": {
+      "requirement": "optional"
+    },
+    "mortgage:mortgages.mort_refi": {
+      "requirement": "required"
+    },
+    "chapter:savings": {
+      "checked": true,
+      "notes": "למה חשוב למפות את החסכונות? להרחיב"
+    },
+    "savings:savings": {
+      "requirement": "required",
+      "checked": true
+    },
+    "savings:savings_knowledge": {
+      "wording": "עד כמה תמונת החסכונות שלכם ידועה ומוכרת לכם?",
+      "requirement": "optional",
+      "checked": true
+    },
+    "savings:savings_goals": {
+      "requirement": "optional"
+    },
+    "savings:savings_goals:option:fees": {
+      "notes": "להסביר למה נצרך. וגם בכולם."
+    },
+    "insurance:ins": {
+      "requirement": "required",
+      "notes": "ביטוח תכולת דירה\nביטוחים נוספים"
+    },
+    "insurance:has_car": {
+      "requirement": "required",
+      "checked": true,
+      "notes": "להוסיף האם ישנם כמה רכבים."
+    },
+    "insurance:car_cover": {
+      "requirement": "optional",
+      "checked": true
+    },
+    "loans:loans": {
+      "requirement": "optional"
+    },
+    "loans:loans.lender": {
+      "requirement": "optional",
+      "notes": "בכללי אין צורך לפרט מספיק לכתוב חבר מהכולל ולא ראובן החברותא סדר ב' וכו\nכדי שירגישו יותר נעים",
+      "checked": true
+    },
+    "loans:loans.balance": {
+      "requirement": "optional",
+      "checked": true
+    },
+    "loans:loans.monthly": {
+      "requirement": "optional"
+    },
+    "loans:loans.rate": {
+      "requirement": "optional"
+    },
+    "loans:loans.end": {
+      "requirement": "optional"
+    },
+    "rights:tax_filed": {
+      "notes": "לברר עם היועצת מה נצרך עכשיו ומה אחכ"
+    },
+    "rights:ravkav_profile": {
+      "notes": "הכותרת לא ברורה",
+      "checked": true
+    },
+    "rights:ravkav_review": {
+      "notes": "אין לנו מה לבדוק, רק בפגישה יהיה מצויין לנציג האם יש פרופיל ואם לא לפי העיר יציין האם ניתן לעשות ומה דרכי הפעולה של הלקוח",
+      "checked": true
+    },
+    "rights:water_persons": {
+      "requirement": "required",
+      "notes": "לתת אופציה לא יודע. קצת נדחף במקום לא נכון באמצע עניני המס"
+    },
+    "rights:tax_withheld_withdrawal": {
+      "requirement": "optional"
+    },
+    "chapter:rights": {
+      "notes": "אולי תכין כזה רק על התחום הזה ואני אשלח ליועצת.",
+      "checked": true
+    },
+    "rights:tax_withheld_securities": {
+      "requirement": "optional"
+    },
+    "rights:property_tax_paid": {
+      "requirement": "optional"
+    },
+    "rights:tax_locality_review": {
+      "requirement": "optional",
+      "notes": "מה השאלה, אם ניתן שנעדכן....",
+      "checked": true
+    },
+    "rights:rights_review": {
+      "requirement": "optional",
+      "checked": true
+    },
+    "rights:disability_function": {
+      "requirement": "optional",
+      "notes": "קצת יותר פירוט והסבר.",
+      "checked": true
+    },
+    "rights:disability_income": {
+      "notes": "להסביר את הצורך.",
+      "checked": true
+    },
+    "rights:disability_documents": {
+      "requirement": "required",
+      "notes": "חובה למי שמעוננין לקדם נושאים אלו. אפילו שיענה איני יודע"
+    },
+    "chapter:banks": {
+      "notes": "אין למסור סיסמה או פרטי כרטיס אשראי.  - Bold",
+      "checked": true
+    },
+    "banks:bank_count": {
+      "requirement": "optional"
+    },
+    "banks:banks": {
+      "requirement": "optional",
+      "guidance": "אפשר לבחור כמה בנקים. אם יש כמה חשבונות באותו בנק, מסמנים אותו פעם אחת. אין צורך להזין מספר חשבון, סיסמה או קוד כניסה. ",
+      "notes": "אין צורך למסור סיסמה או פרטי כרטיס אשראי. Bold",
+      "checked": true
+    },
+    "banks:cc_count": {
+      "requirement": "optional"
+    },
+    "banks:monthly_fees": {
+      "requirement": "optional",
+      "notes": "אם הולכים על לשון קלילה, אז להוסיף האם אתה באמת נהנה לשלם לבנק וכד'"
+    },
+    "banks:credit_frame": {
+      "requirement": "optional",
+      "notes": "ההסבר לא ברור"
+    },
+    "banks:overdraft": {
+      "requirement": "undecided",
+      "notes": "אנשים יבהלו, מה נרוויח שנדע?"
+    },
+    "banks:overdraft_amount": {
+      "notes": "כנל",
+      "checked": true
+    },
+    "banks:credit_used": {
+      "notes": "כנל"
+    },
+    "banks:bank_fee_plan": {
+      "requirement": "optional",
+      "notes": "להסביר מה זה המסלולים ומה הרווח החסכן בעמלות"
+    },
+    "banks:gemach_money": {
+      "requirement": "optional",
+      "notes": "אולי לשים אחרי חסכונות"
+    },
+    "banks:gemach_terms": {
+      "requirement": "optional"
+    },
+    "banks:gemach_amount": {
+      "requirement": "optional"
+    },
+    "banks:communication_monthly": {
+      "requirement": "optional"
+    },
+    "banks:communication_reviewed": {
+      "requirement": "optional",
+      "checked": true
+    },
+    "chapter:weddings": {
+      "checked": true
+    },
+    "weddings:wt_{child}": {
+      "requirement": "optional",
+      "notes": "אולי להסביר פה קצת על אינפלציה או שמאתגר..."
+    },
+    "weddings:wa_{child}": {
+      "requirement": "optional",
+      "checked": true
+    },
+    "weddings:wed_monthly": {
+      "requirement": "optional",
+      "notes": "אולי לומר שצריך לזכור שלא כל החיים ניתן לחסוך אותו דבר שעכשיו אתה מתכנן, לטוב ולמוטב.",
+      "checked": true
+    },
+    "weddings:wed_lump": {
+      "requirement": "optional",
+      "notes": "להוסיף פה אופציה איפה נמצא כיום? או שלא יודעים"
+    },
+    "document:identity_h": {
+      "requirement": "required",
+      "notes": "ישלח רק לבעלי מקצוע שנצרך, ויהיה זמין לנציג?",
+      "checked": true
+    },
+    "document:payslips_h": {
+      "requirement": "optional",
+      "notes": "להרחיב מה הצורך"
+    },
+    "document:tax_assessment_h": {
+      "requirement": "optional",
+      "notes": "לברר אם היועצת מס"
+    },
+    "document:clearinghouse_auth_h": {
+      "requirement": "required",
+      "notes": "למי שנצרך לטפל חובה שיהיה כדי שלא נחכה, אולי כן נית להגיש שאלון אל שיהיה לו תזכורת בהערות אישיות שחייב לעשות את זה.",
+      "checked": true
+    },
+    "document:identity_w": {
+      "requirement": "required",
+      "notes": "כנל"
+    },
+    "document:tax_assessment_w": {
+      "requirement": "optional"
+    },
+    "document:clearinghouse_auth_w": {
+      "requirement": "required",
+      "notes": "כנל"
+    },
+    "document:rental_contract": {
+      "requirement": "optional",
+      "notes": "לא נראה לי שיש לנו מה לעשות בנידון."
+    },
+    "document:mortgage_balance": {
+      "requirement": "optional",
+      "notes": "מומלץ. לדבר עם אוסטר."
+    },
+    "document:loan_statements": {
+      "notes": "מה העניין והמטרה?"
+    },
+    "document:bank_identity": {
+      "notes": "מה העניין והמטרה?"
+    },
+    "document:municipal_bill": {
+      "requirement": "optional",
+      "notes": "אין לנו באמת איך לעזור איך להוציא ארנונה אולי רק להסביר על הצורך ואיך מבצעים",
+      "checked": true
+    },
+    "document:electricity_bill": {
+      "notes": "אולי לבקש כמה משלמים שוער על מים וחשמל ונראה האן חורג ונסביר שצריך בירור"
+    },
+    "document:pension_report": {
+      "requirement": "optional",
+      "notes": "חשוב \nלהסביר למה ומה ירויחו",
+      "checked": true
+    }
+  }
+}
