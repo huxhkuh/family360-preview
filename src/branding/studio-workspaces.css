@@ -33,7 +33,7 @@
 
 .studio-workspace.client-shell.questionnaire-mode .questionnaire-paper>.card>fieldset>.chapter-process{margin-block:4px 8px}
 .studio-workspace.client-shell.questionnaire-mode .questionnaire-paper>.card>fieldset>.chapter-process button{min-height:88px}
-@media(max-width:800px){.app-shell.brand-workspace.studio-workspace.client-focus-mode .sidebar>.client-account{grid-column:1/-1;grid-row:3;justify-self:stretch}}
+@media(max-width:800px){.app-shell.brand-workspace.studio-workspace.client-shell.client-focus-mode .sidebar>.client-account{grid-column:1/-1;grid-row:3;justify-self:stretch}}
 
 .studio-workspace.client-shell.questionnaire-mode .chapter-process button{min-height:70px;gap:5px;padding-bottom:4px}
 
@@ -41,6 +41,6 @@
 .studio-workspace.client-shell.questionnaire-mode .content{padding-top:8px}
 
 @media(max-width:1100px){
-.app-shell.brand-workspace.studio-workspace.client-focus-mode:not(.task-menu-open) .sidebar nav,.studio-workspace.client-focus-mode:not(.task-menu-open) .topbar{display:none}
-.app-shell.brand-workspace.studio-workspace.client-focus-mode .sidebar>.client-account{grid-column:1/-1;grid-row:3;justify-self:stretch}
+.app-shell.brand-workspace.studio-workspace.client-shell.client-focus-mode:not(.task-menu-open) .sidebar nav,.studio-workspace.client-shell.client-focus-mode:not(.task-menu-open) .topbar{display:none}
+.app-shell.brand-workspace.studio-workspace.client-shell.client-focus-mode .sidebar>.client-account{grid-column:1/-1;grid-row:3;justify-self:stretch}
 }
