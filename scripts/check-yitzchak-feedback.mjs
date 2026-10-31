@@ -12,7 +12,7 @@ try{for(const width of [1440,390,320]){
  await page.goto(base+'#workspace');await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();await page.getByRole('button',{name:'התחלת השאלון',exact:true}).click();
  await expect(field('h_email')).toHaveAttribute('aria-required','true');
  await field('marital').selectOption('single');await field('h_first').fill('ישראל');await field('h_last').fill('לדוגמה');await field('h_dob').fill('1990-01-01');
- await field('h_phone').fill('123');await field('h_id').fill('000000019');await next.click();
+ await field('h_email').fill('not-an-email');await field('h_phone').fill('123');await field('h_id').fill('000000019');await next.click();
  await expect(nav.getByRole('button',{name:'פרטי משפחה',exact:true})).toHaveAttribute('aria-current','step');
  for(const key of ['h_id','h_phone','h_email'])await expect(field(key)).toHaveAttribute('aria-invalid','true');
  await field('h_email').fill('invalid');await nav.getByRole('button',{name:'עבודה והכנסות',exact:true}).click();await expect(field('h_email')).toBeVisible();

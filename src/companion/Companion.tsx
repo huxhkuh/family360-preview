@@ -9,8 +9,8 @@ export function Companion({pose,title,children}:{pose:Pose;title:string;children
   <CompanionPortrait pose={pose}/><div className="companion-content"><h3>{title}</h3>{children}</div>
  </aside>;
 }
-const why:Record<string,[string,string]>={
- family:['למה מתחילים בהיכרות?','פרטי המשפחה עוזרים להתאים לכם את השאלות. אפשר להעתיק פרטי קשר שכבר קיימים בתיק דרך ״לפני שמתחילים״.'],
+export const chapterCompanionCopy:Record<string,[string,string]>={
+ family:['למה מתחילים בהיכרות?','פרטי הקשר מההרשמה כבר מופיעים בשאלון ואפשר לשנות אותם. מלאו גם את פרטי המשפחה כדי להתאים את המשך השאלות.'],
  work:['למה צריך את פרטי ההכנסות?','פרטי העבודה וההכנסות עוזרים לנציג להכין בירור של מס וזכויות. עובדים בכמה מסגרות? סמנו את כולן.'],
  housing:['למה שואלים על המגורים?','ההוצאה על דיור היא חלק מהתמונה המשפחתית. בעלות ושכירות מובילות לשאלות ולמסמכים שונים; התשובה אינה קובעת זכאות לסיוע.'],
  mortgage:['איך פרטי המשכנתא עוזרים?','היתרה וההחזר החודשי מאפשרים לנציג להבין את ההתחייבות. הדוח יעזור להשלים נתונים מדויקים; אין כאן שינוי של ההלוואה.'],
@@ -22,7 +22,7 @@ const why:Record<string,[string,string]>={
  weddings:['למה לדבר גם על התוכניות קדימה?','יעדים משפחתיים עוזרים להבין לקראת מה מתכננים. זהו פרק רשות לתכנון, ללא התחייבות להפקיד סכום. אפשר למלא רק מה שכבר ידוע.'],
 };
 export function ChapterCompanion({chapter,description}:{chapter:string;description:string}){
- const [open,setOpen]=useState(false);const copy=why[chapter]||['למה המידע הזה חשוב?',description];
+ const [open,setOpen]=useState(false);const copy=chapterCompanionCopy[chapter]||['למה המידע הזה חשוב?',description];
  return <div className="chapter-companion"><CompanionPortrait pose={open?'explain':'welcome'}/>
   <details className="speech-bubble" open={open} onToggle={e=>setOpen(e.currentTarget.open)}><summary>{copy[0]}</summary><div className="chapter-speech-content"><p>{copy[1]}</p></div></details>
  </div>;

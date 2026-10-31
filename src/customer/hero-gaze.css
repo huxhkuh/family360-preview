@@ -5,3 +5,6 @@
 .brand-companion-person:has(>.hero-gaze),.brand-public .brand-companion-full .brand-companion-person:has(>.hero-gaze){transform:none;translate:none;transition:none;animation:none}
 @media(max-width:700px){.restored-home .brand-companion-person>.hero-gaze{width:320px}}
 .hero-gaze{position:relative;display:block;aspect-ratio:1;isolation:isolate}
+
+/* Let the shoes clearly cross the backdrop edge rather than touch it. */
+.restored-home .brand-companion-person>.hero-gaze{top:12px}

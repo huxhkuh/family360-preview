@@ -19,3 +19,5 @@ export async function rpc<T=unknown>(name:string,args:Record<string,unknown>={})
 export async function loadWorkspace(familyId?:string){return workspaceSchema.parse(await rpc(familyId?'rpc_family_workspace':'rpc_workspace',familyId?{p_family_id:familyId}:{}));}
 export async function uploadDocument(_familyId:string,documentId:string,file:File){await validateUpload(file);await request('/api/documents/'+encodeURIComponent(documentId),{method:'PUT',headers:{'Content-Type':file.type,'X-File-Name':encodeURIComponent(file.name)},body:file});}
 export async function documentUrl(path:string){const documentId=path.split('/').at(-2);if(!documentId)throw Error('VALIDATION');const result=await request('/api/documents/'+encodeURIComponent(documentId));const url=URL.createObjectURL(await result.blob());setTimeout(()=>URL.revokeObjectURL(url),300000);return url;}
+
+export async function telephoneMessageUrl(messageId:string){const result=await request('/api/telephone/messages/'+encodeURIComponent(messageId)+'/audio');return URL.createObjectURL(await result.blob());}

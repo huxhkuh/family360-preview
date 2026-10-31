@@ -19,6 +19,7 @@ export function fixture(){
  insert('partners',{id:'partner',profile_id:'marketer',name:'Synthetic marketer',code:'test-code'});
  insert('families',{id:'f1',name:'Synthetic A',case_number:'TEST-A',client_profile_id:'client',representative_id:'r1',internal_notes:'PRIVATE NOTE',phone:'0500000000',contact_name:'Synthetic A'});
  insert('families',{id:'f2',name:'Synthetic B',case_number:'TEST-B',client_profile_id:'otherclient',representative_id:'r2',internal_notes:'OTHER PRIVATE NOTE'});
+ for(const family_id of ['f1','f2'])insert('timeline_events',{id:'intro:'+family_id,family_id,title:'הנציג אישר שהתקיימה שיחת היכרות עם המשפחה',actor_profile_id:'rep'});
  insert('services',{id:'s1',key:'bank',name:'Synthetic service'});for(const id of ['p1','p2'])insert('professional_services',{id:'ps-'+id,professional_id:id,service_id:'s1'});
  insert('family_services',{id:'fs1',family_id:'f1',service_id:'s1'});insert('family_services',{id:'fs2',family_id:'f2',service_id:'s1'});
  insert('document_types',{id:'dt1',key:'statement',name:'Synthetic statement'});for(const n of [1,2])insert('documents',{id:'d'+n,family_id:'f'+n,key:'statement',name:'Synthetic document',document_type_id:'dt1'});

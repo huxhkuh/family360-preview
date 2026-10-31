@@ -1,9 +1,12 @@
-import {useState} from 'react';
+import {useEffect,useState} from 'react';
 import {backend} from '../lib/backend';
 import {SaveForm,Field,textValue} from '../ui';
+import {GoogleSignIn} from './GoogleSignIn';
+import {safeMessage} from '../lib/core';
+import {BrandLogo} from '../branding/Brand';
 export function Login(){
  const [reset,setReset]=useState(false);
- return <main className="auth-layout"><section className="auth-hero"><div className="brand">360° <span>כלכלה נכונה</span></div><h1>תמונת מצב אחת.<br/>על כל הכסף של המשפחה.</h1><p>המידע, הבדיקות וההחלטות שלכם במקום אחד.</p></section><section className="auth-card"><h2>{reset?'שחזור סיסמה':'כניסה למערכת'}</h2><SaveForm label={reset?'שליחת קישור':'כניסה'} save={async d=>{
+ return <main className="auth-layout"><section className="auth-hero"><BrandLogo mode="dark"/><h1>תמונת מצב אחת.<br/>על כל הכסף של המשפחה.</h1><p>המידע, הבדיקות וההחלטות שלכם במקום אחד.</p></section><section className="auth-card"><h2>{reset?'שחזור סיסמה':'כניסה למערכת'}</h2>{!reset&&import.meta.env.VITE_LIVE_MODE&&<GoogleSignIn/>}<SaveForm label={reset?'שליחת קישור':'כניסה'} save={async d=>{
   const email=textValue(d,'email'),password=textValue(d,'password');
   const result=reset?await backend!.auth.resetPasswordForEmail(email,{redirectTo:location.origin}):await backend!.auth.signInWithPassword({email,password});
   if(result.error)throw result.error;
@@ -11,11 +14,11 @@ export function Login(){
 }
 export function Recovery({done}:{done:()=>void}){return <main className="auth-card"><h1>הגדרת סיסמה חדשה</h1><SaveForm label="עדכון סיסמה" save={async d=>{const password=textValue(d,'password');if(password!==textValue(d,'confirmation'))throw new Error('VALIDATION');const {error}=await backend!.auth.updateUser({password});if(error)throw error;await backend!.auth.signOut();done();}}><Field label="סיסמה חדשה (12 תווים לפחות)"><input name="password" type="password" minLength={12} required autoComplete="new-password"/></Field><Field label="אימות סיסמה"><input name="confirmation" type="password" minLength={12} required autoComplete="new-password"/></Field></SaveForm></main>;}
 export function Mfa({done}:{done:()=>Promise<void>}){
- const [factor,setFactor]=useState('');const [qr,setQr]=useState('');
- return <main className="auth-card"><h1>אימות דו־שלבי</h1><p>גישה ניהולית דורשת קוד מאפליקציית האימות.</p>{!factor?<SaveForm label="הכנת אימות" save={async()=>{
+ const [factor,setFactor]=useState('');const [qr,setQr]=useState('');const [loading,setLoading]=useState(true);const [error,setError]=useState('');
+ useEffect(()=>{let active=true;backend!.auth.mfa.listFactors().then(({data,error})=>{if(!active)return;if(error)setError(safeMessage(error));else setFactor(data.totp.find(f=>f.status==='verified')?.id||'');}).catch(e=>{if(active)setError(safeMessage(e));}).finally(()=>{if(active)setLoading(false);});return()=>{active=false;};},[]);
+ return <main className="auth-card"><h1>אימות דו־שלבי</h1><p>גישה ניהולית למידע ולפעולות רגישות דורשת קוד מאפליקציית האימות. לאחר האימות אפשר להמשיך לעבוד באותה התחברות.</p>{loading?<p role="status">בודקים את אמצעי האימות…</p>:error?<p role="alert">{error}</p>:!factor?<SaveForm label="הגדרת אימות דו־שלבי" save={async()=>{
  const {data,error}=await backend!.auth.mfa.listFactors();if(error)throw error;
- const verified=data.totp.find(f=>f.status==='verified');
- if(verified){setFactor(verified.id);return;}
+ const verified=data.totp.find(f=>f.status==='verified');if(verified){setFactor(verified.id);return;}
  for(const f of data.all.filter(f=>f.status==='unverified')){const result=await backend!.auth.mfa.unenroll({factorId:f.id});if(result.error)throw result.error;}
  const result=await backend!.auth.mfa.enroll({factorType:'totp',friendlyName:'Family360'});if(result.error)throw result.error;
  setQr(result.data.totp.qr_code);setFactor(result.data.id);

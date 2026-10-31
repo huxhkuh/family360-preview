@@ -1,0 +1,24 @@
+.professional-workspace .inbox-sections{display:flex;gap:8px;flex-wrap:wrap;margin:24px 0 16px;border-bottom:1px solid #ddd8cd;padding-bottom:12px}
+.professional-workspace .inbox-sections button{background:transparent;border:1px solid transparent;min-height:44px;color:#234b43}
+.professional-workspace .inbox-sections button[aria-pressed=true]{background:#edf0e8;border-color:#a6b5a5;font-weight:700}
+.professional-workspace .inbox-sections span{margin-inline-start:8px;font-variant-numeric:tabular-nums}
+.professional-workspace.task-list>.cards{display:grid;grid-template-columns:1fr;gap:0}
+.professional-workspace .task-card{display:grid;grid-template-columns:minmax(180px,2fr) minmax(120px,1fr) auto;gap:10px 24px;align-items:center;border:0;border-bottom:1px solid #ddd8cd;border-radius:0;box-shadow:none;padding:24px 8px;background:transparent}
+.professional-workspace .task-card>strong{font-size:1.15rem}
+.professional-workspace .task-card>button{min-height:44px;grid-column:3;grid-row:1 / span 2}
+.professional-workspace .work-guidance{border-radius:8px;box-shadow:none}
+.professional-workspace .work-guidance dl>div{padding:10px 0;border-bottom:1px solid #ddd8cd}
+.professional-workspace .work-guidance dd{margin-inline-start:0;overflow-wrap:anywhere;white-space:pre-wrap}
+.professional-workspace button:focus-visible{outline:3px solid #9b682f;outline-offset:3px}
+.professional-workspace .page-title{margin-block:12px;padding-block:12px}
+.professional-workspace .page-title h1{font-size:clamp(1.55rem,3vw,2.1rem);margin-block:6px}
+.professional-workspace .page-title .eyebrow{display:none}
+.professional-workspace .task-card>.badge{justify-self:start;width:auto;min-width:0}
+.professional-workspace .work-filters{padding:12px;gap:12px;margin-block:12px}
+.professional-workspace .inbox-sections{margin-block:12px}
+@media(max-width:650px){.professional-workspace .task-card{grid-template-columns:1fr auto;gap:10px;padding:20px 0}.professional-workspace .task-card>strong,.professional-workspace .task-card>div{grid-column:1 / -1}.professional-workspace .task-card>button{grid-column:1 / -1;grid-row:auto;width:100%}.professional-workspace .work-filters{display:grid;grid-template-columns:1fr}.professional-workspace .inbox-sections button{flex:1;padding:10px 8px}}
+
+.professional-workspace .analysis-evidence,.professional-workspace .information-request {margin-block:1rem;border-block:1px solid var(--line,#dce3e8);padding-block:.85rem;}
+.professional-workspace .analysis-evidence>summary,.professional-workspace .information-request>summary {cursor:pointer;font-weight:650;min-height:44px;display:list-item;align-content:center;}
+.professional-workspace .info-request-record {padding-block:.8rem;border-bottom:1px solid var(--line,#dce3e8);overflow-wrap:anywhere;}
+.professional-workspace .information-request textarea {min-height:100px;}

@@ -8,3 +8,13 @@ export async function revealTaskContent(page,selector){
  }
  throw new Error('Too many nested task disclosures for '+selector);
 }
+
+// Required document obligations are completed through the same sample action available to clients.
+export async function attachRequiredSamples(page){
+ for(let attempts=0;attempts<30;attempts++){
+  const required=page.locator('article.document[data-document-required=true]').filter({has:page.getByRole('button',{name:'צירוף קובץ דוגמה בלבד',exact:true})});
+  if(!await required.count())return;
+  await required.first().getByRole('button',{name:'צירוף קובץ דוגמה בלבד',exact:true}).click();
+ }
+ throw new Error('Required documents did not settle after attachment');
+}

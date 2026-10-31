@@ -28,8 +28,8 @@ describe('confirmed questionnaire decisions',()=>{
  });
  it('suggests all general-guide documents conditionally, never bank statements',()=>{
   const keys=documentPreparation({...validDemoAnswers,h_emp:['emp','self'],housing:'rent',owns_property:'yes',has_mortgage:'yes',loans:[{balance:100}],savings:['pension']}).map(p=>p.key);
-  expect(keys).toEqual(expect.arrayContaining(['identity_h','clearinghouse_auth_h','bank_identity','municipal_bill','electricity_bill','pension_report','loan_statements','mortgage_balance','rental_contract','payslips_h','tax_assessment_h']));
-  expect(keys).not.toContain('bank_statements');expect(keys).not.toContain('identity_w');
+  expect(keys).toEqual(expect.arrayContaining(['identity_h','clearinghouse_auth_h','bank_identity','municipal_bill','electricity_bill','pension_report','mortgage_balance','rental_contract','payslips_h','tax_assessment_h']));
+  expect(keys).not.toContain('bank_statements');expect(keys).not.toContain('loan_statements');expect(keys).not.toContain('identity_w');
  });
  it('initializes phone from the case, preserves intentional edits and synchronizes valid saved changes',async()=>{
   let f=(await loadWorkspace()).families[0];expect(initialAnswers(f).h_phone).toBe('0500000000');
@@ -66,7 +66,8 @@ describe('confirmed questionnaire decisions',()=>{
   await save(validDemoAnswers);await rpc('rpc_demo_prepare_document',{p_family_id:'f1',p_key:'clearinghouse_auth_h'});
   let w=await loadWorkspace();const doc=w.documents[0];expect(doc).toMatchObject({optional:true,type:'signature',status:'missing'});
   await expect(rpc('rpc_demo_attach_example',{p_document_id:doc.id})).rejects.toThrow('VALIDATION');
-  await rpc('rpc_complete_onboarding',{p_family_id:'f1'});w=await loadWorkspace();expect(clientReadyToWait(w.families[0],w)).toBe(true);
-  expect(w.documents).toHaveLength(1);expect(w.documents[0].status).toBe('missing');
+  await rpc('rpc_complete_onboarding',{p_family_id:'f1'});w=await loadWorkspace();expect(w.families[0].onboarding_pct).toBe(100);expect(clientReadyToWait(w.families[0],w)).toBe(false);
+  expect(w.documents.find(d=>d.key==='clearinghouse_auth_h')).toMatchObject({optional:true,status:'missing'});expect(w.documents.find(d=>d.key==='identity_h')).toMatchObject({optional:false,status:'missing'});
+  await rpc('rpc_demo_attach_example',{p_document_id:w.documents.find(d=>d.key==='identity_h')!.id});w=await loadWorkspace();expect(clientReadyToWait(w.families[0],w)).toBe(true);
  });
 });

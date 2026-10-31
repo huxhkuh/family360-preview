@@ -5,22 +5,22 @@ import {CHAPTERS} from './questionnaire-definition';
 import {questionnaireReview} from './questionnaire-review';
 import {documentPreparation} from '../companion/document-preparation';
 describe('household conditions',()=>{
- it('allows submission without optional location details',()=>{
-  const answers={...validDemoAnswers,address:'',city:''};
+ it('allows submission without an optional street address',()=>{
+  const answers={...validDemoAnswers,address:''};
   expect(missingAnswers(answers,[])).toEqual([]);
   expect(questionnaireIssues(answers,[])).toEqual([]);
  });
- it.each(['h_email','h_id','h_dob','h_phone','h_first','h_last','marital','h_emp','housing','has_car','bank_count'])('still blocks submission without %s',key=>{
+ it.each(['h_email','h_id','h_dob','h_phone','h_first','h_last','marital','city','h_emp','h_work_continuity','housing','has_car','savings','ins','water_persons'])('still blocks submission without %s',key=>{
   expect(questionnaireIssues({...validDemoAnswers,[key]:''},[]).map(f=>f.key)).toContain(key);
  });
  it('allows employed married owners to defer details while retaining document requests and visible follow-ups',()=>{
-  const answers={...validDemoAnswers,city:'',marital:'married',w_first:'דוגמה',w_id:'000000018',w_dob:'1991-01-01',h_emp:['emp','self'],w_emp:['emp'],housing:'own',has_mortgage:'yes'};
+  const answers={...validDemoAnswers,marital:'married',w_first:'דוגמה',w_id:'000000018',w_dob:'1991-01-01',w_phone:'0500000000',h_emp:['emp','self'],w_emp:['emp'],housing:'own',has_mortgage:'yes',mort_refi:'dk'};
   expect(questionnaireIssues(answers,[])).toEqual([]);
   expect(documentPreparation(answers).map(d=>d.key)).toEqual(expect.arrayContaining(['payslips_h','payslips_w','tax_assessment_h','mortgage_balance']));
   const rows=questionnaireReview(answers,[]).flatMap(c=>c.items);
   expect(rows.filter(r=>r.value.includes('להשלמה'))).toHaveLength(4);
   expect(questionnaireReview({...answers,h_gross:0},[]).flatMap(c=>c.items).some(r=>r.label==='שכר חודשי ברוטו (₪)'&&r.value==='0')).toBe(true);
-  for(const key of ['w_id','w_dob','w_emp'])expect(questionnaireIssues({...answers,[key]:''},[]).map(f=>f.key)).toContain(key);
+  for(const key of ['w_id','w_dob','w_phone','w_emp'])expect(questionnaireIssues({...answers,[key]:''},[]).map(f=>f.key)).toContain(key);
   expect(questionnaireIssues({...answers,mort_monthly:-1},[]).map(f=>f.key)).toContain('mort_monthly');
  });
  it('allows unknown or omitted rental aid and tracks missing rent without blocking submission',()=>{
@@ -30,6 +30,42 @@ describe('household conditions',()=>{
    expect(documentPreparation(answers).map(d=>d.key)).toContain('rental_contract');
    expect(questionnaireReview(answers,[]).flatMap(c=>c.items).some(r=>r.value.includes('מחוזה השכירות'))).toBe(true);
   }
+ });
+ it('applies Isaac’s requirements without forcing hidden or optional answers',()=>{
+  expect(questionnaireIssues({...validDemoAnswers,bank_count:''},[]).some(i=>i.key==='bank_count')).toBe(false);
+  expect(questionnaireIssues({...validDemoAnswers,housing:'own',has_mortgage:'yes',mort_refi:''},[]).some(i=>i.key==='mort_refi')).toBe(true);
+  expect(questionnaireIssues({...validDemoAnswers,housing:'own',has_mortgage:'no',mort_refi:''},[]).some(i=>i.key==='mort_refi')).toBe(false);
+  expect(questionnaireIssues({...validDemoAnswers,rights_review:['disability'],disability_documents:''},[]).some(i=>i.key==='disability_documents')).toBe(false);
+ });
+ it('accepts a partner learning in kollel and shows the related optional income',()=>{
+  const answers={...validDemoAnswers,marital:'married',w_first:'דוגמה',w_id:'000000018',w_dob:'1991-01-01',w_phone:'0500000000',w_emp:['avrech']};
+  const field=CHAPTERS.find(c=>c.key==='work')!.secs.flatMap(s=>s.fields||[]).find(f=>f.k==='w_kollel_monthly')!;
+  expect(field.cond?.(answers)).toBe(true);expect(field.req).toBeUndefined();
+  expect(questionnaireIssues(answers,[]).some(i=>i.key==='w_emp')).toBe(false);
+ });
+ it('offers additional insurance categories and asks about multiple cars only when applicable',()=>{
+  const fields=CHAPTERS.find(c=>c.key==='insurance')!.secs.flatMap(s=>s.fields||[]);
+  const insurance=fields.find(f=>f.k==='ins')!;
+  expect(insurance.opts?.map(o=>o[0])).toEqual(expect.arrayContaining(['contents','other','none','dk']));
+  const cars=fields.find(f=>f.k==='has_multiple_cars')!;
+  expect(cars.cond?.({has_car:'yes'})).toBe(true);expect(cars.cond?.({has_car:'no'})).toBe(false);
+  expect(questionnaireIssues({...validDemoAnswers,ins:['contents','other'],has_car:'yes'},[]).some(i=>i.key==='ins')).toBe(false);
+  expect(questionnaireIssues({...validDemoAnswers,ins:['contents','none']},[]).some(i=>i.key==='ins')).toBe(true);
+ });
+ it('uses readable Hebrew labels for required savings and insurance in both validation paths',()=>{
+  const answers={...validDemoAnswers,savings:[],ins:[]};
+  for(const [key,label] of [['savings','חסכונות והשקעות'],['ins','סוגי הביטוח']]){
+   expect(questionnaireIssues(answers,[]).find(i=>i.key===key)?.label).toBe(label);
+   expect(missingAnswers(answers,[]).find(i=>i.key===key)?.label).toContain(label);
+  }
+ });
+ it('requires a refinancing answer per additional mortgage and validates a supplied year only when applicable',()=>{
+  const base={...validDemoAnswers,housing:'own',has_mortgage:'yes',mort_refi:'no',mortgages:[{mort_refi:'yes',mort_refi_year:'2019'},{mort_refi:'dk'}]};
+  expect(questionnaireIssues(base,[]).filter(i=>i.key.startsWith('mortgages.'))).toEqual([]);
+  expect(questionnaireIssues({...base,mortgages:[{mort_refi:''}]},[]).map(i=>i.key)).toContain('mortgages.0.mort_refi');
+  expect(questionnaireIssues({...base,mortgages:[{mort_refi:'yes',mort_refi_year:'invalid'}]},[]).map(i=>i.key)).toContain('mortgages.0.mort_refi_year');
+  expect(questionnaireIssues({...base,mortgages:[{mort_refi:'no',mort_refi_year:'invalid'}]},[]).map(i=>i.key)).not.toContain('mortgages.0.mort_refi_year');
+  expect(questionnaireIssues({...base,mortgages:[{mort_refi:'yes',mort_refi_year:''}]},[]).map(i=>i.key)).not.toContain('mortgages.0.mort_refi_year');
  });
  it('still validates optional data when supplied',()=>{
   expect(questionnaireIssues({...validDemoAnswers,h_email:'invalid'},[]).map(f=>f.key)).toContain('h_email');
@@ -46,7 +82,7 @@ describe('household conditions',()=>{
  });
  it('requires current partner details and applicable employment fields when married',()=>{
   const fields=missingAnswers({marital:'married',w_emp:'emp'},[]).map(f=>f.key);
-  expect(fields).toEqual(expect.arrayContaining(['w_first','w_id','w_dob']));
+  expect(fields).toEqual(expect.arrayContaining(['w_first','w_id','w_dob','w_phone']));
   expect(fields).not.toEqual(expect.arrayContaining(['w_work','w_gross']));
  });
  it('does not erase stored answers when their section is hidden',()=>{

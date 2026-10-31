@@ -25,7 +25,7 @@ for(const [device,width,height] of [['desktop',1440,1000],['mobile',390,844]]){
    await page.getByRole('navigation',{name:'תוכן תיק המשפחה'}).getByRole('button',{name:'מעקב',exact:true}).click();await page.getByRole('button',{name:'הוספת פעולה בתיק'}).click();await page.getByLabel('הפעולה הבאה',{exact:true}).fill('פעולת בדיקה לדמו');await page.getByLabel('תאריך יעד לפעולה').fill('2026-11-01');await page.getByRole('button',{name:'שמירת הפעולה',exact:true}).click();await page.getByRole('heading',{name:'פעולת בדיקה לדמו',exact:true}).waitFor();
    await page.getByRole('button',{name:'השלמת הפעולה',exact:true}).click();await page.getByText('מצב הפעולה עודכן.',{exact:true}).waitFor();
   }
-  if(role==='professional'){await nav.getByRole('button',{name:'משימות',exact:true}).click();await page.getByRole('button',{name:'קבלת המשימה',exact:true}).click();await page.getByText('המשימה התקבלה. היא מופיעה כעת ברשימת המשימות שלך.',{exact:true}).waitFor();}
+  if(role==='professional'){await nav.getByRole('button',{name:'משימות',exact:true}).click();await revealTaskContent(page,'.professional-offer-open');await page.locator('.professional-offer-open').first().click();await page.getByRole('button',{name:'קבלת המשימה',exact:true}).click();await page.getByText('המשימה התקבלה. היא מופיעה כעת ברשימת המשימות שלך.',{exact:true}).waitFor();}
   await page.screenshot({path:`test-results/${device}-${role}.png`,fullPage:true});
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,role+' horizontal overflow');
  }

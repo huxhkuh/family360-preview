@@ -1,0 +1,19 @@
+import {useState,type ReactNode} from 'react';
+import type {Workspace} from '../lib/model';
+import type {RouteState} from '../lib/navigation';
+import type {nextActions} from '../workspace/next-actions';
+import {meetingLaunches} from '../meetings/meeting-launch';
+import {BrandLogo} from '../branding/Brand';
+import {Icon} from '../icons';
+type Action=ReturnType<typeof nextActions>[number];
+export function RepresentativeLanding({w,open,action,children}:{w:Workspace;open:(r:RouteState)=>void;action?:Action;children:ReactNode}){
+ const [expanded,setExpanded]=useState(false);const meetings=meetingLaunches(w),meeting=meetings[0];const family=w.families.find(f=>f.id===meeting?.family_id);const queueFamily=w.families.find(f=>f.id===action?.familyId);const targetFamily=queueFamily||family;const ongoing=meeting?.status==='in_progress';
+ const when=(date:string|null)=>date&&Number.isFinite(Date.parse(date))?new Date(date).toLocaleString('he-IL',{day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'Asia/Jerusalem'}):'מועד טרם נקבע';
+ const enter=()=>meeting&&open({page:'meetings',id:meeting.id,family:meeting.family_id});
+ return <section className="focused-home representative-landing" data-focus-role="representative"><header className="studio-welcome"><div><p className="eyebrow">שלום, {w.profile.name}</p><h1>יום העבודה שלי</h1></div><button className="studio-family-link" onClick={()=>open({page:'families'})}><Icon name="family"/>המשפחות שלי</button></header>
+ <div className="studio-feature"><section className="studio-meeting" aria-label="כניסה לפגישה"><p className="studio-kicker"><Icon name="meetings"/>{meeting?ongoing?'ממשיכים בשיחה':'השיחה הקרובה':'לקראת השיחה הבאה'}{meeting&&<time>{when(meeting.scheduled_at)}</time>}</p><h2>{meeting?ongoing?'ממשיכים עם':'נפגשים עם':'מתכוננים לשיחה.'}{meeting&&<><br/><span>{family?.name||'המשפחה'}</span></>}</h2><p>{meeting?'הממצאים, ההחלטות והצעדים הבאים.':'בחרו תיק משפחה כדי לעבור על המידע ולתאם שיחה.'}</p><div className="studio-meeting-actions">{meeting?<button className="primary" onClick={enter}>{ongoing?'המשך הפגישה':'הכנה וכניסה לפגישה'}<Icon name="arrow"/></button>:<button className="primary" onClick={()=>open({page:'families'})}>בחירת משפחה<Icon name="arrow"/></button>}{family&&<button className="studio-text-link" onClick={()=>open({page:'families',id:family.id,tab:'overview'})}>פתיחת התיק</button>}</div></section>
+ <section className="focus-task studio-dossier" aria-label="הפעולה הבאה שלי" data-action-id={action?.id||''}><span className="studio-dossier-tab">{action?'לטיפולך':'התיק המשפחתי'}</span><div className="studio-dossier-sheet"><div className="studio-dossier-head"><BrandLogo mode="dark" mark/><div><strong>{targetFamily?.name||'שולחן העבודה'}</strong><small>{targetFamily?'תיק '+targetFamily.case_number:'המשפחות שבטיפולך'}</small></div></div><div className="focus-task-copy"><span className="focus-caption">{action?.reason||'מצב הטיפול'}</span><h2>{action?.title||'אין פעולה שממתינה לך כרגע.'}</h2><p>{action?.detail||'אפשר לעיין בתיקים ובמעקב המלא.'}</p>{action&&<button className="primary" onClick={()=>open(action.target)}>{action.label}<Icon name="arrow"/></button>}</div></div></section></div>
+ {w.familiesTruncated&&<p className="studio-partial">מוצגים התיקים שנטענו. אפשר למצוא תיקים נוספים ברשימת המשפחות.</p>}
+ {meetings.length>1&&<section className="studio-agenda" aria-label="פגישות נוספות"><h2>עוד בסדר היום</h2>{meetings.slice(1,4).map(m=><button key={m.id} onClick={()=>open({page:'meetings',id:m.id,family:m.family_id})}><time>{when(m.scheduled_at)}</time><strong>{w.families.find(f=>f.id===m.family_id)?.name||'פגישה עם המשפחה'}</strong><Icon name="arrow"/></button>)}</section>}
+ <details className="focus-more studio-work-detail" open={expanded} onToggle={e=>setExpanded(e.currentTarget.open)}><summary>תור העבודה והמעקב המלא</summary><div className="focus-secondary">{children}</div></details></section>
+}

@@ -22,3 +22,5 @@
  .questionnaire-paper .questionnaire-support-card>h2,
  .questionnaire-paper .questionnaire-support-card>h3{font-size:21px}
 }
+
+.address-question{grid-column:1 / -1;border:0;padding:0;margin:0;min-width:0}.address-question>legend{font-weight:700;margin-bottom:12px}

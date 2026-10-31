@@ -1,5 +1,6 @@
 // @ts-nocheck
 import {contactPatch} from "../families/questionnaire-decisions";
+import {changedAnswerKeys,snapshotAffected} from '../families/questionnaire-changes';
 export function meetingRpc(path,args,state,role,workspace){
 const staff=role==='representative'||role==='admin';const randomUUID=()=>crypto.randomUUID();const send=(value,status=200)=>{if(status>=400)throw new Error(value.message);return value;};
    if(path==='/rest/v1/rpc/rpc_meeting_action'||path==='/rest/v1/rpc/rpc_finish_meeting'){
@@ -67,6 +68,19 @@ const staff=role==='representative'||role==='admin';const randomUUID=()=>crypto.
     if(args.p_expected_updated_at!==f.updated_at)return send({message:'CONFLICT'},409);
     const allowed=staff?['answers','contact_name','phone','email','internal_notes']:['answers','contact_name','phone','email'];
     const patch=contactPatch(f,args.p_patch);
+    const changed=changedAnswerKeys(f.answers||{},patch.answers||f.answers||{});
+    if(role==='client'&&f.onboarding_pct===100&&changed.size){
+     const title='תשובות השאלון עודכנו לאחר השליחה — נדרשת בדיקה מחדש';
+     state.notifications.push({id:randomUUID(),title,body:'יש לבדוק את הנתונים המעודכנים לפני המשך הטיפול.',read_at:null,audience:'representative',family_id:f.id});
+     const notified=new Set();
+     for(const task of [...state.analysisTasks,...state.executionTasks]){
+      if(task.family_id!==f.id||['cancelled','reassigned'].includes(task.status)||!snapshotAffected(task.snapshot,changed)||notified.has(task.professional_id))continue;
+      const pro=state.professionals.find(p=>p.id===task.professional_id&&p.active&&p.profile_active);
+      if(!pro)continue;
+      state.notifications.push({id:randomUUID(),title:'נתוני שאלון ששימשו במשימה '+task.task_number+' עודכנו',body:'יש לתאם עם הנציג קבלת מידע מעודכן לפני המשך הטיפול.',read_at:null,audience:'professional',profile_id:pro.profile_id,family_id:f.id});
+      notified.add(pro.id);
+     }
+    }
     for(const key of allowed)if(Object.hasOwn(patch,key))f[key]=patch[key];
     f.updated_at=new Date(Math.max(Date.now(),Date.parse(f.updated_at||0)+1)).toISOString();return send(workspace(role).families.find(row=>row.id===f.id));
    }

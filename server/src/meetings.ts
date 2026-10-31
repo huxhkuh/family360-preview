@@ -4,15 +4,28 @@ import {requireThat,uuid,now,type Row} from './db';
 import {saveTask} from './families';
 import {meetingTopics} from '../../src/meetings/topic-catalog';
 export const meetingOperations=['rpc_schedule_meeting','rpc_meeting_action','rpc_manage_meeting','rpc_finish_meeting','rpc_save_meeting_topic','rpc_save_decision_followup'];
+async function cancelMeeting(c:Context,meeting:Row,reason:unknown){
+ const result=c.patch('meetings',meeting,{status:'cancelled',cancel_reason:parse(z.string().trim().min(3).max(2000),reason)});
+ const items=await c.db.rows('meeting_items','meeting_id=?',[meeting.id]);
+ for(const item of items){
+  if(!item.family_service_id)continue;
+  const fs=await c.db.required('family_services',item.family_service_id);
+  if(fs.status==='waiting_meeting'&&fs.analysis_task_id===item.analysis_task_id)c.patch('family_services',fs,{status:'approved_analysis'});
+ }
+ const family=await c.db.required('families',meeting.family_id);c.patch('families',family,{status:'ready_meeting'});
+ c.event(family.id,'הפגישה בוטלה; הממצאים זמינים לתיאום מחדש');return result;
+}
 export async function meetings(c:Context,name:string,a:Row):Promise<unknown>{
  if(name==='rpc_schedule_meeting'){
   const family=await c.staffFamily(a.p_family_id);const at=parse(timestamp,a.p_scheduled_at);const type=parse(z.enum(['inperson','phone','video','zoom']),a.p_type);const analyses=await c.db.rows('analysis_tasks',"family_id=? AND status='approved'",[family.id]);
   requireThat(!(await c.db.rows('meetings',"family_id=? AND status IN ('scheduled','in_progress')",[family.id])).length,'INVALID_STATE',409);
   const meeting={id:uuid(),family_id:family.id,representative_id:family.representative_id,scheduled_at:at,type,status:'scheduled'};c.insert('meetings',meeting);
+  let included=0;
   for(const [index,task]of analyses.entries()){
    const fs=await c.db.required('family_services',task.family_service_id);if(fs.analysis_task_id!==task.id||fs.status!=='approved_analysis')continue;const service=await c.db.required('services',task.service_id);
-   c.insert('meeting_items',{id:uuid(),meeting_id:meeting.id,family_id:family.id,family_service_id:fs.id,service_id:service.id,analysis_task_id:task.id,sort_order:index,title:service.name,client_summary:task.client_summary,current_situation:task.current_situation,recommendation:task.recommendation,result_tone:task.result_tone,financial:task.financial,actions:task.actions,attachments:task.attachments,visible_to_client:true,client_decision:'undecided'});c.patch('family_services',fs,{status:'waiting_meeting'});
+   c.insert('meeting_items',{id:uuid(),meeting_id:meeting.id,family_id:family.id,family_service_id:fs.id,service_id:service.id,analysis_task_id:task.id,sort_order:index,title:service.name,client_summary:task.client_summary,current_situation:task.current_situation,recommendation:task.recommendation,result_tone:task.result_tone,financial:task.financial,actions:task.actions,attachments:task.attachments,visible_to_client:true,client_decision:'undecided'});c.patch('family_services',fs,{status:'waiting_meeting'});included++;
   }
+  requireThat(included>0,'INVALID_STATE',409);
   c.patch('families',family,{status:'meeting_set'});c.event(family.id,'נקבעה פגישה');return meeting;
  }
  const meeting=await c.db.required('meetings',a.p_meeting_id);await c.staffFamily(meeting.family_id);
@@ -24,7 +37,7 @@ export async function meetings(c:Context,name:string,a:Row):Promise<unknown>{
  if(name==='rpc_manage_meeting'){
   stateIn(meeting,['scheduled']);expected(meeting.scheduled_at,a.p_expected_scheduled_at);parse(z.enum(['cancel','reschedule']),a.p_action);
   if(a.p_action==='reschedule')return c.patch('meetings',meeting,{scheduled_at:parse(timestamp,a.p_scheduled_at)});
-  const result=c.patch('meetings',meeting,{status:'cancelled',cancel_reason:parse(z.string().trim().min(3).max(2000),a.p_reason)});const family=await c.db.required('families',meeting.family_id);c.patch('families',family,{status:'ready_meeting'});return result;
+  return cancelMeeting(c,meeting,a.p_reason);
  }
  if(name==='rpc_save_meeting_topic'){
   stateIn(meeting,['in_progress','completed']);requireThat(meetingTopics.some(t=>t.key===a.p_topic_key),'VALIDATION',400);const result=parse(z.enum(['pending','not_relevant','no_action','follow_up']),a.p_result);const note=parse(z.string().max(2000),a.p_note||'');const old=(await c.db.rows('meeting_topic_checks','meeting_id=? AND topic_key=?',[meeting.id,a.p_topic_key]))[0];expected(old?.revision||0,a.p_expected_revision);let followup=old?.followup_id||null;
@@ -39,7 +52,7 @@ export async function meetings(c:Context,name:string,a:Row):Promise<unknown>{
  if(name==='rpc_meeting_action'){
   const action=parse(z.enum(['start','decision','reschedule','cancel','visibility']),a.p_action);const p=a.p_payload||{};
   if(action==='start'){stateIn(meeting,['scheduled']);return c.patch('meetings',meeting,{status:'in_progress',started_at:now()});}
-  if(action==='reschedule'||action==='cancel'){stateIn(meeting,['scheduled']);return c.patch('meetings',meeting,action==='reschedule'?{scheduled_at:parse(timestamp,p.scheduled_at)}:{status:'cancelled',cancel_reason:parse(z.string().min(3).max(2000),p.reason)});}
+  if(action==='reschedule'||action==='cancel'){stateIn(meeting,['scheduled']);return action==='cancel'?cancelMeeting(c,meeting,p.reason):c.patch('meetings',meeting,{scheduled_at:parse(timestamp,p.scheduled_at)});}
   stateIn(meeting,['in_progress']);const item=await c.db.required('meeting_items',p.item_id);requireThat(item.meeting_id===meeting.id&&item.family_id===meeting.family_id);
   if(action==='visibility')return c.patch('meeting_items',item,{visible_to_client:parse(z.boolean(),p.visible_to_client)});
   return c.patch('meeting_items',item,parse(z.object({client_decision:z.enum(['progress','thinking','declined','no_action','undecided']),decision_note:z.string().max(5000).optional(),execution_instructions:z.string().max(5000).optional(),approved_actions:z.array(z.unknown()).max(100).optional()}),p));

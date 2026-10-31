@@ -1,3 +1,5 @@
+import {representativeCallConfirmed,supportClosed} from '../../src/lib/case-policy';
+import {documentPreparation} from '../../src/companion/document-preparation';
 import {z} from 'zod';
 import {Context,parse,idSchema,shortText,dateSchema,timestamp,expected,stateIn} from './context';
 import {familyAccess,familyFilter,has} from './auth';
@@ -6,6 +8,7 @@ import {conditionMatches} from '../../src/lib/core';
 import {questionnaireIssues} from '../../src/families/questionnaire-validation';
 import {questionnaireDiscussion} from '../../src/families/questionnaire-discussion';
 import {contactPatch} from '../../src/families/questionnaire-decisions';
+import {changedAnswerKeys,snapshotAffected} from '../../src/families/questionnaire-changes';
 const taskPayload=z.object({title:z.string().trim().min(3).max(200),details:z.string().max(3000),owner_role:z.enum(['client','representative']),due_on:dateSchema,visible_to_client:z.boolean(),document_id:idSchema.nullable().optional()}).strict();
 export async function saveTask(c:Context,a:Row,followup=false){
  const payload=parse(followup?taskPayload.extend({item_id:idSchema.nullable().optional()}):taskPayload,a.p_payload) as Row;
@@ -15,20 +18,25 @@ export async function saveTask(c:Context,a:Row,followup=false){
  const owner=payload.owner_role==='client'?await c.db.one('profiles',family.client_profile_id):family.representative_id?await c.db.one('representatives',family.representative_id):null;requireThat(owner?.active,'VALIDATION',400);
  if(payload.document_id){const doc=await c.db.required('documents',payload.document_id);requireThat(doc.family_id===family.id);}
  if(payload.item_id){const item=await c.db.required('meeting_items',payload.item_id);requireThat(item.meeting_id===meeting!.id&&item.family_id===family.id&&(!payload.visible_to_client||item.visible_to_client));}
- const table=followup?'meeting_followups':'family_tasks';const id=parse(idSchema,a.p_id);const old=await c.db.one(table,id);
+ const table=followup?'meeting_followups':'family_tasks';const id=parse(idSchema,a.p_id);const old=await c.db.one(table,id);if(old&&!followup)requireThat(!(await c.db.rows('professional_requests','representative_task_id=?',[id])).length,'INVALID_STATE',409);
  if(old){requireThat(old.family_id===family.id&&(!meeting||old.meeting_id===meeting.id));expected(old.revision,a.p_expected_revision);stateIn(old,['open','in_progress']);return c.patch(table,old,{...payload,revision:old.revision+1,updated_by:c.actor.profile.id});}
  requireThat(a.p_expected_revision==null||a.p_expected_revision===0,'CONFLICT',409);
  return c.insert(table,{id,family_id:family.id,...payload,...(meeting?{meeting_id:meeting.id,item_id:payload.item_id||null}:{}),status:'open',revision:1,created_by:c.actor.profile.id,updated_by:c.actor.profile.id,created_at:now(),updated_at:now()});
 }
-export const familyOperations=[ 'rpc_assign_family_representative','rpc_create_family','rpc_save_family','rpc_complete_onboarding','rpc_add_family_service','rpc_search_families','rpc_family_activity','rpc_save_family_task','rpc_save_meeting_followup','rpc_set_family_task_status','rpc_set_followup_status','rpc_record_family_contact','rpc_telephone_contact','rpc_review_questionnaire_topic','rpc_client_request'];
+export const familyOperations=['rpc_confirm_representative_call', 'rpc_assign_family_representative','rpc_create_family','rpc_save_family','rpc_complete_onboarding','rpc_add_family_service','rpc_search_families','rpc_family_activity','rpc_save_family_task','rpc_save_meeting_followup','rpc_set_family_task_status','rpc_set_followup_status','rpc_record_family_contact','rpc_telephone_contact','rpc_review_questionnaire_topic','rpc_client_request'];
 export async function families(c:Context,name:string,a:Row):Promise<unknown>{
+ if(name==='rpc_confirm_representative_call'){const f=await c.staffFamily(a.p_family_id);requireThat(a.p_confirmed===true,'VALIDATION',400);if(!(await c.db.rows('timeline_events','family_id=? AND title=?',[f.id,representativeCallConfirmed])).length)c.event(f.id,representativeCallConfirmed);return null;}
  if(name==='rpc_assign_family_representative'){
   requireThat(c.actor.profile.role==='admin'&&has(c.actor,'families.edit'));
   const p=parse(z.object({p_family_id:idSchema,p_representative_id:idSchema,p_expected_updated_at:timestamp}).strict(),a);
   const f=await familyAccess(c.db,c.actor,p.p_family_id,'families.edit');expected(f.updated_at,p.p_expected_updated_at);
   const rep=await c.db.required('representatives',p.p_representative_id);const profile=await c.db.required('profiles',rep.profile_id);
   requireThat(rep.active&&profile.active&&profile.role==='representative','VALIDATION',400);
-  const result=c.patch('families',f,{representative_id:rep.id});c.event(f.id,'שויך נציג לטיפול בתיק');return result;
+  const result=c.patch('families',f,{representative_id:rep.id});
+  // Evaluate the inbox inside the same transaction as reassignment. A message
+  // arriving before this commit is covered; one arriving after targets the new rep.
+  if(f.representative_id!==rep.id)c.statements.push(c.db.statement("INSERT INTO notifications(id,profile_id,family_id,title,created_at) SELECT ?,?,?, 'יש הודעות קוליות הממתינות לטיפול בתיק שהועבר אליך',? WHERE EXISTS (SELECT 1 FROM telephone_messages WHERE family_id=? AND status='open')", [uuid(),profile.id,f.id,now(),f.id]));
+  c.event(f.id,'שויך נציג לטיפול בתיק');return result;
  }
  if(name==='rpc_create_family'){
   requireThat(has(c.actor,'families.edit'));const p=parse(z.object({p_name:shortText,p_client_profile_id:idSchema.nullable(),p_representative_id:idSchema.nullable(),p_phone:z.string().max(40).nullable().optional(),p_email:z.email().nullable().optional()}),a);
@@ -41,7 +49,26 @@ export async function families(c:Context,name:string,a:Row):Promise<unknown>{
   const f=await familyAccess(c.db,c.actor,a.p_family_id,c.actor.profile.role==='client'?undefined:'families.edit');expected(f.updated_at,a.p_expected_updated_at);
   const base=z.object({name:shortText.optional(),contact_name:z.string().max(200).optional(),phone:z.string().max(40).optional(),email:z.union([z.email(),z.literal('')]).optional(),answers:z.record(z.string(),z.unknown()).optional()});
   const p=parse(c.actor.profile.role==='client'?base.strict():base.extend({internal_notes:z.string().max(10000).optional()}).strict(),a.p_patch);
-  return c.patch('families',f,contactPatch(f as any,p));
+  const patch=contactPatch(f as any,p);
+  const changed=changedAnswerKeys(f.answers||{},patch.answers||f.answers||{});
+  const result=c.patch('families',f,patch);
+  if(c.actor.profile.role==='client'&&f.onboarding_pct===100&&changed.size){
+   await c.notifyRep(f.id,'תשובות השאלון עודכנו לאחר השליחה — נדרשת בדיקה מחדש');
+   const notified=new Set<string>();
+   for(const table of ['analysis_tasks','execution_tasks']){
+    const tasks=await c.db.rows(table,'family_id=?',[f.id]);
+    for(const task of tasks){
+     if(['cancelled','reassigned'].includes(task.status)||!snapshotAffected(task.snapshot,changed)||notified.has(task.professional_id))continue;
+     const pro=await c.db.one('professionals',task.professional_id);
+     const profile=pro?.profile_id?await c.db.one('profiles',pro.profile_id):null;
+     if(!pro?.active||!profile?.active||profile.role!=='professional')continue;
+     c.notify(profile.id,f.id,'נתוני שאלון ששימשו במשימה '+task.task_number+' עודכנו. יש לתאם עם הנציג קבלת מידע מעודכן לפני המשך הטיפול.');
+     notified.add(task.professional_id);
+    }
+   }
+   c.event(f.id,'המשפחה עדכנה תשובות לאחר שליחת השאלון');
+  }
+  return result;
  }
  if(name==='rpc_complete_onboarding'){
   const f=await familyAccess(c.db,c.actor,a.p_family_id,c.actor.profile.role==='client'?undefined:'families.edit');if(f.onboarding_pct===100)return null;
@@ -50,6 +77,10 @@ export async function families(c:Context,name:string,a:Row):Promise<unknown>{
   for(const service of services.filter(s=>s.trigger_conditions.every((r:any)=>conditionMatches(f.answers,r)))){
    if(!present.some(s=>s.service_id===service.id))c.insert('family_services',{id:uuid(),family_id:f.id,service_id:service.id});
    for(const req of service.required_documents){const dt=(await c.db.rows('document_types','key=? AND active=1',[req.doc_key]))[0];if(dt&&!keys.has(dt.key)){keys.add(dt.key);c.insert('documents',{id:uuid(),family_id:f.id,document_type_id:dt.id,service_id:service.id,key:dt.key,name:dt.name,type:dt.type});}}
+  }
+  for(const d of documentPreparation(f.answers||{}).filter(d=>d.requirement==='required')){
+   const old=docs.find(doc=>doc.key===d.key);if(old){if(old.optional)c.patch('documents',old,{optional:false});continue;}if(keys.has(d.key))continue;keys.add(d.key);
+   c.insert('documents',{id:uuid(),family_id:f.id,key:d.key,name:d.name,type:d.type,optional:false,purpose:d.reason,source_hint:d.source,period:d.period});
   }
   c.patch('families',f,{onboarding_pct:100,status:'waiting_docs'});c.event(f.id,'שאלון ההיכרות נשלח');await c.notifyRep(f.id,'שאלון חדש ממתין לבדיקה');return null;
  }
@@ -76,7 +107,7 @@ export async function families(c:Context,name:string,a:Row):Promise<unknown>{
  }
  if(name==='rpc_review_questionnaire_topic'){const f=await c.staffFamily(a.p_family_id);expected(f.updated_at,a.p_expected_updated_at);const topic=questionnaireDiscussion(f.answers).find(t=>t.key===a.p_key);requireThat(topic,'VALIDATION',400);expected(topic.token,a.p_token);const note=parse(z.string().trim().min(3).max(1000),a.p_note);return c.patch('families',f,{questionnaire_reviews:{...f.questionnaire_reviews,[topic.key]:{token:topic.token,note}}});}
  if(name==='rpc_client_request'){
-  requireThat(c.actor.profile.role==='client');const f=await familyAccess(c.db,c.actor,a.p_family_id);const kind=parse(z.enum(['help','correction']),a.p_kind);const details=parse(z.string().trim().min(3).max(3000),a.p_details);let source:Row|undefined;
+  requireThat(c.actor.profile.role==='client');const f=await familyAccess(c.db,c.actor,a.p_family_id);requireThat(!supportClosed(f.status,await c.db.rows('final_reports','family_id=?',[f.id])),'SUPPORT_CLOSED',409);const kind=parse(z.enum(['help','correction']),a.p_kind);const details=parse(z.string().trim().min(3).max(3000),a.p_details);let source:Row|undefined;
   if(kind==='correction'){parse(z.enum(['familyTask','followUp']),a.p_source_kind);source=await c.db.required(a.p_source_kind==='familyTask'?'family_tasks':'meeting_followups',a.p_source_id);requireThat(source.family_id===f.id&&source.visible_to_client&&source.owner_role==='client');if(source.item_id)requireThat((await c.db.required('meeting_items',source.item_id)).visible_to_client);}
   const id=parse(idSchema,a.p_id);const old=await c.db.one('family_tasks',id);if(old){requireThat(old.family_id===f.id);expected(old.details,details);return old;}
   await c.notifyRep(f.id,'פנייה חדשה מהמשפחה');return c.insert('family_tasks',{id,family_id:f.id,title:kind==='help'?'בקשת עזרה מהמשפחה':'בקשת תיקון מהמשפחה',details,owner_role:'representative',visible_to_client:true,due_on:new Date().toISOString().slice(0,10),status:'open',revision:1,created_by:c.actor.profile.id,updated_by:c.actor.profile.id,request_kind:kind,source_kind:source?a.p_source_kind:null,source_id:source?.id||null});

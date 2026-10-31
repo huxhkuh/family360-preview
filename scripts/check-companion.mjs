@@ -34,7 +34,7 @@ try{for(const [device,width,height] of [['desktop',1440,1000],['mobile',390,844]
  const inline=page.getByRole('region',{name:'מסמכים לפרק הנוכחי'});
  await expect(inline.locator('[data-preparation-key=rental_contract]')).toBeVisible();
  await inline.getByText('איך המסמך עוזר ואיפה מוצאים?',{exact:true}).click();
- await expect(inline).toContainText('העותק שברשותכם');
+ await expect(inline).toContainText('בעותק החוזה שברשותכם');
  await inline.scrollIntoViewIfNeeded();await page.screenshot({path:`${out}/${device}-request.png`});
  await inline.getByRole('button',{name:'אולי בהמשך',exact:true}).click();
  await expect(inline.getByRole('button',{name:'השארנו להמשך'})).toHaveAttribute('aria-pressed','true');

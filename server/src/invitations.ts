@@ -2,12 +2,13 @@ import {z} from 'zod';
 import {Context,parse,idSchema} from './context';
 import {admin} from './auth';
 import {now,uuid,requireThat,type Row} from './db';
+import {validPhoneNumber} from '../../src/families/questionnaire-validation';
 async function digest(s:string){return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)))).map(b=>b.toString(16).padStart(2,'0')).join('');}
 export const invitationOperations=['rpc_create_agent_invitation','rpc_list_agent_invitations','rpc_revoke_agent_invitation','rpc_accept_agent_invitation','rpc_open_client_case'];
 export async function invitations(c:Context,name:string,a:Row):Promise<unknown>{
  if(name==='rpc_open_client_case'){
   requireThat(c.actor.profile.role==='client');const old=(await c.db.rows('families','client_profile_id=?',[c.actor.profile.id]))[0];if(old)return old;
-  const p=parse(z.object({p_name:z.string().trim().min(2).max(150),p_phone:z.string().min(9).max(40),p_referral_code:z.string().max(50).optional()}),a);const id=uuid();const family=c.insert('families',{id,case_number:'F-'+id.slice(0,8).toUpperCase(),client_profile_id:c.actor.profile.id,name:p.p_name,contact_name:p.p_name,phone:p.p_phone,email:c.actor.email,created_at:now(),updated_at:now()});
+  const p=parse(z.object({p_name:z.string().trim().min(2).max(150),p_phone:z.string().trim().min(9).max(40).refine(validPhoneNumber),p_referral_code:z.string().max(50).optional()}),a);const id=uuid();const family=c.insert('families',{id,case_number:'F-'+id.slice(0,8).toUpperCase(),client_profile_id:c.actor.profile.id,name:p.p_name,contact_name:p.p_name,phone:p.p_phone,email:c.actor.email,created_at:now(),updated_at:now()});
   if(p.p_referral_code){const partner=(await c.db.rows('partners','code=? AND active=1',[p.p_referral_code]))[0];if(partner)c.insert('referrals',{id:uuid(),public_id:uuid(),family_id:id,partner_id:partner.id,registered_at:now(),status:'registered'});}
   return family;
  }

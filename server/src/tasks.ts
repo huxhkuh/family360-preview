@@ -1,3 +1,4 @@
+import {representativeCallConfirmed} from '../../src/lib/case-policy';
 import {z} from 'zod';
 import {Context,parse,stateIn} from './context';
 import {taskAccess,has} from './auth';
@@ -7,6 +8,7 @@ export async function eligible(c:Context,professionalId:string,service:Row,kind:
 }
 export async function assign(c:Context,fs:Row,professionalId:string,kind:'analysis'|'execution',args:Row={},claimed=false){
  const family=claimed?await c.db.required('families',fs.family_id):await c.staffFamily(fs.family_id,kind+'.send');const service=await c.db.required('services',fs.service_id);const pro=await eligible(c,professionalId,service,kind);
+ requireThat((await c.db.rows('timeline_events','family_id=? AND title=?',[family.id,representativeCallConfirmed])).length,'CALL_REQUIRED',409);
  stateIn(fs,kind==='analysis'?['waiting_analysis']:['client_approved_execution']);
  const id=uuid();const count=(await c.db.rows('counters','key=?',[kind+'_task']))[0];const number=Number(count.value)+1;
  c.statements.push(c.db.statement('UPDATE counters SET value=? WHERE key=?',[number,kind+'_task']));

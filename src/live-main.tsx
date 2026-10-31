@@ -21,3 +21,5 @@ import './live.css';
 createRoot(document.getElementById('root')!).render(<React.StrictMode><Live/></React.StrictMode>);
 
 import './branding/editorial-workspaces.css';
+
+import './branding/studio-workspaces.css';

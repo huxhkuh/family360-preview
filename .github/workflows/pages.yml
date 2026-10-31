@@ -24,6 +24,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+      - run: npm run check:server
+      - run: npm run build:live
+      - run: npm run test:live-boundary
       - run: npm run build
       - name: Install browser and dependencies
         run: |
@@ -70,6 +73,7 @@ jobs:
           npm run test:role-handoffs
           npm run test:focused-home
           npm run test:workspace-brand
+          node scripts/check-studio-integration.mjs
           npm run test:hero-gaze
       - uses: actions/upload-pages-artifact@v4
         with:

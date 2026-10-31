@@ -1,3 +1,4 @@
+import {RepresentativeLanding} from '../representative/RepresentativeLanding';
 import {useState,type ReactNode} from 'react';
 import type {Workspace} from '../lib/model';
 import type {RouteState} from '../lib/navigation';
@@ -24,6 +25,7 @@ export function FocusedHome({w,open,refresh,children}:{w:Workspace;open:(r:Route
  const headings={client:family?.name||'הבית שלי',representative:'יום העבודה שלי',professional:'העבודה המקצועית שלי',admin:'מה מצריך החלטה',marketer:'ההפניות שלי'};
  const emptyTitle=partial?'אין בקשה פתוחה במידע שנטען':client?'כרגע אין פעולה שנדרשת מכם':role==='admin'?'אין כרגע אישור או שיוך שממתינים לכם':'אין כרגע משימה פתוחה באחריותך';
  const emptyDetail=client?owner?`${owner} מרכז את המשך הטיפול. בקשה חדשה תופיע כאן כשיהיה צורך בכם.`:'כשישויך נציג ותהיה בקשה להמשך, היא תופיע כאן.':role==='professional'?'משימות חדשות או בקשות לתיקון יופיעו כאן. עבודה שנשלחה לאישור או ממתינה ללקוח זמינה בתור העבודה והמעקב המלא.':'אפשר לעיין במצב העבודה לפי הצורך. פעולות של אנשים אחרים נשארות באחריותם.';
+ if(role==='representative')return <RepresentativeLanding w={w} open={open} action={action}>{children}</RepresentativeLanding>;
  return <section className="focused-home" data-focus-role={role}>
   <header className="focus-heading"><p className="eyebrow">{client?'טוב שחזרתם. ממשיכים מאיפה שעצרתם.':role==='admin'?'חריגים ואישורים באחריותך':'באחריותך להמשך הטיפול'}</p><h1>{headings[role]}</h1></header>
   <section className={`focus-task${!action?' focus-rest':''}`} aria-label="הפעולה הבאה שלי" data-action-id={action?.id||''}>

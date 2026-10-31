@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && vite build && node scripts/copy-design-demos.mjs",
     "preview": "vite preview --host 127.0.0.1",
     "test": "vitest run",
     "test:demo": "node scripts/check-demo.mjs",
@@ -34,6 +34,7 @@
     "test:hero-gaze": "node scripts/check-hero-gaze.mjs",
     "dev:live": "vite --config vite.live.config.ts",
     "build:live": "tsc --noEmit && vite build --config vite.live.config.ts",
+    "test:live-boundary": "node scripts/check-live-build-boundary.mjs",
     "test:server": "vitest run server/tests",
     "check:server": "tsc --project server/tsconfig.json",
     "dev:api": "wrangler dev --config server/wrangler.jsonc",
@@ -41,7 +42,8 @@
     "test:runtime": "wrangler deploy --config server/wrangler.jsonc --dry-run --minify --outdir artifacts/runtime && node scripts/check-worker-runtime.mjs",
     "test:focused-home": "node scripts/check-focused-home.mjs",
     "test:task-surfaces": "node scripts/check-task-surfaces.mjs",
-    "test:role-handoffs": "node scripts/check-role-handoffs.mjs"
+    "test:role-handoffs": "node scripts/check-role-handoffs.mjs",
+    "test:questionnaire-review": "node scripts/check-questionnaire-review.mjs"
   },
   "dependencies": {
     "@fontsource-variable/assistant": "5.3.0",

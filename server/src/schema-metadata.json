@@ -665,5 +665,21 @@
       "actor_profile_id",
       "created_at"
     ]
+  },
+  "professional_requests": {
+    "json": [],
+    "boolean": [],
+    "columns": [
+      "id",
+      "task_kind",
+      "task_id",
+      "family_id",
+      "professional_id",
+      "category",
+      "details",
+      "representative_task_id",
+      "created_at",
+      "response"
+    ]
   }
 }

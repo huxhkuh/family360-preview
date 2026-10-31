@@ -11,3 +11,6 @@
 @media(prefers-reduced-motion:reduce){.brand-workspace *{animation:none!important;transition:none!important}}
 .brand-workspace .sidebar footer button{color:#24483b;border-color:#d9d5c7;background:transparent}.brand-workspace .rep-priorities{background:none;border:0;gap:14px;padding:0}.brand-workspace .work-row{border:0;border-bottom:1px solid var(--border);border-radius:0;background:none;margin:0;padding:22px 0}.brand-workspace .work-row:last-child{border-bottom:0}
 .customer-payment form button[type=submit]{box-shadow:none}
+
+/* Meeting feedback: keep the questionnaire surface clean and white. */
+.brand-workspace .questionnaire-paper>.card{background:#fff}

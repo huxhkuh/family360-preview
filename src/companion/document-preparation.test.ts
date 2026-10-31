@@ -20,7 +20,7 @@ describe('contextual document preparation',()=>{
  it('removes preparation prompts when the relevant answer changes',()=>{
   expect(documentPreparation({housing:'rent'})).toHaveLength(3);
   expect(documentPreparation({housing:'family',has_mortgage:'yes'}).map(p=>p.key)).toEqual(['municipal_bill','electricity_bill']);
-  expect(documentPreparation({loans:[{balance:0}]}).map(r=>r.key)).toEqual(['loan_statements']);
+  expect(documentPreparation({loans:[{balance:0}]}).map(r=>r.key)).toEqual([]);
  });
  it('creates one pending sample from saved answers, without a file upload',async()=>{
   await save({housing:'rent'});

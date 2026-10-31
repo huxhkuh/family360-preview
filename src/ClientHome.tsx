@@ -6,6 +6,7 @@ import {ClientJourney} from './ClientJourney';
 import {ClientHelp} from './ClientRequests';
 import {Badge,Empty} from './ui';
 import {dueLabel} from './followups/followup-utils';
+import {MeetingPreparation} from './companion/MeetingPreparation';
 
 export function ClientHome({family:f,w,open,refresh,supplemental=false}:{supplemental?:boolean;family:Family;w:Workspace;open:(r:RouteState)=>void;refresh:()=>Promise<void>}){
  const go=(tab:string,focus?:string)=>open({page:'families',id:f.id,tab,focus});
@@ -32,6 +33,7 @@ export function ClientHome({family:f,w,open,refresh,supplemental=false}:{supplem
  </section>}
  {submitted&&<section className="client-care" aria-labelledby={`client-care-${f.id}`}><h2 id={`client-care-${f.id}`}>בטיפול עבורי</h2>{care.map(t=><article className="client-action-row" key={t.id}><div><h3>{t.title}</h3><p>{t.details}</p><small>{t.owner_name} · {t.due_on?`מועד במעקב: ${dueLabel(t.due_on)}`:'טרם נקבע מועד לחזרה'}</small></div><Badge status={t.status}/></article>)}{pending.map(d=><article className="client-action-row" key={d.id}><div><h3>{d.name}</h3><p>המסמך ממתין לבדיקה. אין צורך לצרף אותו שוב.</p></div><button className="ghost" onClick={()=>go('documents',d.id)}>למצב המסמך</button></article>)}{!care.length&&!pending.length&&<Empty>אין כרגע משימות מעקב או מסמכים שממתינים לבדיקה. אפשר לעיין במצב תחומי הטיפול.</Empty>}<button className="text-button" onClick={()=>go('services')}>מצב תחומי הטיפול</button></section>}
  {(upcoming.length>0||last)&&<section className="client-meeting"><h2>{upcoming.length?'השיחה הקרובה':'השיחה האחרונה ששמרנו'}</h2>{[upcoming[0]||last!].map(m=><div key={m.id}><p>{m.scheduled_at?new Date(m.scheduled_at).toLocaleString('he-IL'):'טרם נקבע מועד'}</p><button onClick={()=>open({page:'meetings',id:m.id,stage:'summary'})}>{m.status==='completed'?'לסיכום השיחה ולהחלטות':'לפרטי השיחה'}</button></div>)}</section>}
+ <MeetingPreparation key={f.id} w={w} familyId={f.id} open={open}/>
  <nav className="client-reference" aria-label="המידע שלי"><button onClick={()=>go('questionnaire')}>השאלון שלי</button><button onClick={()=>go('documents')}>כל המסמכים</button><button onClick={()=>go('followups')}>כל הפעולות והמעקב</button><button onClick={()=>go('meetings')}>כל השיחות</button></nav>
  {!supplemental&&<ClientHelp familyId={f.id} w={w} refresh={refresh}/>}
  {submitted&&<details className="client-process-reference"><summary>המסלול המלא · תשלום, שאלון, מסמכים והנציג</summary><ClientJourney family={f} w={w} onNavigate={go}/></details>}

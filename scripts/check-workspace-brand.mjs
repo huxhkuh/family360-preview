@@ -18,7 +18,7 @@ try{
   const links=workspace.locator('.sidebar nav button'),screens=[];
   for(let n=0;n<await links.count();n++){
    const link=links.nth(n),label=await link.innerText();
-   await expect(link.locator('svg.brand-icon')).toHaveAttribute('viewBox','0 0 32 32');
+   await expect(link.locator('svg.brand-icon')).toHaveAttribute('viewBox','0 0 40 40');
    if(!await link.isVisible())await workspace.locator('.mobile-task-menu').click();
    await link.click();await expect(link).toHaveAttribute('aria-current','page');
    await expect(workspace.locator('#main-content')).toBeVisible();

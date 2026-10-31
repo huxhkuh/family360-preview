@@ -11,6 +11,10 @@ export function missingAnswers(answers:Answers,services:Service[]){
 
 export type AnswerIssue={key:string;label:string;chapter:string;message:string};
 const absent=(v:unknown)=>v==null||typeof v==='string'&&!v.trim()||Array.isArray(v)&&!v.length;
+// Missing required answers may be completed later; entered contact details still need correction.
+export function chapterNavigationIssues(answers:Answers,services:Service[],chapter:string){
+ return questionnaireIssues(answers,services).filter(issue=>issue.chapter===chapter&&/(^|_)(id|phone|email)$/.test(issue.key)&&!absent(answers[issue.key]));
+}
 export function questionnaireIssues(answers:Answers,services:Service[],today=new Date().toISOString().slice(0,10)):AnswerIssue[]{
  const issues:AnswerIssue[]=[];
  function check(field:LegacyField,values:Answers,chapter:string,prefix='',labelPrefix=''){

@@ -30,13 +30,14 @@ describe('honest completion feedback',()=>{
   w.followUps=[{...original.followUps[0],family_id:f.id,item_id:null,visible_to_client:true,owner_role:'client',status:'in_progress'}];expect(clientReadyToWait(f,w)).toBe(false);
   w.followUps[0].status='completed';expect(clientReadyToWait(f,w)).toBe(true);
  });
- it('submission does not fabricate a document requirement; optional preparation does not block',async()=>{
+ it('submission adds only confirmed required documents; optional authorization does not block',async()=>{
   startClientIntake();let w=await loadWorkspace();
   await rpc('rpc_save_family',{p_family_id:'f1',p_patch:{answers:validDemoAnswers},p_expected_updated_at:w.families[0].updated_at});
   await rpc('rpc_complete_onboarding',{p_family_id:'f1'});w=await loadWorkspace();
-  expect(clientReadyToWait(w.families[0],w)).toBe(true);expect(w.documents).toHaveLength(0);
+  expect(w.families[0].onboarding_pct).toBe(100);expect(clientReadyToWait(w.families[0],w)).toBe(false);expect(w.documents).toHaveLength(1);expect(w.documents[0]).toMatchObject({key:'identity_h',optional:false});
+  await rpc('rpc_demo_attach_example',{p_document_id:w.documents[0].id});
   await rpc('rpc_demo_prepare_document',{p_family_id:'f1',p_key:'clearinghouse_auth_h'});w=await loadWorkspace();
-  expect(w.documents[0]).toMatchObject({optional:true,type:'signature',status:'missing'});
+  expect(w.documents.find(d=>d.key==='clearinghouse_auth_h')).toMatchObject({optional:true,type:'signature',status:'missing'});
   expect(clientReadyToWait(w.families[0],w)).toBe(true);
  });
 });
