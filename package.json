@@ -7,7 +7,7 @@
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build && node scripts/copy-design-demos.mjs",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "vitest run",
+    "test": "vitest run --maxWorkers=4 --exclude=artifacts/**",
     "test:demo": "node scripts/check-demo.mjs",
     "test:professional-admin": "node scripts/check-pro-admin.mjs",
     "test:ux": "node scripts/check-mint.mjs && node scripts/check-mint-workflow.mjs",
