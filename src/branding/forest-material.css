@@ -1,8 +1,11 @@
 /* Quiet, static material: large logo-derived forms and fine paper grain.
    Backgrounds only; no overlay sits above text or intercepts interaction. */
 .studio-workspace {
-  --forest-grain: url('../assets/forest-grain.png');
+  --forest-grain: none;
   --forest-panels: url('../assets/forest-panels.svg');
+}
+:root[data-offline-preview="true"] .studio-workspace {
+  --forest-grain: url('../assets/forest-grain.png');
 }
 
 .app-shell.brand-workspace.studio-workspace .sidebar {
