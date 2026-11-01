@@ -11,6 +11,7 @@ try{
   page.on('dialog',dialog=>dialog.accept());
   await page.goto(base+'#welcome');
   await page.getByRole('heading',{name:'את הצעד הראשון כבר עשיתם.',exact:true}).waitFor();
+  await page.locator('.hero-gaze[data-rig-status="ready"]').waitFor();
   for(const image of await page.locator('.welcome-page img').all())await image.evaluate(img=>{img.loading='eager';return img.decode();});
   assert.equal(await page.locator('.welcome-page .landing-brand-image').count(),2);
   assert.equal(await page.locator('.welcome-page .integrated-art').count(),3);
