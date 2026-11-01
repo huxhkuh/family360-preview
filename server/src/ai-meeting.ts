@@ -1,8 +1,8 @@
 import {admin, familyAccess, type Actor} from './auth';
 import {Database, requireThat} from './db';
 
-// This is an unwired, opt-in preparation building block. No provider, API route,
-// credentials, or permission to send real case data is configured here.
+// Legacy presence-only building block retained for compatibility. The connected
+// document/brief workflow and its scoped provider live in ai-workflow.ts.
 type Fact = {source: string; label: string; value: string};
 export type MeetingDraftInput = {facts: Fact[]};
 export type MeetingDraftProvider = (input: MeetingDraftInput) => Promise<unknown>;

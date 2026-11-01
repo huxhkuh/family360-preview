@@ -33,7 +33,8 @@ export async function upload(c:Context,env:Env,request:Request,documentId:string
  const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).map(b=>b.toString(16).padStart(2,'0')).join('');const key=doc.family_id+'/'+doc.id+'/'+uuid();
  // Never overwrite an existing object. Failed DB commits leave an unreferenced private version.
  await env.DOCUMENTS.put(key,bytes,{httpMetadata:{contentType:mime,cacheControl:'private, no-store'}});
- c.insert('document_versions',{id:uuid(),document_id:doc.id,object_key:key,file_name:fileName,mime_type:mime,size:bytes.length,sha256:hash,uploaded_by:c.actor.profile.id,created_at:now()});
+ const versionId=uuid();c.insert('document_versions',{id:versionId,document_id:doc.id,object_key:key,file_name:fileName,mime_type:mime,size:bytes.length,sha256:hash,uploaded_by:c.actor.profile.id,created_at:now()});
+ if(env.AI_ENABLED==='true'&&env.OPENAI_API_KEY&&env.AI_JOBS){const at=now(),limit=Math.min(1000,Math.max(1,Number(env.AI_DAILY_JOB_LIMIT)||50));c.statements.push(c.db.statement("INSERT INTO ai_jobs(id,kind,family_id,document_id,document_version_id,requested_by,requested_role,fingerprint,input,status,created_at,updated_at) SELECT ?,'document',?,?,?,?,?,?,?,'queued',?,? WHERE (SELECT COUNT(*) FROM ai_jobs WHERE created_at>=?)<?",[uuid(),doc.family_id,doc.id,versionId,c.actor.profile.id,c.actor.profile.role,versionId,JSON.stringify({object_key:key,sha256:hash,mime}),at,at,new Date(Date.now()-86400000).toISOString(),limit]));}
  // Shares authorize the reviewed file; replacement requires a fresh review and grant.
  c.statements.push(c.db.statement('UPDATE task_documents SET revoked_at=? WHERE document_id=? AND revoked_at IS NULL',[now(),doc.id]));
  c.patch('documents',doc,{storage_path:key,file_name:fileName,file_size:bytes.length,mime_type:mime,status:'pending',uploaded_at:now(),reject_reason:null,approved_at:null});

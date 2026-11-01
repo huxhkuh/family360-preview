@@ -1,6 +1,6 @@
 import {createClient} from '@supabase/supabase-js';
 import {Database,ApiError,requireThat,uuid,type Row} from './db';
-export interface Env{DB:D1Database;DOCUMENTS:R2Bucket;SUPABASE_URL:string;SUPABASE_PUBLISHABLE_KEY:string;ALLOWED_ORIGINS:string;ENVIRONMENT:string;AUTH_ENABLED:string}
+export interface Env{OPENAI_API_KEY?:string;AI_MODEL?:string;AI_ENABLED?:string;AI_DAILY_JOB_LIMIT?:string;AI_JOBS?:Queue<{job_id:string}>;DB:D1Database;DOCUMENTS:R2Bucket;SUPABASE_URL:string;SUPABASE_PUBLISHABLE_KEY:string;ALLOWED_ORIGINS:string;ENVIRONMENT:string;AUTH_ENABLED:string}
 export interface Actor{profile:Row;permissions:string[];representative?:Row;professional?:Row;partner?:Row;aal:string;authId:string;email:string;issuedAt:number}
 export async function authenticate(request:Request,env:Env,db:Database):Promise<Actor>{
  requireThat(env.AUTH_ENABLED==='true','SERVICE_NOT_CONFIGURED',503);

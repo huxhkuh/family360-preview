@@ -45,11 +45,14 @@
     "test:focused-home": "node scripts/check-focused-home.mjs",
     "test:task-surfaces": "node scripts/check-task-surfaces.mjs",
     "test:role-handoffs": "node scripts/check-role-handoffs.mjs",
-    "test:questionnaire-review": "node scripts/check-questionnaire-review.mjs"
+    "test:questionnaire-review": "node scripts/check-questionnaire-review.mjs",
+    "test:ai": "vitest run server/tests/ai-documents.test.ts --exclude=artifacts/**",
+    "test:ai:live": "node --use-system-ca scripts/check-ai-live.mjs"
   },
   "dependencies": {
     "@fontsource-variable/assistant": "5.3.0",
     "@supabase/supabase-js": "2.115.0",
+    "pdfjs-dist": "6.5.438",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "zod": "4.6.7"

@@ -5,13 +5,52 @@
   "compatibility_date": "2026-10-26",
   "workers_dev": true,
   "preview_urls": false,
-  "observability": { "enabled": false },
+  "observability": {
+    "enabled": false
+  },
   "vars": {
     "ENVIRONMENT": "staging",
     "SUPABASE_URL": "https://vrswvpvygmjhcarzvuqf.supabase.co",
     "ALLOWED_ORIGINS": "http://127.0.0.1:5174",
-    "AUTH_ENABLED": "false"
+    "AUTH_ENABLED": "false",
+    "AI_ENABLED": "false",
+    "AI_MODEL": "gpt-6.1-sol",
+    "AI_DAILY_JOB_LIMIT": "50"
   },
-  "d1_databases": [{"binding":"DB","database_name":"mesudarim360-staging","database_id":"e1c4565a-c666-4859-84dd-39d30061cc26","migrations_dir":"migrations"}],
-  "r2_buckets": [{"binding":"DOCUMENTS","bucket_name":"mesudarim360-documents-staging"}]
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "mesudarim360-staging",
+      "database_id": "e1c4565a-c666-4859-84dd-39d30061cc26",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "DOCUMENTS",
+      "bucket_name": "mesudarim360-documents-staging"
+    }
+  ],
+  "queues": {
+    "producers": [
+      {
+        "binding": "AI_JOBS",
+        "queue": "mesudarim360-ai-staging"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "mesudarim360-ai-staging",
+        "max_batch_size": 1,
+        "max_batch_timeout": 1,
+        "max_retries": 3,
+        "max_concurrency": 2
+      }
+    ]
+  },
+  "triggers": {
+    "crons": [
+      "* * * * *"
+    ]
+  }
 }
