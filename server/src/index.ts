@@ -1,3 +1,4 @@
+import {conversationSummaries,summaryOperations} from './conversation-summaries';
 import {aiOperations,aiOperation,enqueueDocument,processAiJob,flushAiJobs,aiConfigured} from './ai-workflow';
 import {professionalRequests,requestOperations} from './professional-requests';
 import {Database,ApiError,requireThat,type Row} from './db';
@@ -16,14 +17,14 @@ import {invitations,invitationOperations} from './invitations';
 import {telephoneStaff,telephoneStaffOperations} from './telephone-staff';
 import {listenVoiceMessage} from './telephone-messages';
 const routes=new Map<string,(c:Context,name:string,args:Row)=>Promise<unknown>>();
-for(const [names,handler]of [[guidedOperations,guidedConversation],[requestOperations,professionalRequests],[familyOperations,families],[taskOperations,tasks],[meetingOperations,meetings],[reportOperations,reports],[adminOperations,administrative],[offerOperations,offers],[documentOperations,documents],[invitationOperations,invitations]] as const)for(const name of names)routes.set(name,handler);
+for(const [names,handler]of [[summaryOperations,conversationSummaries],[guidedOperations,guidedConversation],[requestOperations,professionalRequests],[familyOperations,families],[taskOperations,tasks],[meetingOperations,meetings],[reportOperations,reports],[adminOperations,administrative],[offerOperations,offers],[documentOperations,documents],[invitationOperations,invitations]] as const)for(const name of names)routes.set(name,handler);
 export const supportedOperations=[...aiOperations,'rpc_workspace','rpc_family_workspace',...routes.keys(),...telephoneStaffOperations];
 export async function dispatch(db:Database,actor:Actor,version:number,name:string,args:Row){
  if(telephoneStaffOperations.includes(name))return telephoneStaff(db,actor,version,name,args);
  if(name==='rpc_workspace'||name==='rpc_family_workspace')return workspace(db,actor,name==='rpc_family_workspace'?args.p_family_id:undefined);
  const handler=routes.get(name);requireThat(handler,'UNKNOWN_OPERATION',404);const c=new Context(db,actor,version);const result=await handler(c,name,args);const target=[args.p_document_id,args.p_task_id,args.p_meeting_id,args.p_family_id,args.p_id].find(v=>typeof v==='string'&&v.length<=150)||null;if(c.statements.length)await db.commit(version,actor.profile,name,'operation',target,c.statements);return actor.profile.role==='client'&&['rpc_save_family','rpc_complete_onboarding','rpc_open_client_case'].includes(name)&&result?clientFamily(result as Row):result??null;
 }
-const publicErrors=new Set(['AI_RETRY_LIMIT','AI_NOT_CONFIGURED','AI_NO_FILE','AI_OUTPUT_INVALID','AI_UNAVAILABLE','AI_RATE_LIMITED','AI_BUDGET_LIMIT','AI_STALE','AI_NO_DATA','NO_ACTIVE_REPRESENTATIVE','CALL_REQUIRED','SUPPORT_CLOSED','VALIDATION','CONFLICT','INVALID_STATE','PERMISSION_DENIED','MFA_REQUIRED','UNAUTHENTICATED','SERVICE_NOT_CONFIGURED','NOT_FOUND','FILE_SIZE','FILE_TYPE','UNKNOWN_OPERATION','QUESTIONNAIRE_INCOMPLETE','UNDECIDED_ITEMS','INELIGIBLE_PROFESSIONAL','INVITE_INVALID','INVITE_LIMIT','INVITE_ACCOUNT_CONFLICT','INSUFFICIENT_BALANCE','REPORT_INCOMPLETE','REPORT_TREATMENT_OPEN','REPORT_QUESTIONNAIRE_CHANGED','DUPLICATE_FACT','RATE_LIMITED']);
+const publicErrors=new Set(['SUMMARY_SOURCE_CHANGED','SUMMARY_REVIEW_REQUIRED','SUMMARY_INCOMPLETE','SUMMARY_MEETING_OPEN','AI_RETRY_LIMIT','AI_NOT_CONFIGURED','AI_NO_FILE','AI_OUTPUT_INVALID','AI_UNAVAILABLE','AI_RATE_LIMITED','AI_BUDGET_LIMIT','AI_STALE','AI_NO_DATA','NO_ACTIVE_REPRESENTATIVE','CALL_REQUIRED','SUPPORT_CLOSED','VALIDATION','CONFLICT','INVALID_STATE','PERMISSION_DENIED','MFA_REQUIRED','UNAUTHENTICATED','SERVICE_NOT_CONFIGURED','NOT_FOUND','FILE_SIZE','FILE_TYPE','UNKNOWN_OPERATION','QUESTIONNAIRE_INCOMPLETE','UNDECIDED_ITEMS','INELIGIBLE_PROFESSIONAL','INVITE_INVALID','INVITE_LIMIT','INVITE_ACCOUNT_CONFLICT','INSUFFICIENT_BALANCE','REPORT_INCOMPLETE','REPORT_TREATMENT_OPEN','REPORT_QUESTIONNAIRE_CHANGED','DUPLICATE_FACT','RATE_LIMITED']);
 export default {
  async fetch(request:Request,env:Env,execution?:ExecutionContext):Promise<Response>{
   const origin=request.headers.get('Origin');const allowed=(env.ALLOWED_ORIGINS||'').split(',').map(s=>s.trim()).filter(Boolean);const headers=new Headers({'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Vary':'Origin'});

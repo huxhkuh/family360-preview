@@ -6,7 +6,7 @@ import {briefInput} from '../../src/ai/brief-context';
 import {extractionSchema,fieldLabels,type AiSource,type AiJob,type BriefInput} from '../../src/ai/contracts';
 import {readDocument,createBrief,assistTopic} from './ai-provider';
 import {topicInput} from '../../src/ai/topic-context';
-import {topicActionSchema,type TopicAction} from '../../src/ai/topic-contracts';
+import {topicActionSchema,topicStatusAllowed,type TopicAction} from '../../src/ai/topic-contracts';
 
 export const aiOperations=['rpc_ai_document','rpc_ai_read_document','rpc_ai_review_field','rpc_ai_brief','rpc_ai_prepare_brief','rpc_ai_assist_topic','rpc_ai_topic_assistance'];
 const parse=<T>(s:z.ZodType<T>,v:unknown)=>{const r=s.safeParse(v);if(!r.success)throw new ApiError('VALIDATION',400);return r.data;};
@@ -35,25 +35,26 @@ export async function verifiedDocumentFacts(db:Database,familyId:string):Promise
  return rows.flatMap(row=>{const result=extractionSchema.parse(JSON.parse(row.result));const f=result.fields[Number(row.field_id.replace('field-',''))-1];return f?[{id:`d:${row.document_version_id}:${row.field_id}`,label:`${fieldLabels[f.key]}${f.owner?' · '+f.owner:''}${f.period?' · '+f.period:''}`,value:row.value+(f.unit==='ILS'?' ₪':f.unit==='percent'?'%':''),kind:'document' as const,document_id:row.document_id,page:f.page,quote:f.quote}]:[];});
 }
 async function preparation(db:Database,actor:Actor,familyId:unknown){const family=await staffAccess(db,actor,familyId);const w=await workspace(db,actor,family.id);const input=briefInput(w,family.id,await verifiedDocumentFacts(db,family.id));return {family,input,fp:await fingerprint({family:family.id,prompt:'brief-v1',input})};}
-async function topicPreparation(db:Database,actor:Actor,meetingId:string,topicKey:string,action:TopicAction,notes:string){
+async function topicPreparation(db:Database,actor:Actor,meetingId:string,topicKey:string,action:TopicAction,notes:string,clientWording=false){
  const meeting=await db.required('meetings',meetingId),family=await staffAccess(db,actor,meeting.family_id),w=await workspace(db,actor,family.id);
  let input;try{input=topicInput(w as any,meetingId,topicKey,action,notes,await verifiedDocumentFacts(db,family.id));}catch{throw new ApiError('VALIDATION',400);}
+ if(clientWording)input.clientWording=true;
  return {family,meeting,input,fp:await fingerprint({family:family.id,requestedBy:actor.profile.id,prompt:'topic-assistance-v1',input})};
 }
 export async function aiOperation(db:Database,actor:Actor,env:Env,name:string,args:Row){
  const recordVersion=await db.version();const staff=['admin','representative'].includes(actor.profile.role),configured=aiConfigured(env);
  if(name==='rpc_ai_assist_topic'||name==='rpc_ai_topic_assistance'){
-  requireThat(staff&&actor.profile.active);const a=parse(z.object({p_meeting_id:id,p_topic_key:z.string().min(1).max(180),p_action:topicActionSchema,p_notes:z.string().max(5000),p_job_id:id.optional()}),args);
-  const {family,meeting,input,fp}=await topicPreparation(db,actor,a.p_meeting_id,a.p_topic_key,a.p_action,a.p_notes);
+  requireThat(staff&&actor.profile.active);const a=parse(z.object({p_meeting_id:id,p_topic_key:z.string().min(1).max(180),p_action:topicActionSchema,p_notes:z.string().max(5000),p_job_id:id.optional(),p_client_wording:z.boolean().optional()}),args);
+  const {family,meeting,input,fp}=await topicPreparation(db,actor,a.p_meeting_id,a.p_topic_key,a.p_action,a.p_notes,a.p_client_wording===true);
   let job:Row|null=null;
   if(a.p_job_id){job=await jobById(db,a.p_job_id);requireThat(job&&job.input.scope==='topic_assistance'&&job.family_id===family.id&&job.requested_by===actor.profile.id&&job.input.meetingId===meeting.id&&job.input.topicKey===a.p_topic_key&&job.input.action===a.p_action);}
   else {const row=await db.statement("SELECT * FROM ai_jobs WHERE kind='brief' AND family_id=? AND fingerprint=?",[family.id,fp]).first<Row>();job=row?decode(row):null;}
   if(name==='rpc_ai_assist_topic'){
-   requireThat(configured,'AI_NOT_CONFIGURED',503);requireThat(meeting.status==='in_progress','INVALID_STATE',409);requireThat(a.p_action!=='summarize'||a.p_notes.trim().length>0,'VALIDATION',400);
+   requireThat(configured,'AI_NOT_CONFIGURED',503);requireThat(topicStatusAllowed(meeting.status,a.p_action,a.p_client_wording),'INVALID_STATE',409);requireThat(a.p_action!=='summarize'||a.p_notes.trim().length>0,'VALIDATION',400);
    if(!job||job.fingerprint!==fp){await budget(db,env);job=await insertJob(db,actor,'brief',family.id,fp,input,env);}
    else if(['failed','stale'].includes(job.status)){requireThat(job.attempts<3,'AI_RETRY_LIMIT',429);await db.statement("UPDATE ai_jobs SET status='queued',error_code=NULL,next_attempt_at=NULL WHERE id=? AND status IN ('failed','stale')",[job.id]).run();job=await jobById(db,job.id);}
   }
-  if(job&&(job.fingerprint!==fp||meeting.status!=='in_progress'))job={...job,status:'stale'};
+  if(job&&(job.fingerprint!==fp||!topicStatusAllowed(meeting.status,a.p_action,a.p_client_wording)))job={...job,status:'stale'};
   return {configured,job:await publicJob(db,job,true)};
  }
  if(name==='rpc_ai_document'||name==='rpc_ai_read_document'){
@@ -103,9 +104,9 @@ export async function processAiJob(env:Env,jobId:string,fetcher:typeof fetch=fet
    generated=await readDocument(env,{bytes,mime:version.mime_type},fetcher);
    const current=await db.required('documents',job.document_id);requireThat(current.storage_path===version.object_key,'AI_STALE',409);
   }else if(job.input.scope==='topic_assistance'){
-   const {meetingId,topicKey,action,notes}=job.input;
-   const current=await topicPreparation(db,actor,meetingId,topicKey,action,notes);requireThat(current.meeting.status==='in_progress'&&current.fp===job.fingerprint,'AI_STALE',409);
-   generated=await assistTopic(env,current.input,fetcher);const latest=await topicPreparation(db,actor,meetingId,topicKey,action,notes);requireThat(latest.meeting.status==='in_progress'&&latest.fp===job.fingerprint,'AI_STALE',409);
+   const {meetingId,topicKey,action,notes,clientWording}=job.input;
+   const current=await topicPreparation(db,actor,meetingId,topicKey,action,notes,clientWording);requireThat(topicStatusAllowed(current.meeting.status,action,clientWording)&&current.fp===job.fingerprint,'AI_STALE',409);
+   generated=await assistTopic(env,current.input,fetcher);const latest=await topicPreparation(db,actor,meetingId,topicKey,action,notes,clientWording);requireThat(topicStatusAllowed(latest.meeting.status,action,clientWording)&&latest.fp===job.fingerprint,'AI_STALE',409);
   }else {const current=await preparation(db,actor,job.family_id);requireThat(current.fp===job.fingerprint,'AI_STALE',409);generated=await createBrief(env,current.input,fetcher);const latest=await preparation(db,actor,job.family_id);requireThat(latest.fp===job.fingerprint,'AI_STALE',409);}
   await db.statement("UPDATE ai_jobs SET status=?,result=?,token_usage=?,error_code=NULL,lease_token=NULL,lease_until=NULL,revision=revision+1,updated_at=? WHERE id=? AND lease_token=?",[job.kind==='document'?'review':'ready',JSON.stringify(generated.result),generated.tokens,now(),job.id,lease]).run();
  }catch(e){const known=['AI_STALE','AI_NO_FILE','AI_OUTPUT_INVALID','AI_UNAVAILABLE','AI_RATE_LIMITED','PERMISSION_DENIED'];const code=e instanceof Error&&known.includes(e.message)?e.message:'AI_UNAVAILABLE';const transient=['AI_UNAVAILABLE','AI_RATE_LIMITED'].includes(code)&&job.attempts<3;await db.statement('UPDATE ai_jobs SET status=?,error_code=?,next_attempt_at=?,lease_token=NULL,lease_until=NULL,updated_at=? WHERE id=? AND lease_token=?',[code==='AI_STALE'?'stale':transient?'queued':'failed',code,transient?new Date(Date.now()+60000).toISOString():null,now(),job.id,lease]).run();}

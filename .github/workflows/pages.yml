@@ -69,6 +69,7 @@ jobs:
           npm run test:new-client-optional
           node scripts/check-homepage.mjs
           npm run test:growth
+          npm run test:conversation-summary
           npm run test:final-report
           npm run test:representative
           npm run test:completed-example

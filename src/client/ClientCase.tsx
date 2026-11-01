@@ -1,3 +1,4 @@
+import {FamilyConversationSummaries} from '../reports/ConversationSummaryPanel';
 import type {Document,Family,Workspace} from '../lib/model';
 import type {Destination} from '../lib/workflow';
 import type {RouteState} from '../lib/navigation';
@@ -16,7 +17,7 @@ export function ClientCaseHeader({family,w,tab,change,open,back}:{family:Family;
 
 export function ClientReports({w,familyId,open}:{w:Workspace;familyId:string;open:(r:RouteState)=>void}){
  const reports=w.finalReports.filter(r=>r.family_id===familyId&&r.status==='approved'&&r.snapshot);
- return <section className="client-reports"><p className="eyebrow">התיק המשפחתי</p><h2>הדוחות שלנו</h2>{reports.length?reports.map(r=><article key={r.id}><Icon name="report"/><div><h3>דוח סיכום הטיפול</h3><p>{r.snapshot?.approved_at?new Date(r.snapshot.approved_at).toLocaleDateString('he-IL'):'אושר על ידי הנציג'}</p></div><button onClick={()=>open({page:'meetings',id:r.meeting_id,stage:'summary'})}>פתיחת הדוח</button></article>):<p>דוח שאושר על ידי הנציג יופיע כאן.</p>}</section>;
+ return <section className="client-reports"><p className="eyebrow">התיק המשפחתי</p><h2>הדוחות שלנו</h2><FamilyConversationSummaries familyId={familyId}/>{reports.length?reports.map(r=><article key={r.id}><Icon name="report"/><div><h3>דוח סיכום הטיפול</h3><p>{r.snapshot?.approved_at?new Date(r.snapshot.approved_at).toLocaleDateString('he-IL'):'אושר על ידי הנציג'}</p></div><button onClick={()=>open({page:'meetings',id:r.meeting_id,stage:'summary'})}>פתיחת הדוח</button></article>):<p>דוח סיום הטיפול יופיע כאן לאחר אישורו.</p>}</section>;
 }
 
 export function ClientFolderTabs({tab,change}:{tab:Destination;change:(tab:Destination)=>void}){

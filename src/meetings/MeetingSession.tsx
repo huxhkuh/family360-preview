@@ -1,3 +1,4 @@
+import {ConversationSummaryPanel} from '../reports/ConversationSummaryPanel';
 import {GuidedConversation} from './GuidedConversation';
 import {TaskSupport} from '../workspace/TaskSurface';
 import {readRoute} from '../lib/navigation';
@@ -141,7 +142,7 @@ function LegacyMeetingSession({meeting:m,w,edit,refresh,onDirtyChange,leave,back
    <section className="card"><FollowUps openFamily={openFamily} w={w} refresh={refresh} meetingId={m.id} onDirtyChange={setDirty} leave={leave}/>{edit&&w.followUpsEnabled&&<details className="summary-preview"><summary>תצוגת משימות ההמשך של הלקוח</summary><FollowUps openFamily={openFamily} w={w} refresh={refresh} meetingId={m.id} onDirtyChange={setDirty} leave={leave} preview/></details>}</section>
    {edit&&m.status==='in_progress'&&<section className="card meeting-finish"><h2>בדיקה לפני סיום השיחה</h2>{progress.missing.length>0?<><p>נותרו {progress.missing.length} נושאים גלויים ללא החלטה. חזרו אליהם לפני הסיום:</p>{progress.missing.map(i=><button className="ghost" key={i.id} onClick={()=>move(()=>onView({topic:i.id,stage:'discussion'}))}>{i.title}</button>)}</>:<p>כל הנושאים הגלויים כוללים החלטה שמורה. נושאים שאושרו ימתינו לשיוך לביצוע; נושאים למחשבה יישארו למעקב הנציג.</p>}<p className="muted">סיום השיחה מעדכן את מצב התחומים בתיק. הוא אינו שולח מייל ואינו משייך בעל מקצוע אוטומטית.</p><AsyncButton className="primary" disabled={progress.missing.length>0||dirty||pendingDecisions.length>0||!items.length} action={async()=>{await rpc('rpc_finish_meeting',{p_meeting_id:m.id,p_force:false});await refresh();}}>סיום הפגישה ושמירת הסיכום</AsyncButton></section>}
    {edit&&m.status==='completed'&&<section className="card"><h2>המשך הטיפול באחריות הנציג</h2><button className="primary" onClick={()=>openFamily(m.family_id,'services')}>לשיוך בתחומי הטיפול</button><p>בדקו בתיק המשפחה אילו תחומים ממתינים לשיוך לביצוע ואילו נושאים ממתינים להחלטת המשפחה.</p><p className="muted">התיעוד הפנימי שנשמר נגיש כאן לצוות המורשה.</p>{items.filter(i=>i.decision_note||i.execution_instructions).map(i=><details key={i.id}><summary>{i.title} — תיעוד פנימי</summary><p>{i.decision_note}</p><p>{i.execution_instructions}</p></details>)}</section>}
-   <FinalReportPanel w={w} meeting={m} refresh={refresh}/>
+   <ConversationSummaryPanel key={m.id} w={w} meeting={m}/><FinalReportPanel w={w} meeting={m} refresh={refresh}/>
   </>}
  {taskMode&&familyContext}{taskMode&&meetingTools}{taskMode&&meetingContext}</div>;
 }

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import {demoSummary,resetDemoSummaries,summaryRpcNames} from '../reports/summary-demo';
 import {demoAi,resetDemoAi,demoDocumentSource} from '../ai/demo';
 import {representativeCallConfirmed,supportClosed} from './case-policy';
 import {catalogDocumentTypes} from '../families/document-catalog';
@@ -29,7 +30,7 @@ let role:Role='representative';
 const now=()=>new Date().toISOString();
 const id=()=>crypto.randomUUID();
 export function resetDemo(){
- resetDemoAi();
+ resetDemoAi();resetDemoSummaries();
  growth=createGrowthStore();
  state=structuredClone(initial);
  state.finalReports=[];state.finalReportHistory=[];state.documentTypes=catalogDocumentTypes();
@@ -129,6 +130,7 @@ const find=(key:string,value:string)=>{const row=state[key].find(x=>x.id===value
 function update(key:string,identifier:string,patch:any,expected?:number){const old=state[key].find(x=>x.id===identifier);if(old&&expected!=null&&old.revision!==expected)throw Error('CONFLICT');const row={...old,...patch,id:identifier,revision:(old?.revision||0)+1,updated_at:now()};if(old)Object.assign(old,row);else state[key].push(row);return row;}
 function assign(serviceId:string,kind:string,professionalId:string){const fs=find('familyServices',serviceId);if(!state.timeline.some(t=>t.family_id===fs.family_id&&t.title===representativeCallConfirmed))throw Error('CALL_REQUIRED');const task={id:id(),family_id:fs.family_id,family_service_id:fs.id,service_id:fs.service_id,professional_id:professionalId,task_number:'DEMO-'+(state.analysisTasks.length+state.executionTasks.length+1),status:kind==='analysis'?'assigned':'sent_execution',due_at:new Date(Date.now()+86400000*3).toISOString()};state[kind==='analysis'?'analysisTasks':'executionTasks'].push(task);fs[kind+'_task_id']=task.id;fs.status=kind==='analysis'?'in_analysis':'sent_execution';return task.id;}
 export async function rpc<T=unknown>(name:string,a:Record<string,any>={}):Promise<T>{
+ if(summaryRpcNames.includes(name))return structuredClone(demoSummary(name,a,workspace())) as T;
  if(name.startsWith('rpc_ai_'))return structuredClone(demoAi(name,a,workspace())) as T;
  if(name==='rpc_confirm_representative_call'){if(!['admin','representative'].includes(role))throw Error('PERMISSION_DENIED');if(a.p_confirmed!==true)throw Error('VALIDATION');find('families',a.p_family_id);if(!state.timeline.some(t=>t.family_id===a.p_family_id&&t.title===representativeCallConfirmed))state.timeline.push({id:id(),family_id:a.p_family_id,title:representativeCallConfirmed,created_at:now()});return null as T;}
  if(['rpc_send_to_analysis','rpc_assign_analysis','rpc_send_to_execution','rpc_assign_execution'].includes(name)){const fs=find('familyServices',a.p_family_service_id);if(!state.timeline.some(t=>t.family_id===fs.family_id&&t.title===representativeCallConfirmed))throw Error('CALL_REQUIRED');}
