@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1100" preserveAspectRatio="xMidYMin slice">
+  <defs>
+    <radialGradient id="light" cx=".27" cy=".15" r=".85">
+      <stop stop-color="#255747"/><stop offset=".48" stop-color="#103e31"/><stop offset="1" stop-color="#062b23"/>
+    </radialGradient>
+    <linearGradient id="turn" x1="0" y1="0" x2="1" y2=".9">
+      <stop stop-color="#193f33"/><stop offset=".48" stop-color="#082b22"/><stop offset="1" stop-color="#031e18"/>
+    </linearGradient>
+    <linearGradient id="fold" x1="0" y1="0" x2=".9" y2="1">
+      <stop stop-color="#1e4d3d"/><stop offset=".6" stop-color="#0b3127"/><stop offset="1" stop-color="#06271f"/>
+    </linearGradient>
+    <linearGradient id="shade" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#021c16" stop-opacity=".8"/><stop offset="1" stop-color="#021c16" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset=".62" stop-color="#062b23" stop-opacity="0"/><stop offset="1" stop-color="#062b23"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#light)" d="M0 0h1600v1100H0z"/>
+  <!-- Broad quarter turns echo the four rounded pieces of the mark. -->
+  <path fill="url(#turn)" d="M0 40h40c224 0 405 181 405 405v35H0z"/>
+  <path fill="url(#fold)" d="M-150 1100V680c0-304 246-550 550-550h260v280H400c-149 0-270 121-270 270v420z"/>
+  <path fill="url(#turn)" d="M930 0h670v540H930z"/>
+  <path fill="url(#shade)" d="M930 0l670 540H930z"/>
+  <path fill="url(#turn)" d="M400 410h530v530H400z"/>
+  <path fill="url(#fold)" d="M790 1100v-80c0-282 228-510 510-510h300v590z"/>
+  <path fill="#041f19" fill-opacity=".55" d="M1300 510h300v590h-300z"/>
+  <path fill="url(#fade)" d="M0 0h1600v1100H0z"/>
+</svg>

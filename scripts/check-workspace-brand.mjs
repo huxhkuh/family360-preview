@@ -10,7 +10,7 @@ try{
   await page.goto(base+'#workspace');await page.locator('.demo-roles>button').nth(index).click();
   const workspace=page.locator('.brand-workspace');await expect(workspace).toHaveAttribute('data-role',role);
   await expect(workspace.getByRole('navigation',{name:'ניווט ראשי'})).toBeVisible();
-  expect(await workspace.locator('.sidebar').evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(8, 46, 40)');
+  expect(await workspace.locator('.sidebar').evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(4, 31, 25)');
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
   await expect.poll(()=>page.evaluate(()=>window.scrollY)).toBe(0);
   await page.screenshot({path:`${out}/${role}-${width}.png`,fullPage:true});

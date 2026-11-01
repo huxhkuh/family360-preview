@@ -23,3 +23,5 @@ createRoot(document.getElementById('root')!).render(<React.StrictMode><Live/></R
 import './branding/editorial-workspaces.css';
 
 import './branding/studio-workspaces.css';
+import './branding/guided-studio-finish.css';
+import './branding/forest-material.css';

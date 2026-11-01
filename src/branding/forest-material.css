@@ -1,0 +1,42 @@
+/* Quiet, static material: large logo-derived forms and fine paper grain.
+   Backgrounds only; no overlay sits above text or intercepts interaction. */
+.studio-workspace {
+  --forest-grain: url('../assets/forest-grain.png');
+  --forest-panels: url('../assets/forest-panels.svg');
+}
+
+.app-shell.brand-workspace.studio-workspace .sidebar {
+  background-color: #041f19;
+  background-image: linear-gradient(110deg,#02191280,#05261e33),var(--forest-grain),radial-gradient(ellipse at 20% 0,#23554066,transparent 65%);
+  background-size: auto,180px 180px,auto;
+}
+.studio-workspace .topbar {
+  background-color: #092d23;
+  background-image: linear-gradient(#04251b77,#04251b77),var(--forest-grain);
+  background-size: auto,180px 180px;
+}
+.app-shell.studio-workspace .main {
+  background-color: #f7f5ee;
+  background-image: var(--forest-grain),var(--forest-panels),linear-gradient(#062b23 600px,#f7f5ee 600px);
+  background-size: 256px 256px,100% 600px,auto;
+  background-position: left top,center top,center top;
+  background-repeat: repeat,no-repeat,no-repeat;
+  background-attachment: scroll;
+}
+.app-shell.studio-workspace:has(.representative-landing,.guided-conversation,.management-studio,.pro-studio,.professional-desk) .main {
+  background-color: #062b23;
+  background-image: var(--forest-grain),var(--forest-panels);
+  background-size: 256px 256px,100% 1100px;
+  background-position: left top,center top;
+  background-repeat: repeat,no-repeat;
+  background-attachment: scroll;
+}
+.studio-workspace :is(.management-people,.pro-desk-signature) {
+  background-color: #0c3026;
+  background-image: var(--forest-grain),radial-gradient(ellipse at 0 0,#315f4566,transparent 70%);
+  background-size: 180px 180px,auto;
+}
+@media (max-width:650px) {
+  .app-shell.studio-workspace .main {background-size:192px 192px,auto 600px,auto;background-position:left top,36% top,center top}
+  .app-shell.studio-workspace:has(.representative-landing,.guided-conversation,.management-studio,.pro-studio,.professional-desk) .main {background-size:192px 192px,auto 1100px;background-position:left top,32% top}
+}
