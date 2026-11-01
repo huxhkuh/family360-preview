@@ -35,7 +35,7 @@ try{for(const width of [1440,390,320]){
  await chapter('בנקים ואשראי');await field('bank_count').fill('2');await field('credit_frame').selectOption('yes');await field('overdraft').selectOption('yes');await field('credit_used').fill('2000');await field('overdraft_amount').fill('2500');await save();
  await chapter('משכנתא');await expect(field('mort_date')).toHaveValue('2018');await expect(field('mortgages.0.mort_date')).toHaveValue('2020-06');
  await page.getByRole('button',{name:'שליחת השאלון לבדיקה',exact:true}).click();await expect(page.locator('[role=alert]')).toHaveCount(0);await expect(page.locator('.questionnaire-paper')).toHaveCount(0);
- await expect(page.locator('.client-completion')).toHaveCount(0);await expect(page.locator('article.document')).toHaveCount(5);await attachRequiredSamples(page);await expect(page.locator('.client-completion')).toBeVisible();await expect(page.locator('article.document').filter({hasText:'קוראים וחותמים על ההרשאה'})).toHaveCount(1);
+ await expect(page.locator('.client-completion')).toHaveCount(0);await expect(page.locator('article.document')).toHaveCount(5);await attachRequiredSamples(page);await expect(page.locator('.client-completion')).toBeVisible();await expect(page.locator('article.document[data-document-type=signature]')).toHaveCount(1);
  const prep=page.locator('.document-preparation-more');await prep.locator(':scope > summary').click();
  for(const key of ['bank_identity','municipal_bill','electricity_bill','payslips_w','rental_contract'])await expect(prep.locator(`[data-preparation-key=${key}]`)).toBeVisible();
  await expect(prep.locator('[data-preparation-key=bank_statements]')).toHaveCount(0);

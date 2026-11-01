@@ -30,6 +30,7 @@ try{for(const width of [1440,390,320]){
  await expect(field('savings')).toBeVisible();
  const authorization=page.locator('[data-preparation-key="clearinghouse_auth_h"]').first();await authorization.getByRole('button',{name:'הוספת הרשאה להשלמה עם הנציג',exact:true}).click();
  await page.goto(base+'#/families/f1/documents');
+ await page.locator('article.client-document-row[data-document-type=signature]').getByRole('button').click();
  const consent=page.getByRole('region',{name:'חתימה על הרשאה למסלקה',exact:true});await expect(consent).toBeVisible();await expect(consent).toContainText('סוכן פנסיוני לדוגמה');
  await consent.getByLabel('חתימה — הקלדת שם מלא',{exact:true}).fill('ישראל לדוגמה');await consent.getByRole('checkbox').check();await consent.getByRole('button',{name:'חתימה ושמירת ההרשאה בדמו',exact:true}).click();
  const signed=page.getByRole('region',{name:'אישור הרשאה שנחתם',exact:true});await expect(signed).toContainText('ישראל לדוגמה');await expect(signed).toContainText('ההרשאה נחתמה בדמו');await page.screenshot({path:`${out}/${width}-consent.png`});

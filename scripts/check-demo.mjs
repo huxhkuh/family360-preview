@@ -15,7 +15,7 @@ for(const [device,width,height] of [['desktop',1440,1000],['mobile',390,844]]){
  await page.screenshot({path:`test-results/${device}-welcome.png`,fullPage:true});
  for(const [role,label] of [['representative','נציג'],['client','לקוח'],['professional','בעל מקצוע'],['admin','מנהל'],['marketer','משווק']]){
   await page.goto(base+'#workspace');await page.reload();await page.getByRole('button',{name:new RegExp('^0[1-5] '+label+' ')}).click();
-  if(role==='client')await openClientNavigation(page);
+  if(role==='client')await openClientNavigation(page,true);
   await page.getByRole('navigation',{name:'ניווט ראשי'}).waitFor();await page.getByRole('button',{name:'רענון נתונים',exact:true}).click();
   const nav=page.getByRole('navigation',{name:'ניווט ראשי'});const names=await nav.getByRole('button').allTextContents();
   for(const name of names){if(role==='client')await openClientNavigation(page);await nav.getByRole('button',{name,exact:true}).click();await page.waitForTimeout(350);assert.equal(await page.getByText('אירעה תקלה בתצוגה',{exact:true}).count(),0);assert.equal(await page.locator('[role=alert]').count(),0,`${role}/${name} alert: ${await page.locator('[role=alert]').allTextContents()}`);}

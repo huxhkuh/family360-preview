@@ -1,9 +1,9 @@
 // Open the focused mobile menu through its real, keyboard-accessible control.
-export async function openClientNavigation(page){
+export async function openClientNavigation(page,showAccount=false){
  const menu=page.getByRole('button',{name:'תפריט ותיק',exact:true});
  if(await menu.isVisible())await menu.click();
  const account=page.locator('.client-brandbar .client-account');
- if(await account.isVisible()&&!(await account.evaluate(el=>el.open)))await account.locator('summary').click();
+ if(await account.isVisible()&&(await account.evaluate(el=>el.open))!==showAccount)await account.locator('summary').click();
 }
 // Required synthetic identifiers for tests that exercise chapter navigation.
 export async function fillRequiredContactAnswers(page){

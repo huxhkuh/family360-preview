@@ -77,3 +77,8 @@
 
 .studio-workspace.client-shell .content:is([data-page=notifications],[data-page=followups],[data-page=meetings]){background:#fcfaf6;border:10px solid #eaeade;border-radius:23px;margin:35px auto;padding:32px;color:#193e30}.studio-workspace.client-shell .content:is([data-page=notifications],[data-page=followups],[data-page=meetings])>.page-title,.studio-workspace.client-shell .content:is([data-page=notifications],[data-page=followups],[data-page=meetings])>h1{color:#193e30}
 @media(max-width:650px){.studio-workspace.client-shell .content:is([data-page=notifications],[data-page=followups],[data-page=meetings]){padding:18px 10px;border-width:6px;margin-top:20px}}
+
+/* Demo tools stay above the client header, inside the viewport. */
+.demo-bar.client-demo-bar{z-index:40}
+.client-demo-bar .demo-advanced{position:static}
+.client-demo-bar .demo-advanced .demo-advanced-actions{inset-inline-start:12px;inset-inline-end:auto;max-width:calc(100% - 24px);flex-wrap:wrap}

@@ -102,7 +102,7 @@ try{for(const width of [1440,390,320]){
  await page.locator('.client-completion').scrollIntoViewIfNeeded();
  await page.screenshot({path:`${out}/${width}-submitted.png`,fullPage:false});
  await collection.locator('[data-preparation-key=bank_identity]').getByRole('button',{name:'צירוף דוגמה',exact:true}).click();
- await openClientNavigation(page);await expect(page.locator('.focus-case-context .badge')).toHaveText('השאלון נשלח');
+ await openClientNavigation(page);await expect(page.locator('.client-completion')).toContainText('השאלון נשלח');
  await expect(page.locator('.submission-notice')).toHaveCount(0);
  await expect(page.getByRole('status',{name:'סיום הפעולות הנדרשות כרגע'})).toContainText('כרגע אין פעולה נוספת שנדרשת מכם');
  await expect(collection.locator('.preparation-kind')).toHaveCount(6);

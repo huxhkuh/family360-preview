@@ -36,7 +36,7 @@ try{
   await page.waitForURL(/q=/);
   const route=new URL(page.url()).hash;
   const before=await nav.evaluate(el=>({color:getComputedStyle(el).color,font:getComputedStyle(el).fontSize}));
-  await page.getByRole('button',{name:'דף הבית',exact:true}).click();
+  await page.getByRole('region',{name:'כלי הדמו'}).getByRole('button',{name:'דף הבית',exact:true}).click();
   await page.getByRole('heading',{name:'את הצעד הראשון כבר עשיתם.',exact:true}).waitFor();
   await page.locator('.welcome-page .public-header').getByText('איך זה עובד?',{exact:true}).click();
   await page.locator('#welcome-how h2').waitFor();
@@ -54,7 +54,7 @@ try{
    if(role==='marketer')await page.getByRole('heading',{name:'ההפניות שלי',exact:true}).waitFor();
    const currentRoute=new URL(page.url()).hash;
    const shellClass=await page.locator('.app-shell').getAttribute('class');
-   await page.getByRole('button',{name:'דף הבית',exact:true}).click();
+   await page.getByRole('region',{name:'כלי הדמו'}).getByRole('button',{name:'דף הבית',exact:true}).click();
    await page.locator('.welcome-page .public-header').getByText('איך זה עובד?',{exact:true}).click();
    await page.locator('#welcome-how h2').waitFor();
   assert.ok(await page.evaluate(()=>window.scrollY>0));
@@ -69,7 +69,7 @@ try{
   await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();
   await page.getByRole('button',{name:'התחלת השאלון',exact:true}).click();
   await page.locator('[data-answer-key=city]').fill('טיוטה שנשמרת במעבר לדף הבית');
-  await page.getByRole('button',{name:'דף הבית',exact:true}).click();
+  await page.getByRole('region',{name:'כלי הדמו'}).getByRole('button',{name:'דף הבית',exact:true}).click();
   await page.getByRole('button',{name:/^כניסה (לדמו המערכת|למערכת)/}).click();
   assert.equal(await page.locator('[data-answer-key=city]').inputValue(),'טיוטה שנשמרת במעבר לדף הבית');
   await page.goto(base+'?landing=reserve#welcome');
