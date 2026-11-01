@@ -41,7 +41,7 @@ export default {
    if(docPath&&request.method==='GET'){const file=await download(c,env,decodeURIComponent(docPath[1]));headers.forEach((v,k)=>file.headers.set(k,v));return file;}
    const rpc=url.pathname.match(/^\/api\/rpc\/(rpc_[a-z_]+)$/);requireThat(rpc&&request.method==='POST','NOT_FOUND',404);requireThat(request.headers.get('Content-Type')?.split(';')[0]==='application/json','VALIDATION',400);
    let args:unknown;try{args=JSON.parse(new TextDecoder().decode(await boundedBody(request,256*1024)));}catch(e){if(e instanceof ApiError)throw e;throw new ApiError('VALIDATION');}requireThat(args&&typeof args==='object'&&!Array.isArray(args),'VALIDATION',400);
-   if(aiOperations.includes(rpc[1])){const result=await aiOperation(db,actor,env,rpc[1],args as Row);if(['rpc_ai_read_document','rpc_ai_prepare_brief'].includes(rpc[1])){const schedule=flushAiJobs(env).catch(()=>{});if(execution)execution.waitUntil(schedule);else await schedule;}return response({data:result});}
+   if(aiOperations.includes(rpc[1])){const result=await aiOperation(db,actor,env,rpc[1],args as Row);if(['rpc_ai_read_document','rpc_ai_prepare_brief','rpc_ai_assist_topic'].includes(rpc[1])){const schedule=flushAiJobs(env).catch(()=>{});if(execution)execution.waitUntil(schedule);else await schedule;}return response({data:result});}
    return response({data:await dispatch(db,actor,version,rpc[1],args as Row)});
   }catch(e){const code=e instanceof Error&&publicErrors.has(e.message)?e.message:'SERVER_ERROR';const status=e instanceof ApiError?e.status:code==='CONFLICT'?409:code==='SERVER_ERROR'?500:400;return response({error:{code}},status);}
  },

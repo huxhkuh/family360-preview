@@ -46,8 +46,10 @@
     "test:task-surfaces": "node scripts/check-task-surfaces.mjs",
     "test:role-handoffs": "node scripts/check-role-handoffs.mjs",
     "test:questionnaire-review": "node scripts/check-questionnaire-review.mjs",
-    "test:ai": "vitest run server/tests/ai-documents.test.ts --exclude=artifacts/**",
-    "test:ai:live": "node --use-system-ca scripts/check-ai-live.mjs"
+    "test:ai": "vitest run server/tests/ai-documents.test.ts server/tests/ai-topic-assistance.test.ts --exclude=artifacts/**",
+    "test:ai:live": "node --use-system-ca scripts/check-ai-live.mjs",
+    "test:ai-topic": "node scripts/check-ai-topic.mjs",
+    "test:ai-topic:live": "node scripts/run-ai-topic-live.mjs"
   },
   "dependencies": {
     "@fontsource-variable/assistant": "5.3.0",

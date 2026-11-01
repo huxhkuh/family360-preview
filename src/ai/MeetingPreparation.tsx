@@ -7,7 +7,7 @@ import {aiMessage} from './DocumentReader';
 import {Icon} from '../icons';
 import './ai.css';
 
-const kinds={reported:'מהשאלון · דיווח המשפחה',document:'מהמסמך · אומת בידי נציג',professional:'ממצא מקצועי שאושר',work:'מצב הטיפול'};
+const kinds={reported:'מהשאלון · דיווח המשפחה',document:'מהמסמך · אומת בידי נציג',professional:'ממצא מקצועי שאושר',work:'מצב הטיפול',conversation:'תיעוד הנציג בנושא',guide:'מדריך השיחה'};
 export function AiSources({ids,sources}:{ids:string[];sources:AiSource[]}){return <details className="ai-evidence"><summary>על מה זה מבוסס</summary><dl>{ids.map(id=>sources.find(s=>s.id===id)).filter((s):s is AiSource=>!!s).map(s=><div key={s.id}><dt>{kinds[s.kind]} · {s.label}</dt><dd>{s.value}{s.page&&<small>עמוד {s.page} · {s.quote}</small>}</dd></div>)}</dl></details>;}
 export function MeetingPreparation({w,familyId,onTopic}:{w:Workspace;familyId:string;onTopic?:(key:string)=>void}){
  const [state,setState]=useState<AiState|null>(null),[error,setError]=useState(''),[loading,setLoading]=useState(false),[filter,setFilter]=useState('all'),[showAll,setShowAll]=useState(false);

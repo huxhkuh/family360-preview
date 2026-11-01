@@ -1,14 +1,16 @@
+import {demoTopic,resetDemoTopics} from './demo-topic';
 import {invalidatePreparation} from './preparation-cache';
 import {briefInput} from './brief-context';
 import {fieldLabels,type AiJob,type AiState,type AiSource,type Extraction} from './contracts';
 import type {Workspace} from '../lib/model';
 
 const jobs=new Map<string,AiJob>();
-export const resetDemoAi=()=>{jobs.clear();invalidatePreparation();};
+export const resetDemoAi=()=>{jobs.clear();resetDemoTopics();invalidatePreparation();};
 const extraction:Extraction={kind:'payslip',owner:'ישראל לדוגמה',period:'09/2026',pages:[{page:1,text:'מסמך סינתטי להדגמה בלבד\nישראל לדוגמה\nתקופה 09/2026\nמעסיק: חברה לדוגמה\nשכר ברוטו 12,000 ₪\nשכר נטו 9,250 ₪\nהפרשת עובד לפנסיה 720 ₪'}],fields:[{key:'gross_salary',value:'12,000',unit:'ILS',owner:'ישראל לדוגמה',period:'09/2026',page:1,quote:'שכר ברוטו 12,000 ₪'},{key:'net_salary',value:'9,250',unit:'ILS',owner:'ישראל לדוגמה',period:'09/2026',page:1,quote:'שכר נטו 9,250 ₪'},{key:'employee_deposit',value:'720',unit:'ILS',owner:'ישראל לדוגמה',period:'09/2026',page:1,quote:'הפרשת עובד לפנסיה 720 ₪'}],warnings:['זו קריאה לדוגמה; הקובץ המקורי לא נשלח לספק AI.']};
 function pensionExample():Extraction{return {kind:'pension',owner:'ישראל לדוגמה',period:'2025',pages:[{page:1,text:'מסמך סינתטי להדגמה בלבד\nישראל לדוגמה\nדוח שנתי 2025\nיתרה צבורה 120,000 ₪\nדמי ניהול מצבירה 0.20%\nדמי ניהול מהפקדות 1.50%'}],fields:[{key:'balance',value:'120,000',unit:'ILS',owner:'ישראל לדוגמה',period:'2025',page:1,quote:'יתרה צבורה 120,000 ₪'},{key:'balance_fee',value:'0.20',unit:'percent',owner:'ישראל לדוגמה',period:'2025',page:1,quote:'דמי ניהול מצבירה 0.20%'},{key:'deposit_fee',value:'1.50',unit:'percent',owner:'ישראל לדוגמה',period:'2025',page:1,quote:'דמי ניהול מהפקדות 1.50%'}],warnings:['מסמך סינתטי להדגמת בדיקת הנתונים.']};}
 export function demoAi(name:string,a:Record<string,any>,w:Workspace){
  if(!name.startsWith('rpc_ai_'))return undefined;
+ if(['rpc_ai_assist_topic','rpc_ai_topic_assistance'].includes(name))return demoTopic(name,a,w);
  const staff=['admin','representative'].includes(w.profile.role);const deny=()=>{throw Error('PERMISSION_DENIED');};
  const result=(job:AiJob|null):AiState=>({configured:true,job:job?structuredClone(job):null});
  if(name==='rpc_ai_review_field'){
