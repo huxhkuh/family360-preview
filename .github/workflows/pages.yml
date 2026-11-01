@@ -56,6 +56,7 @@ jobs:
           npm run test:client-intake
           npm run test:chapter-process
           npm run test:client-workspace
+          node scripts/check-client-atelier.mjs
           npm run test:client-folio
           npm run test:branding
           npm run test:companion

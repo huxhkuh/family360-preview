@@ -6,13 +6,13 @@ import {useRetainedState} from './lib/draft-guard';
 import {AsyncButton,Field,SaveForm} from './ui';
 import {routeHash} from './lib/navigation';
 
-export function ClientHelp({familyId,w,refresh}:{familyId:string;w:Workspace;refresh:()=>Promise<void>}){
+export function ClientHelp({familyId,w,refresh,expanded=false}:{familyId:string;w:Workspace;refresh:()=>Promise<void>;expanded?:boolean}){
  const [requestId,setRequestId]=useState(()=>crypto.randomUUID());
  const [note,setNote]=useRetainedState('client-help:'+familyId,()=>'',v=>!!v,'בקשת עזרה');
  const family=w.families.find(f=>f.id===familyId);
  if(supportClosed(family?.status||'',w.finalReports.filter(r=>r.family_id===familyId)))return <section className="client-help"><h3>המשך פנייה בדוא״ל</h3><p>חלון הפניות במערכת הסתיים, שבעה ימים לאחר סיום התיק ואישור הדוח. להמשך סיוע יש לפנות בדוא״ל למערכת.</p>{typeof w.settings.support_email==='string'?<a href={'mailto:'+w.settings.support_email}>שליחת דוא״ל למערכת</a>:<p>כתובת הדוא״ל טרם הוגדרה בסביבת הבדיקה.</p>}</section>;
  const request=w.familyTasks.find(t=>t.family_id===familyId&&t.request_kind==='help'&&['open','in_progress'].includes(t.status));
- return <details className="client-help"><summary>צריכים עזרה מהנציג?</summary>{request?<p role="status">בקשת העזרה רשומה במעקב של {request.owner_name}. טרם נקבע מועד לחזרה. אפשר לעקוב אחריה ב״בטיפול עבורי״.</p>:<SaveForm protectDraft={false} label="רישום בקשת עזרה" successMessage="הבקשה נרשמה במעקב. לא נשלחה הודעה מחוץ למערכת." save={async()=>{await rpc('rpc_client_request',{p_id:requestId,p_family_id:familyId,p_kind:'help',p_details:note});await refresh();setNote('');setRequestId(crypto.randomUUID());}}><p>כתבו במה נדרשת עזרה בנוגע לתיק, למסמכים או לתיאום השיחה. הבקשה תופיע אצל הנציג במעקב; אין כאן שליחת מייל או הודעה.</p><Field label="במה נוכל לעזור?"><textarea required minLength={3} maxLength={1000} value={note} onChange={e=>setNote(e.target.value)}/></Field></SaveForm>}</details>;
+ return <details className="client-help" open={expanded||undefined}><summary>צריכים עזרה מהנציג?</summary>{request?<p role="status">בקשת העזרה רשומה במעקב של {request.owner_name}. טרם נקבע מועד לחזרה. אפשר לעקוב אחריה ב״בטיפול עבורי״.</p>:<SaveForm protectDraft={false} label="רישום בקשת עזרה" successMessage="הבקשה נרשמה במעקב. לא נשלחה הודעה מחוץ למערכת." save={async()=>{await rpc('rpc_client_request',{p_id:requestId,p_family_id:familyId,p_kind:'help',p_details:note});await refresh();setNote('');setRequestId(crypto.randomUUID());}}><p>כתבו במה נדרשת עזרה בנוגע לתיק, למסמכים או לתיאום השיחה. הבקשה תופיע אצל הנציג במעקב; אין כאן שליחת מייל או הודעה.</p><Field label="במה נוכל לעזור?"><textarea required minLength={3} maxLength={1000} value={note} onChange={e=>setNote(e.target.value)}/></Field></SaveForm>}</details>;
 }
 
 export function TaskContext({task,kind,w,refresh,preview=false}:{task:FamilyTask|FollowUp;kind:'familyTask'|'followUp';w:Workspace;refresh:()=>Promise<void>;preview?:boolean}){

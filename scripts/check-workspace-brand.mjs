@@ -14,8 +14,8 @@ try{
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
   await expect.poll(()=>page.evaluate(()=>window.scrollY)).toBe(0);
   await page.screenshot({path:`${out}/${role}-${width}.png`,fullPage:true});
-  await expect(workspace.locator('.sidebar .mesudarim-logo')).toHaveAttribute('src',/concept-5-dark.svg$/);
-  const links=workspace.locator('.sidebar nav button'),screens=[];
+  await expect(workspace.locator('.sidebar .mesudarim-logo')).toHaveAttribute('src',role==='client'?/concept-5-dark-mark.svg$/:/concept-5-dark.svg$/);
+  const links=workspace.locator('.sidebar nav[aria-label="ניווט ראשי"] button'),screens=[];
   for(let n=0;n<await links.count();n++){
    const link=links.nth(n),label=await link.innerText();
    await expect(link.locator('svg.brand-icon')).toHaveAttribute('viewBox','0 0 40 40');

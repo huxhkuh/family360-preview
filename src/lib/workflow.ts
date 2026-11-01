@@ -1,6 +1,6 @@
 import type {Family,Workspace} from './model';
 import {deadline,dueLabel,isOpen,orderedFollowUps} from '../followups/followup-utils';
-export type Destination='overview'|'questionnaire'|'documents'|'services'|'meetings'|'tasks'|'followups';
+export type Destination='reports'|'overview'|'questionnaire'|'documents'|'services'|'meetings'|'tasks'|'followups';
 export type NextStep={stage:number;title:string;detail:string;owner:string;after:string;label:string;target:Destination;actionable:boolean};
 export const stages=['היכרות ושאלון','מסמכים','בדיקה מקצועית','שיחה והחלטות','ביצוע ומעקב'];
 // Derive guidance only from the workspace already authorized by the server.

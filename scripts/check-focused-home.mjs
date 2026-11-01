@@ -11,7 +11,7 @@ try{
   if(['admin','professional'].includes(role)){await expect(page.locator('.role-studio')).toBeVisible();await expect(page.locator('.role-studio-heading h1')).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);await page.screenshot({path:`${out}/${role}-${width}.png`,fullPage:true});expect(errors).toEqual([]);results.push({role,width,passed:true});await context.close();continue;}
   const home=page.locator('.focused-home'),task=page.getByRole('region',{name:'הפעולה הבאה שלי'});
   await expect(home).toHaveAttribute('data-focus-role',role);await expect(task).toBeVisible();
-  const primary=task.getByRole('button');expect(await primary.count()).toBeLessThanOrEqual(1);
+  const primary=task.locator('button.primary');expect(await primary.count()).toBeLessThanOrEqual(1);
   if(await primary.count())await expect(primary).toBeInViewport();
   await expect(home.locator('.focus-more')).not.toHaveAttribute('open','');
   await expect(page.getByRole('heading',{name:'מה דורש טיפול עכשיו',exact:true})).toHaveCount(0);
@@ -20,11 +20,11 @@ try{
   if(role==='client'){
    await expect(task).toHaveAttribute('data-action-id','client-task:fu1');await expect(task).not.toContainText('לתאם שיחת מעקב');
    await primary.click();const doc=page.locator('[data-record-id=d1]');await expect(doc).toBeFocused();await doc.getByRole('button',{name:'צירוף קובץ דוגמה בלבד',exact:true}).click();
-   await page.getByRole('button',{name:'לצעד הבא שלי',exact:true}).click();await expect(task).toHaveAttribute('data-action-id','client-task:fu1');await expect(task.getByRole('button')).toHaveText('לפרטי הפעולה ולעדכון');await task.getByRole('button').click();
+   await page.getByRole('button',{name:'לצעד הבא שלי',exact:true}).click();await expect(task).toHaveAttribute('data-action-id','client-task:fu1');await expect(task.locator('button.primary')).toHaveText('לפרטי הפעולה ולעדכון');await task.locator('button.primary').click();
    await page.locator('[data-record-id=fu1]').getByRole('button',{name:'סימון כהושלמה',exact:true}).click();
-   await page.getByRole('button',{name:'לצעד הבא שלי',exact:true}).click();await expect(task).toHaveAttribute('data-action-id','client-task:ft1');await expect(task).toContainText('להכין רשימת הוצאות חודשית');await task.getByRole('button').click();
+   await page.getByRole('button',{name:'לצעד הבא שלי',exact:true}).click();await expect(task).toHaveAttribute('data-action-id','client-task:ft1');await expect(task).toContainText('להכין רשימת הוצאות חודשית');await task.locator('button.primary').click();
    await page.locator('[data-record-id=ft1]').getByRole('button',{name:'השלמת הפעולה',exact:true}).click();await page.getByRole('button',{name:'לצעד הבא שלי',exact:true}).click();
-   await expect(task.getByRole('button')).toHaveCount(0);await expect(task).toContainText('כרגע אין פעולה שנדרשת מכם');await expect(task).toContainText('נציג לדוגמה');
+   await expect(task.locator('button.primary')).toHaveText('לפתיחת התיק');await expect(task).toContainText('כרגע אין פעולה שנדרשת מכם');await expect(task).toContainText('נציג לדוגמה');
    await expect(home.locator('.focus-more')).not.toHaveAttribute('open','');await home.locator('.focus-more>summary').click();await expect(home.locator('.client-care')).toContainText('לתאם שיחת מעקב');
    await page.screenshot({path:`${out}/client-waiting-${width}.png`,fullPage:true});
   }

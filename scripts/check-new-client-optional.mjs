@@ -30,7 +30,7 @@ try{for(const width of [1440,390,320]){
  await page.locator('.focus-more>summary').click();await page.getByRole('button',{name:'כל המסמכים',exact:true}).click();const prep=page.locator('.document-preparation-more');await expect(prep).not.toHaveAttribute('open');await prep.locator(':scope > summary').click();
  // A deliberately deferred signature must stay optional and must not become an orange "missing" obligation.
  await prep.locator('[data-preparation-key=clearinghouse_auth_h]').getByRole('button',{name:'הוספת הרשאה להשלמה עם הנציג',exact:true}).click();
- await expect(page.locator('article.document').filter({hasText:'קוראים וחותמים על ההרשאה'}).locator('.badge')).toHaveText('חתימה לפני פנייה למסלקה');await expect(page.locator('.client-completion')).toBeVisible();await expect(page.locator('article.document').filter({hasText:'קוראים וחותמים על ההרשאה'})).toHaveCount(1);
+ await expect(page.locator('article.document[data-document-type=signature]').locator('.badge')).toHaveText('חתימה לפני פנייה למסלקה');await expect(page.locator('.client-completion')).toBeVisible();await expect(page.locator('article.document[data-document-type=signature]')).toHaveCount(1);
  await home.scrollIntoViewIfNeeded();await page.screenshot({path:`${out}/${width}-optional-authorization.png`});
  await prep.locator('[data-preparation-key=bank_identity]').getByRole('button',{name:'צירוף דוגמה',exact:true}).click();await expect(page.locator('article.document')).toHaveCount(3);await expect(page.locator('.client-completion')).toBeVisible();
  await page.getByLabel('צפייה בתפקיד',{exact:true}).selectOption('representative');await page.evaluate(()=>{location.hash='/families/f1/documents'});

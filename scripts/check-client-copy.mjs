@@ -22,7 +22,7 @@ try{for(const width of [1440,390,320]){
  await expect(page.locator('.questionnaire-status')).toContainText('עדיין לא מילאתם');
  await expect(nav.getByRole('button',{name:'עבודה והכנסות',exact:true})).toContainText('2 שדות להשלמה');
  await field('city').fill('עיר לדוגמה');
- await openClientNavigation(page);await mainNav.getByRole('button',{name:'הבית שלי',exact:true}).click();
+ await openClientNavigation(page);await mainNav.getByRole('button',{name:'עכשיו',exact:true}).click();
  await page.getByRole('button',{name:'המשך מילוי השאלון',exact:true}).click();
  await expect(field('city')).toHaveValue('עיר לדוגמה');
  await page.getByRole('button',{name:'שליחת השאלון לבדיקה',exact:true}).click();

@@ -9,7 +9,7 @@ try{for(const width of [1440,390,320]){
  const capture=async name=>{expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);await page.screenshot({path:`${out}/${name}-${width}.png`,fullPage:true});};
  await page.goto(base+'#workspace');await page.locator('.demo-roles>button').first().click();await go('families/f1/documents');
  const request=page.locator('form').filter({has:page.getByRole('button',{name:'הוספת דרישת מסמך',exact:true})});await request.getByLabel('סוג מסמך').selectOption('dt1');await request.getByRole('button',{name:'הוספת דרישת מסמך',exact:true}).click();
- await role('client');await page.locator('.focus-task button').click();await expect(page.locator('.record-focus')).toHaveAttribute('data-focused-record','d1');
+ await role('client');await page.locator('.focus-task button.primary').click();await expect(page.locator('.record-focus')).toHaveAttribute('data-focused-record','d1');
  await expect(page.locator('article.document:visible')).toHaveCount(1);await expect(page.getByRole('navigation',{name:'תוכן תיק המשפחה'})).toHaveCount(0);await capture('requested-document');
  await page.locator('[data-record-id=d1]').getByRole('button',{name:'צירוף קובץ דוגמה בלבד',exact:true}).click();await expect(page.locator('[data-record-id=d1]')).toContainText('ממתין לבדיקה');await expect(page.locator('article.document:visible')).toHaveCount(1);
  await page.getByRole('region',{name:'ממשיכים מכאן'}).getByRole('link',{name:'המשך לצעד הבא',exact:true}).click();await expect(page).toHaveURL(/followups\?focus=fu1$/);await expect(page.locator('.followup-row:visible')).toHaveCount(1);await expect(page.locator('[data-record-id=fu1]')).toBeFocused();await capture('requested-followup');

@@ -1,3 +1,4 @@
+import {openDocumentDetail} from './task-navigation.mjs';
 import {attachRequiredSamples} from './task-navigation.mjs';
 import {chromium,expect} from '@playwright/test';
 import {mkdirSync,writeFileSync} from 'node:fs';
@@ -8,7 +9,7 @@ try{for(const [device,width,height] of [['desktop',1440,1000],['tablet',820,900]
  const page=await browser.newPage({viewport:{width,height}});const errors=[],external=[];
  page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());page.on('request',r=>{if(!r.url().startsWith(base)&&!r.url().startsWith('data:'))external.push(r.url());});
  await page.goto(base+'#workspace');await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();
- await expect(page.getByRole('region',{name:'הפעולה הבאה שלי'}).getByRole('button')).toHaveCount(1);
+ await expect(page.getByRole('region',{name:'הפעולה הבאה שלי'}).locator('button.primary')).toHaveCount(1);
  await page.locator('.focus-more>summary').click();await page.locator('.questionnaire-context>summary').click();
  const journey=page.getByRole('region',{name:'המסלול שלכם, צעד אחר צעד'});
  await expect(journey.getByRole('list',{name:'שלבי התהליך'}).getByRole('listitem')).toHaveCount(4);await expect(journey.getByRole('heading',{name:'השאלון המשפחתי',exact:true})).toBeVisible();
@@ -38,13 +39,13 @@ try{for(const [device,width,height] of [['desktop',1440,1000],['tablet',820,900]
  await page.getByLabel('צפייה בתפקיד',{exact:true}).selectOption('client');await page.evaluate(()=>{location.hash='/families/f1/documents'});await journey.locator('.questionnaire-context>summary').click();
  const doc=page.locator('article.document').filter({hasText:'דוח פנסיה שנתי'});await expect(doc).toHaveCount(1);
  await page.screenshot({path:`test-results/client-intake/${device}-documents.png`,fullPage:true});
- await doc.getByRole('button',{name:'צירוף קובץ דוגמה בלבד',exact:true}).click();
+ await openDocumentDetail(doc);await doc.getByRole('button',{name:'צירוף קובץ דוגמה בלבד',exact:true}).click();
  await expect(journey.getByRole('heading',{name:'המסמכים אצל הנציג לבדיקה',exact:true})).toBeVisible();await expect(doc).toContainText('לא הועלה קובץ');await expect(page.getByRole('status',{name:'סיום הפעולות הנדרשות כרגע'})).toBeVisible();await expect(doc.getByRole('button',{name:'צירוף קובץ דוגמה בלבד'})).toHaveCount(0);
  await page.screenshot({path:`test-results/client-intake/${device}-waiting.png`,fullPage:true});
  // A representative may request a correction; the client sees why and can retry the example.
  await page.getByLabel('צפייה בתפקיד',{exact:true}).selectOption('representative');await page.goto(base+'#/families/f1/documents');await doc.getByLabel('סיבת הדחייה').fill('הדוגמה חסרה עמוד');await doc.getByRole('button',{name:'דחיית מסמך',exact:true}).click();await expect(doc).toContainText('הדוגמה חסרה עמוד');
  await page.getByLabel('צפייה בתפקיד',{exact:true}).selectOption('client');await page.goto(base+'#/families/f1/documents');await expect(journey).toContainText('נותר מסמך או הרשאה להשלמה');await expect(doc).toContainText('הדוגמה חסרה עמוד');await expect(page.getByRole('status',{name:'סיום הפעולות הנדרשות כרגע'})).toHaveCount(0);await expect(doc.getByRole('button',{name:'אישור מסמך',exact:true})).toHaveCount(0);
- await doc.getByRole('button',{name:'צירוף קובץ דוגמה בלבד',exact:true}).click();await expect(doc).not.toContainText('הדוגמה חסרה עמוד');
+ await openDocumentDetail(doc);await doc.getByRole('button',{name:'צירוף קובץ דוגמה בלבד',exact:true}).click();await expect(doc).not.toContainText('הדוגמה חסרה עמוד');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1)).toBe(false);expect(errors).toEqual([]);expect(external).toEqual([]);
  results.push({device,passed:true,checks:['four steps','service price and current payment copy','required fields','draft is not submission','submit to documents','sample only','wait for representative','rejection and retry','client cannot approve','no external requests or overflow']});await page.close();
 }}finally{await browser.close();}

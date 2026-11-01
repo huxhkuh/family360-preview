@@ -1,7 +1,7 @@
-export type PageName='overview'|'questionnaire'|'families'|'tasks'|'meetings'|'followups'|'notifications'|'admin'|'referrals'|'telephone'|'missing';
+export type PageName='help'|'overview'|'questionnaire'|'families'|'tasks'|'meetings'|'followups'|'notifications'|'admin'|'referrals'|'telephone'|'missing';
 export type RouteState={page:PageName;id?:string;tab?:string;kind?:string;family?:string;q?:string;filter?:string;stage?:string;topic?:string;cursor?:string;focus?:string};
-const pages=['overview','questionnaire','families','tasks','meetings','followups','notifications','admin','referrals','telephone'];
-const tabs=['overview','questionnaire','documents','services','tasks','meetings','followups'];
+const pages=['help','overview','questionnaire','families','tasks','meetings','followups','notifications','admin','referrals','telephone'];
+const tabs=['reports','overview','questionnaire','documents','services','tasks','meetings','followups'];
 export function readRoute(hash:string):RouteState{
  if(!hash.startsWith('#/'))return {page:'overview'};
  try{
