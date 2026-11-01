@@ -1,3 +1,4 @@
+import {ProfessionalTaskDesk} from './ProfessionalTaskDesk';
 import {InformationRequest} from './InformationRequest';
 import {actionableTask,orderInbox} from './task-inbox';
 import './professional-inbox.css';
@@ -26,6 +27,7 @@ export function Tasks({w,refresh,familyId='',clearFilter,leave,openFamily,select
  const scoped=professional?orderInbox(list.filter(t=>inbox==='active'?actionableTask(t):!actionableTask(t))):list;
  const visible=scoped.filter(t=>(status==='all'||t.status===status)&&[t.task_number,w.services.find(s=>s.id===t.service_id)?.name,familyName(t.family_id),owner(t)].some(v=>v?.includes(query.trim())));
  const changeKind=(next:string)=>{if(next!==kind&&leave()){onKind(next);}};
+ if(task&&professional)return <ProfessionalTaskDesk w={w} task={task} kind={kind} refresh={refresh} back={back}/>;
  const taskTools=<TaskSupport active={!!task} title="רשימת המשימות וכלי העבודה"><header className="page-title"><div><p className="eyebrow">ניתוח וביצוע</p><h1>סביבת עבודה מקצועית</h1><p>פותחים משימה, מתעדים את העבודה ומעבירים לבדיקה כשהיא מוכנה.</p></div></header>{w.professionalPoolEnabled&&w.profile.role==='professional'&&!task&&<TaskSupport title="הצעות נוספות מהמאגר"><ProfessionalPool w={w} refresh={refresh} leave={leave}/></TaskSupport>}{familyId&&<p className="filter-notice">משימות של {familyName(familyId)}<button className="text-button" onClick={()=>{if(leave())clearFilter();}}>לכל המשימות</button></p>}
  <nav className="tabs" aria-label="סוג המשימות"><button className={kind==='analysis'?'selected':'ghost'} onClick={()=>changeKind('analysis')}>ניתוחים</button><button className={kind==='execution'?'selected':'ghost'} onClick={()=>changeKind('execution')}>משימות ביצוע</button></nav></TaskSupport>;
  return <div className={(task?'task-detail':'task-list')+(professional?' professional-workspace':'')}>{!task&&taskTools}

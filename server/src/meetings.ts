@@ -1,3 +1,5 @@
+import {conversationDeck} from '../../src/meetings/conversation-guide';
+import {workspace} from './workspace';
 import {z} from 'zod';
 import {Context,parse,timestamp,expected,stateIn} from './context';
 import {requireThat,uuid,now,type Row} from './db';
@@ -31,7 +33,8 @@ export async function meetings(c:Context,name:string,a:Row):Promise<unknown>{
  const meeting=await c.db.required('meetings',a.p_meeting_id);await c.staffFamily(meeting.family_id);
  if(name==='rpc_finish_meeting'){
   stateIn(meeting,['in_progress']);const items=await c.db.rows('meeting_items','meeting_id=?',[meeting.id]);requireThat(!items.some(i=>i.visible_to_client&&(!i.client_decision||i.client_decision==='undecided')),'UNDECIDED_ITEMS',400);
-  for(const item of items){if(!item.family_service_id)continue;const fs=await c.db.required('family_services',item.family_service_id);const status=({progress:'client_approved_execution',thinking:'client_thinking',declined:'client_declined',no_action:'no_execution_needed'} as Row)[item.client_decision];if(status)c.patch('family_services',fs,{status});}
+  const guided=await c.db.rows('guided_decisions','meeting_id=?',[meeting.id]);if(guided.length){const view=await workspace(c.db,c.actor,meeting.family_id);requireThat(conversationDeck(view as any,meeting.id).every(e=>guided.some(g=>g.topic_key===e.key)),'UNDECIDED_ITEMS',400);}
+  for(const item of items){if(!item.family_service_id)continue;const fs=await c.db.required('family_services',item.family_service_id);const status=({progress:'client_approved_execution',thinking:'client_thinking',declined:'client_declined',no_action:'no_execution_needed'} as Row)[item.client_decision];if(status&&!['sent_execution','execution_in_progress','waiting_client','needs_info','execution_needs_info','execution_reported_complete','completed','assigned','in_progress','in_analysis'].includes(fs.status))c.patch('family_services',fs,{status});}
   c.patch('meetings',meeting,{status:'completed',completed_at:now()});const family=await c.db.required('families',meeting.family_id);c.patch('families',family,{status:'meeting_done',meeting_held:true});c.event(family.id,'הפגישה הסתיימה');return null;
  }
  if(name==='rpc_manage_meeting'){

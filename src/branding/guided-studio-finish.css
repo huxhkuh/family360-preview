@@ -1,0 +1,48 @@
+/* Finishing layer: keep the approved forest/copper material language in the new workspaces. */
+.studio-workspace:has(.guided-conversation,.management-studio,.pro-studio,.professional-desk) .main{background:repeating-linear-gradient(103deg,#ffffff03 0,#ffffff03 1px,transparent 1px,transparent 4px),radial-gradient(ellipse at 8% 12%,#3c655a70,transparent 45%),radial-gradient(ellipse at 90% 78%,#28594488,transparent 50%),#082e26;background-attachment:fixed}
+.studio-workspace :is(.guided-top,.role-studio-heading) h1{color:#faf6ec;font-size:clamp(30px,3.2vw,48px);line-height:1.15}
+.studio-workspace :is(.role-studio-heading) .eyebrow{color:#cda578}
+.studio-workspace .guided-top h1{font-size:26px}
+.studio-workspace .guided-overline{color:#a9784e}
+.studio-workspace .guided-top .guided-overline{color:#d5ab7f}
+.studio-workspace .guided-topic-heading h2,.studio-workspace .guided-summary>h2{font-size:clamp(34px,3.7vw,52px);line-height:1.1;margin:8px 0 14px;color:#123d32}
+.studio-workspace .guided-intro h2{font-size:clamp(36px,4vw,58px);line-height:1.1}
+.studio-workspace .guided-body h3{font-size:20px}
+.studio-workspace .guided-paper{padding:28px 34px 18px;background:#fcfaf5}
+.studio-workspace .guided-top{margin:0 0 18px}
+.studio-workspace .guided-flow{margin-bottom:18px;padding:2px 0}
+.studio-workspace .guided-flow button{padding:10px 16px}
+.studio-workspace .guided-topic-heading{padding-bottom:18px}
+.studio-workspace .guided-topic-heading p:not(.guided-overline){font-size:17px}
+.studio-workspace .guided-saving{min-width:195px;padding:4px 24px}
+.studio-workspace .guided-saving strong{font-size:48px}
+.studio-workspace .guided-saving>small{margin-top:5px}
+.studio-workspace .guided-body{padding:20px 0;gap:30px}
+.studio-workspace .guided-question{font-size:17px;line-height:1.6}
+.studio-workspace .guided-say{margin-top:12px;padding:11px 16px}
+.studio-workspace .guided-say p{font-size:16px;line-height:1.6}
+.studio-workspace .guided-preparation{padding-inline-start:28px}
+.studio-workspace .guided-preparation ul{gap:8px;margin:12px 0}
+.studio-workspace .guided-preparation li{font-size:15px}
+.studio-workspace .guided-preparation a{margin-block:12px}
+.studio-workspace .guided-basis{font-size:12px}
+.studio-workspace .guided-reference summary{padding:8px 0}
+.studio-workspace .guided-decision{padding-top:16px}
+.studio-workspace .guided-decision-title{margin-bottom:10px}
+.studio-workspace .guided-choices{margin-bottom:12px!important}
+.studio-workspace .guided-choices label{min-height:46px;padding:8px;font-size:14px}
+.studio-workspace .guided-decision textarea{min-height:60px!important;height:60px}
+.studio-workspace .guided-save{padding-top:14px;margin-top:12px}
+.studio-workspace .guided-support{color:#e7eadb}
+.studio-workspace .guided-support summary{color:#e7eadb}
+.studio-workspace .guided-support>details[open]{background:#fcfaf5;color:#143f34;padding:20px;border-radius:12px}
+.studio-workspace .guided-support>details[open]>summary{color:#143f34}
+.studio-workspace .management-people{background:#153d31cc;border:1px solid #9ea88a35;border-radius:16px 4px 16px 4px;padding:24px}
+.studio-workspace .management-people :is(.eyebrow,small){color:#c6cbb3}
+.studio-workspace .management-people h2{color:#fbf6ea}
+.studio-workspace .management-people button{color:#d9ad80}
+.studio-workspace .pro-desk-paper h2,.studio-workspace .management-decisions h2{font-size:clamp(27px,2.5vw,38px);line-height:1.2}
+.studio-workspace .management-library{border-radius:16px 4px 16px 4px}
+.studio-workspace .professional-desk-heading p{color:#c4d0bf}
+@media(min-width:1001px){.app-shell.brand-workspace.studio-workspace.rep-call-mode .sidebar{min-height:76px;padding-block:6px}.app-shell.brand-workspace.studio-workspace.rep-call-mode .sidebar .brand .mesudarim-logo{height:58px}.studio-workspace.rep-call-mode .topbar{display:none}.studio-workspace.rep-call-mode .content{padding-top:20px}}
+@media(max-width:650px){.studio-workspace .guided-paper{padding:21px 18px 15px}.studio-workspace .guided-body{gap:18px}.studio-workspace .guided-saving{min-width:0;padding:12px 0}.studio-workspace .guided-preparation{padding-inline-start:0}.studio-workspace .guided-top h1{font-size:24px}.studio-workspace .guided-choices label{min-height:45px}.studio-workspace .management-people{padding:20px}}

@@ -1,3 +1,4 @@
+import {publicAsset} from '../lib/assets';
 import {nissanCopy as copy} from './nissanCopy';
 import {ReserveWelcomePage} from './ReserveWelcomePage';
 import './editorial.css';
@@ -9,7 +10,7 @@ const WELCOME_ART={logo:brandAsset()};
 import {BrandCompanion} from '../customer/BrandCompanion';
 type PublicProps={accountName?:string;onAccount?:()=>void;onSystem:()=>void;onStart:()=>void;onLearn:()=>void;continuing?:boolean;onHome?:()=>void};
 function PublicHeader({onSystem,onStart,onLearn,continuing,onHome,accountName,onAccount}:PublicProps){return <header className="public-header"><button onClick={onHome||(()=>window.scrollTo({top:0,behavior:"auto"}))} className="public-logo" aria-label="מסודרים 360, דף הבית"><BrandLogo/></button><nav aria-label="ניווט באתר">{accountName&&<button className="account-access" onClick={onAccount}>האזור האישי</button>}<button className="quiet-button" onClick={onLearn}>איך זה עובד?</button><button className="quiet-button" onClick={onSystem}>כניסה למערכת</button><button className="primary brand-primary nav-start" onClick={onStart}>{continuing?'ממשיכים מאיפה שעצרתם':'מתחילים יחד'}</button></nav></header>;}
-function WelcomeArt({name,caption}:{name:string;caption:string;number?:string}){return <figure className={`integrated-art art-${name}`}>{name==='welcome'?<><div className="companion-backdrop" aria-hidden="true"><i/><i/><i/><i/></div><BrandCompanion full tracking/></>:<img src={`${import.meta.env.BASE_URL}homepage/${name}.png`} alt={caption} loading="lazy"/>}</figure>;}
+function WelcomeArt({name,caption}:{name:string;caption:string;number?:string}){return <figure className={`integrated-art art-${name}`}>{name==='welcome'?<><div className="companion-backdrop" aria-hidden="true"><i/><i/><i/><i/></div><BrandCompanion full tracking/></>:<img src={publicAsset(`homepage/${name}.png`)} alt={caption} loading="lazy"/>}</figure>;}
 export function WelcomePage(props:PublicProps){
  return new URLSearchParams(window.location.search).get('landing')==='reserve'?<ReserveWelcomePage {...props}/>:<EditorialWelcomePage {...props}/>;
 }

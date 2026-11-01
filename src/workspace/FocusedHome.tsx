@@ -1,3 +1,4 @@
+import {ManagementLanding,ProfessionalLanding} from './RoleLanding';
 import {RepresentativeLanding} from '../representative/RepresentativeLanding';
 import {useState,type ReactNode} from 'react';
 import type {Workspace} from '../lib/model';
@@ -25,9 +26,11 @@ export function FocusedHome({w,open,refresh,children}:{w:Workspace;open:(r:Route
  const headings={client:family?.name||'הבית שלי',representative:'יום העבודה שלי',professional:'העבודה המקצועית שלי',admin:'מה מצריך החלטה',marketer:'ההפניות שלי'};
  const emptyTitle=partial?'אין בקשה פתוחה במידע שנטען':client?'כרגע אין פעולה שנדרשת מכם':role==='admin'?'אין כרגע אישור או שיוך שממתינים לכם':'אין כרגע משימה פתוחה באחריותך';
  const emptyDetail=client?owner?`${owner} מרכז את המשך הטיפול. בקשה חדשה תופיע כאן כשיהיה צורך בכם.`:'כשישויך נציג ותהיה בקשה להמשך, היא תופיע כאן.':role==='professional'?'משימות חדשות או בקשות לתיקון יופיעו כאן. עבודה שנשלחה לאישור או ממתינה ללקוח זמינה בתור העבודה והמעקב המלא.':'אפשר לעיין במצב העבודה לפי הצורך. פעולות של אנשים אחרים נשארות באחריותם.';
+ if(role==='admin')return <ManagementLanding w={w} open={open}>{children}</ManagementLanding>;
+ if(role==='professional')return <ProfessionalLanding w={w} open={open}>{children}</ProfessionalLanding>;
  if(role==='representative')return <RepresentativeLanding w={w} open={open} action={action}>{children}</RepresentativeLanding>;
  return <section className="focused-home" data-focus-role={role}>
-  <header className="focus-heading"><p className="eyebrow">{client?'טוב שחזרתם. ממשיכים מאיפה שעצרתם.':role==='admin'?'חריגים ואישורים באחריותך':'באחריותך להמשך הטיפול'}</p><h1>{headings[role]}</h1></header>
+  <header className="focus-heading"><p className="eyebrow">{client?'טוב שחזרתם. ממשיכים מאיפה שעצרתם.':String(role)==='admin'?'חריגים ואישורים באחריותך':'באחריותך להמשך הטיפול'}</p><h1>{headings[role]}</h1></header>
   <section className={`focus-task${!action?' focus-rest':''}`} aria-label="הפעולה הבאה שלי" data-action-id={action?.id||''}>
    <div className="focus-task-copy"><span className="focus-caption">{action?action.reason:report?'סיכום הטיפול':'מצב הטיפול'}</span>
     <h2>{action?.title||(report?'הדוח הסופי שלכם מוכן':emptyTitle)}</h2>
@@ -35,11 +38,11 @@ export function FocusedHome({w,open,refresh,children}:{w:Workspace;open:(r:Route
     <p>{action?.detail||(report?'התוצאות וההמלצות רוכזו בדוח שאושר על ידי הנציג.':emptyDetail)}</p>
     {action?.due&&<p className="focus-due">מועד לטיפול: {dueLabel(action.due)}</p>}
     {action?<button className="primary" onClick={()=>open(action.target)}>{continueLabel}</button>:report?<button className="primary" onClick={()=>open({page:'meetings',id:report.meeting_id,stage:'summary'})}>לצפייה בדוח הסופי</button>:null}
-   </div><div className="focus-companion" aria-hidden="true">{client?<CompanionPortrait pose={action?'explain':'welcome'}/>:<Icon name={role==='admin'?'check':role==='professional'?'work':'tasks'}/>}</div>
+   </div><div className="focus-companion" aria-hidden="true">{client?<CompanionPortrait pose={action?'explain':'welcome'}/>:<Icon name={String(role)==='admin'?'check':String(role)==='professional'?'work':'tasks'}/>}</div>
   </section>
   {actions.length>1&&<p className="focus-remaining">{actions.length===2?'בקשה נוספת מחכה בהמשך.':`עוד ${actions.length-1} ${client?'בקשות':'פריטים'} בהמשך.`}</p>}
   {partial&&<p className="focus-remaining">התצוגה מבוססת על המידע שנטען. יתר התיקים והפעולות זמינים ברשימות.</p>}
-  <details className="focus-more" open={expanded} onToggle={e=>setExpanded(e.currentTarget.open)}><summary>{client?'מצב התיק ומידע נוסף':role==='admin'?'תמונת המצב וכל העבודה':'תור העבודה והמעקב המלא'}</summary><div className="focus-secondary">{children}</div></details>
+  <details className="focus-more" open={expanded} onToggle={e=>setExpanded(e.currentTarget.open)}><summary>{client?'מצב התיק ומידע נוסף':String(role)==='admin'?'תמונת המצב וכל העבודה':'תור העבודה והמעקב המלא'}</summary><div className="focus-secondary">{children}</div></details>
   {client&&family&&<ClientHelp familyId={family.id} w={w} refresh={refresh}/>}
  </section>;
 }

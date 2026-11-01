@@ -1,14 +1,15 @@
+import {publicAsset} from '../../lib/assets';
 import {useEffect,useId,useRef,useState} from 'react';
 import {MascotMotion,normalizedGaze,type RigPose} from './motion';
 import {eyeContour,rigArtwork as art} from './artwork';
 
-const base=`${import.meta.env.BASE_URL}companion/rig/`;
+const rigAsset=(name:string)=>publicAsset(`companion/rig/${name}`);
 const assets=[['master.png',1254,1254],['head.png',280,390],['neck.png',200,115],['sclera.png',130,60],['lids.png',130,60],['iris-left.png',24,24],['iris-right.png',28,28]] as const;
 const neutral:RigPose={eyes:{x:0,y:0},head:{x:0,y:0},headRoll:0,eyeOpen:1};
 
 function decodeAssets(){
  return Promise.all(assets.map(([name,width,height])=>new Promise<void>((resolve,reject)=>{
-  const image=new Image();image.src=base+name;
+  const image=new Image();image.src=rigAsset(name);
   image.decode().then(()=>image.naturalWidth===width&&image.naturalHeight===height?resolve():reject(new Error(`Invalid rig asset: ${name}`)),reject);
  })));
 }
@@ -87,7 +88,7 @@ export function MascotRig({previewPose,inspectFace=false}:{previewPose?:RigPose;
   };
  },[ready,previewPose]);
  return <span ref={root} className="hero-gaze" data-rig-status={failed?'asset-error':ready?'ready':'loading'} data-enabled={ready}>
-  {!ready?<img className="gaze-body" src={originalFallback?`${import.meta.env.BASE_URL}homepage/welcome.png`:`${base}master.png`} onError={()=>setOriginalFallback(true)} alt="" draggable={false} fetchPriority="high" width={1254} height={1254}/>:<svg ref={svg} viewBox={inspectFace?'470 15 300 370':'0 0 1254 1254'} aria-hidden="true" className="gaze-rig">
+  {!ready?<img className="gaze-body" src={originalFallback?publicAsset('homepage/welcome.png'):rigAsset(`master.png`)} onError={()=>setOriginalFallback(true)} alt="" draggable={false} fetchPriority="high" width={1254} height={1254}/>:<svg ref={svg} viewBox={inspectFace?'470 15 300 370':'0 0 1254 1254'} aria-hidden="true" className="gaze-rig">
    <defs>
     <clipPath id={`${id}-head`}><path d={art.headCut}/></clipPath>
     <mask id={`${id}-body`} maskUnits="userSpaceOnUse" x="0" y="0" width="1254" height="1254"><rect width="1254" height="1254" fill="white"/><path d={art.bodyCut} fill="black"/></mask>
@@ -99,20 +100,20 @@ export function MascotRig({previewPose,inspectFace=false}:{previewPose?:RigPose;
      <clipPath id={`${id}-${eye.id}-iris`}><ellipse cx={eye.iris.cx} cy={eye.iris.cy} rx={eye.iris.rx} ry={eye.iris.ry}/></clipPath>
     </g>)}
    </defs>
-   <image href={`${base}neck.png`} x="490" y="235" width="200" height="115" clipPath={`url(#${id}-neck)`}/>
+   <image href={rigAsset(`neck.png`)} x="490" y="235" width="200" height="115" clipPath={`url(#${id}-neck)`}/>
    <g ref={head} data-rig-head="">
-    <image href={`${base}head.png`} x="480" y="20" width="280" height="390" clipPath={`url(#${id}-head)`}/>
+    <image href={rigAsset(`head.png`)} x="480" y="20" width="280" height="390" clipPath={`url(#${id}-head)`}/>
     {art.eyes.map((eye,i)=><g key={eye.id} data-rig-eye={eye.id}>
-     <image href={`${base}sclera.png`} x="570" y="170" width="130" height="60" clipPath={`url(#${id}-${eye.id}-patch)`}/>
+     <image href={rigAsset(`sclera.png`)} x="570" y="170" width="130" height="60" clipPath={`url(#${id}-${eye.id}-patch)`}/>
      <g clipPath={`url(#${id}-${eye.id}-open)`}>
-      <image href={`${base}sclera.png`} x="570" y="170" width="130" height="60"/>
-      <g data-rig-pupil={eye.id} ref={el=>{pupils.current[i]=el;}}><image href={`${base}iris-${eye.id}.png`} x={eye.iris.x} y={eye.iris.y} width={eye.iris.width} height={eye.iris.height} clipPath={`url(#${id}-${eye.id}-iris)`}/></g>
+      <image href={rigAsset(`sclera.png`)} x="570" y="170" width="130" height="60"/>
+      <g data-rig-pupil={eye.id} ref={el=>{pupils.current[i]=el;}}><image href={rigAsset(`iris-${eye.id}.png`)} x={eye.iris.x} y={eye.iris.y} width={eye.iris.width} height={eye.iris.height} clipPath={`url(#${id}-${eye.id}-iris)`}/></g>
      </g>
-     <g clipPath={`url(#${id}-${eye.id}-patch)`}><image href={`${base}lids.png`} x="570" y="170" width="130" height="60" clipPath={`url(#${id}-${eye.id}-cover)`}/></g>
+     <g clipPath={`url(#${id}-${eye.id}-patch)`}><image href={rigAsset(`lids.png`)} x="570" y="170" width="130" height="60" clipPath={`url(#${id}-${eye.id}-cover)`}/></g>
      <path ref={el=>{lids.current[i]=el;}} d={eyeContour(eye,1).top} fill="none" stroke="#352218" strokeWidth="1.4" strokeLinecap="round"/>
     </g>)}
    </g>
-   <g data-rig-body=""><image href={`${base}master.png`} width="1254" height="1254" mask={`url(#${id}-body)`}/></g>
+   <g data-rig-body=""><image href={rigAsset(`master.png`)} width="1254" height="1254" mask={`url(#${id}-body)`}/></g>
   </svg>}
  </span>;
 }

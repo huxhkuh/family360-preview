@@ -6,6 +6,7 @@ import {workspace,clientFamily} from './workspace';
 import {families,familyOperations} from './families';
 import {tasks,taskOperations} from './tasks';
 import {meetings,meetingOperations} from './meetings';
+import {guidedConversation,guidedOperations} from './guided-conversation';
 import {reports,reportOperations} from './reports';
 import {administrative,adminOperations} from './admin';
 import {offers,offerOperations} from './offers';
@@ -14,7 +15,7 @@ import {invitations,invitationOperations} from './invitations';
 import {telephoneStaff,telephoneStaffOperations} from './telephone-staff';
 import {listenVoiceMessage} from './telephone-messages';
 const routes=new Map<string,(c:Context,name:string,args:Row)=>Promise<unknown>>();
-for(const [names,handler]of [[requestOperations,professionalRequests],[familyOperations,families],[taskOperations,tasks],[meetingOperations,meetings],[reportOperations,reports],[adminOperations,administrative],[offerOperations,offers],[documentOperations,documents],[invitationOperations,invitations]] as const)for(const name of names)routes.set(name,handler);
+for(const [names,handler]of [[guidedOperations,guidedConversation],[requestOperations,professionalRequests],[familyOperations,families],[taskOperations,tasks],[meetingOperations,meetings],[reportOperations,reports],[adminOperations,administrative],[offerOperations,offers],[documentOperations,documents],[invitationOperations,invitations]] as const)for(const name of names)routes.set(name,handler);
 export const supportedOperations=['rpc_workspace','rpc_family_workspace',...routes.keys(),...telephoneStaffOperations];
 export async function dispatch(db:Database,actor:Actor,version:number,name:string,args:Row){
  if(telephoneStaffOperations.includes(name))return telephoneStaff(db,actor,version,name,args);

@@ -1,3 +1,4 @@
+import {folder} from './guided-test-helpers.mjs';
 import {revealTaskContent} from './task-navigation.mjs';
 import {chromium} from '@playwright/test';
 import {openClientNavigation} from './client-navigation.mjs';
@@ -22,7 +23,7 @@ for(const [device,width,height] of [['desktop',1440,1000],['mobile',390,844]]){
    await nav.getByRole('button',{name:'משפחות',exact:true}).click();await page.getByLabel('חיפוש משפחה',{exact:true}).fill('פרידמן');
    await page.getByRole('button',{name:'פתיחת התיק של משפחת פרידמן'}).click();await page.getByRole('heading',{name:'משפחת פרידמן',exact:true}).waitFor();
    await revealTaskContent(page,'section[aria-label="קשר עם המשפחה"]');await page.getByRole('button',{name:'תיעוד קשר',exact:true}).click();await page.getByLabel('תיעוד פנימי של הקשר').fill('תיעוד בדיקה סינתטי לדמו');await page.getByRole('button',{name:'שמירת תיעוד הקשר',exact:true}).click();await page.getByText('תיעוד הקשר נשמר.',{exact:true}).waitFor();
-   await page.getByRole('navigation',{name:'תוכן תיק המשפחה'}).getByRole('button',{name:'מעקב',exact:true}).click();await page.getByRole('button',{name:'הוספת פעולה בתיק'}).click();await page.getByLabel('הפעולה הבאה',{exact:true}).fill('פעולת בדיקה לדמו');await page.getByLabel('תאריך יעד לפעולה').fill('2026-11-01');await page.getByRole('button',{name:'שמירת הפעולה',exact:true}).click();await page.getByRole('heading',{name:'פעולת בדיקה לדמו',exact:true}).waitFor();
+   await folder(page,'מעקב');await page.getByRole('button',{name:'הוספת פעולה בתיק'}).click();await page.getByLabel('הפעולה הבאה',{exact:true}).fill('פעולת בדיקה לדמו');await page.getByLabel('תאריך יעד לפעולה').fill('2026-11-01');await page.getByRole('button',{name:'שמירת הפעולה',exact:true}).click();await page.getByRole('heading',{name:'פעולת בדיקה לדמו',exact:true}).waitFor();
    await page.getByRole('button',{name:'השלמת הפעולה',exact:true}).click();await page.getByText('מצב הפעולה עודכן.',{exact:true}).waitFor();
   }
   if(role==='professional'){await nav.getByRole('button',{name:'משימות',exact:true}).click();await revealTaskContent(page,'.professional-offer-open');await page.locator('.professional-offer-open').first().click();await page.getByRole('button',{name:'קבלת המשימה',exact:true}).click();await page.getByText('המשימה התקבלה. היא מופיעה כעת ברשימת המשימות שלך.',{exact:true}).waitFor();}

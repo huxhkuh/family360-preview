@@ -1,4 +1,5 @@
 // @ts-nocheck
+import {conversationDeck} from '../meetings/conversation-guide';
 import {contactPatch} from "../families/questionnaire-decisions";
 import {changedAnswerKeys,snapshotAffected} from '../families/questionnaire-changes';
 export function meetingRpc(path,args,state,role,workspace){
@@ -11,8 +12,9 @@ const staff=role==='representative'||role==='admin';const randomUUID=()=>crypto.
     if(path.endsWith('rpc_finish_meeting')){
      if(meeting.status!=='in_progress')return send({message:'INVALID_STATE'},400);
      if(items.some(i=>i.visible_to_client&&(!i.client_decision||i.client_decision==='undecided')))return send({message:'UNDECIDED_ITEMS'},400);
+     const guided=(state.guidedDecisions||[]).filter(d=>d.meeting_id===meeting.id);if(guided.length&&!conversationDeck(state,meeting.id).every(e=>guided.some(d=>d.topic_key===e.key)))return send({message:'UNDECIDED_ITEMS'},400);
      meeting.status='completed';
-     for(const item of items){const service=state.familyServices.find(s=>s.id===item.family_service_id);if(service)service.status={progress:'client_approved_execution',thinking:'client_thinking',declined:'client_declined',no_action:'no_execution_needed'}[item.client_decision]||service.status;}
+     for(const item of items){const service=state.familyServices.find(s=>s.id===item.family_service_id);if(service&&!['sent_execution','execution_in_progress','waiting_client','needs_info','execution_needs_info','execution_reported_complete','completed','assigned','in_progress','in_analysis'].includes(service.status))service.status={progress:'client_approved_execution',thinking:'client_thinking',declined:'client_declined',no_action:'no_execution_needed'}[item.client_decision]||service.status;}
      return send(null);
     }
     if(args.p_action==='start'&&meeting.status==='scheduled'){meeting.status='in_progress';return send(null);}

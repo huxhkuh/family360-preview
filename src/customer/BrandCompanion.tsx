@@ -1,3 +1,4 @@
+import {publicAsset} from '../lib/assets';
 import {HeroGaze} from './HeroGaze';
 import {useEffect,useRef} from 'react';
 import {CompanionPortrait,type Pose} from '../companion/Companion';
@@ -13,5 +14,5 @@ export function BrandCompanion({pose='welcome',full=false,tracking=false}:{pose?
   window.addEventListener('pointermove',move,{passive:true});document.documentElement.addEventListener('pointerleave',reset);
   return()=>{cancelAnimationFrame(frame);window.removeEventListener('pointermove',move);document.documentElement.removeEventListener('pointerleave',reset);};
  },[tracking]);
- return <div ref={ref} className={`brand-companion${full?' brand-companion-full':''}`} aria-hidden="true"><div className="brand-companion-scene"><span className="brand-petal petal-one"/><span className="brand-petal petal-two"/><span className="brand-petal petal-three"/><span className="brand-companion-person">{full&&tracking?<HeroGaze/>:full?<img src={`${import.meta.env.BASE_URL}homepage/welcome.png`} alt="" draggable={false}/>:<CompanionPortrait pose={pose}/>}</span><span className="brand-companion-ground"/></div></div>;
+ return <div ref={ref} className={`brand-companion${full?' brand-companion-full':''}`} aria-hidden="true"><div className="brand-companion-scene"><span className="brand-petal petal-one"/><span className="brand-petal petal-two"/><span className="brand-petal petal-three"/><span className="brand-companion-person">{full&&tracking?<HeroGaze/>:full?<img src={publicAsset('homepage/welcome.png')} alt="" draggable={false}/>:<CompanionPortrait pose={pose}/>}</span><span className="brand-companion-ground"/></div></div>;
 }

@@ -22,6 +22,8 @@
     "test:date-picker": "node scripts/check-date-picker.mjs",
     "test:client-decisions": "node scripts/check-client-decisions.mjs",
     "test:new-client-optional": "node scripts/check-new-client-optional.mjs",
+    "export:html": "node scripts/export-workspace-html.mjs",
+    "test:guided-studio": "node scripts/check-guided-studio.mjs",
     "test:guided-call": "node scripts/check-guided-call.mjs",
     "test:yitzchak-feedback": "node scripts/check-yitzchak-feedback.mjs",
     "test:growth": "node scripts/check-growth.mjs",

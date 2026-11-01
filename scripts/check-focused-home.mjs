@@ -8,6 +8,7 @@ try{
   const context=await browser.newContext({viewport:{width,height:900},reducedMotion:'reduce',permissions:['clipboard-read','clipboard-write']});
   const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
   await page.goto(base+'#workspace');await page.locator('.demo-roles>button').nth(index).click();
+  if(['admin','professional'].includes(role)){await expect(page.locator('.role-studio')).toBeVisible();await expect(page.locator('.role-studio-heading h1')).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);await page.screenshot({path:`${out}/${role}-${width}.png`,fullPage:true});expect(errors).toEqual([]);results.push({role,width,passed:true});await context.close();continue;}
   const home=page.locator('.focused-home'),task=page.getByRole('region',{name:'הפעולה הבאה שלי'});
   await expect(home).toHaveAttribute('data-focus-role',role);await expect(task).toBeVisible();
   const primary=task.getByRole('button');expect(await primary.count()).toBeLessThanOrEqual(1);

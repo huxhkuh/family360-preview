@@ -1,3 +1,4 @@
+import {folder} from './guided-test-helpers.mjs';
 import {fillRequiredContactAnswers} from './client-navigation.mjs';
 import {openClientNavigation} from './client-navigation.mjs';
 import {chromium,expect} from '@playwright/test';
@@ -51,29 +52,29 @@ try{for(const [device,width,height] of [['desktop',1440,1000],['mobile',390,844]
  await expect(inline.getByRole('status')).toContainText('ממתינה לבדיקת הנציג');
  await expect(inline.getByRole('status')).toBeFocused();
  const tabs=page.getByRole('navigation',{name:'תוכן תיק המשפחה'});
- await openClientNavigation(page);await tabs.getByRole('button',{name:'מסמכים',exact:true}).click();
+ await openClientNavigation(page);await folder(page,'מסמכים');
  await expect(page.locator('article.document').filter({hasText:'חוזה שכירות'})).toHaveCount(1);
  await expect(page.locator('article.document .badge')).toContainText('ממתין');
- await openClientNavigation(page);await tabs.getByRole('button',{name:'שאלון',exact:true}).click();
+ await openClientNavigation(page);await folder(page,'שאלון');
  await chapters.getByRole('button',{name:'פרטי משפחה',exact:true}).click();
  await expect(page.locator('[data-answer-key=city]')).toHaveValue('טיוטה עם מלווה');
  // Trigger a genuine optimistic-concurrency failure. It must not create a
  // document or report success when the questionnaire could not be saved.
  await chapters.getByRole('button',{name:'עבודה והכנסות',exact:true}).click();
  await page.locator('[data-answer-key=h_emp]').getByLabel('שכיר',{exact:true}).check();
- await openClientNavigation(page);await tabs.getByRole('button',{name:/^(סקירה|הבית שלי|פרטי התיק)$/}).click();
+ await openClientNavigation(page);await folder(page,'פרטי התיק');
  await page.getByRole('button',{name:'עריכת איש קשר',exact:true}).click();
  await page.getByLabel('איש קשר',{exact:true}).fill('עדכון מקביל לדוגמה');
  await page.getByRole('button',{name:'שמירת איש קשר',exact:true}).click();
  await expect(page.getByText('פרטי הקשר נשמרו בתיק. לא נשלחה הודעה.')).toBeVisible();
- await openClientNavigation(page);await tabs.getByRole('button',{name:'שאלון',exact:true}).click();
+ await openClientNavigation(page);await folder(page,'שאלון');
  await inline.getByRole('button',{name:'צירוף דוגמה'}).click();
  await expect(inline.getByRole('alert')).toContainText('הנתונים השתנו');
  await expect(inline.getByRole('button',{name:'צירוף דוגמה'})).toBeEnabled();
  await expect(page.locator('[data-answer-key=h_emp]').getByLabel('שכיר',{exact:true})).toBeChecked();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
  expect(await page.locator('.chapter-companion img').evaluate(el=>getComputedStyle(el).animationName)).toBe('none');
- await openClientNavigation(page);await tabs.getByRole('button',{name:'מסמכים',exact:true}).click();
+ await openClientNavigation(page);await folder(page,'מסמכים');
  await expect(page.locator('article.document')).toHaveCount(1);
  expect(errors).toEqual([]);
  results.push({device,passed:true,checks:['welcome image loaded','keyboard chapter explanation','empty document collection hidden','relevant collection visible and opens','collection removed when answers no longer require documents','answer-driven document prompt','defer survives navigation','irrelevant prompt disappears','sample attached once and awaits review','status focus after attach','draft retained','failed save keeps input and creates no document','no overflow or JS errors','reduced motion']});

@@ -7,11 +7,12 @@ export function DraftShelf({open,w}:{open:(route:RouteState)=>void;w:Workspace})
  const resume=(key:string)=>{
   const [kind,record,item]=key.split(':');
   if(kind==='admin'){store.set('admin-tab',{value:record,dirty:false,label:''});store.set('admin-selection:'+record,{value:item,dirty:false,label:''});open({page:'admin'});}
-  else if(kind==='analysis')open({page:'tasks',kind:'analysis',id:record});
-  else if(kind==='execution'){store.set('execution-view:'+record,{value:item==='complete'?'complete':'update',dirty:false,label:''});open({page:'tasks',kind:'execution',id:record});}
+  else if(kind==='analysis'){store.set('professional-desk:'+record,{value:'findings',dirty:false,label:''});open({page:'tasks',kind:'analysis',id:record});}
+  else if(kind==='execution'){store.set('professional-desk:'+record,{value:'findings',dirty:false,label:''});store.set('execution-view:'+record,{value:item==='complete'?'complete':'update',dirty:false,label:''});open({page:'tasks',kind:'execution',id:record});}
   else if(kind==='resource'){const work=store.get(key)?.value as {saved:Record<string,unknown>;revision:number};store.set('resource-open:true',{value:record==='new'?'new':{...work.saved,id:record,revision:work.revision,verified_at:null},dirty:false,label:''});store.set('admin-tab',{value:'resources',dirty:false,label:''});open({page:'admin'});}
   else if(kind==='final-report')open({page:'meetings',id:record,stage:'summary'});
   else if(kind==='commission'){store.set('marketer-selection',{value:record,dirty:false,label:''});open({page:'referrals'});}
+  else if(kind==='guided')open({page:'meetings',id:record,stage:'discussion',topic:key.slice(('guided:'+record+':').length)});
   else if(kind==='decision')open({page:'meetings',id:record,stage:'discussion',topic:item});
   else if(kind==='checklist'){store.set('checklist-selection:'+record,{value:item,dirty:false,label:''});open({page:'meetings',id:record,stage:'checklist'});}
   else if(kind==='followup-editor'){store.set('followup-open:'+record+':false',{value:item==='new'?'new':w.followUps.find(t=>t.id===item)||null,dirty:false,label:''});open({page:'meetings',id:record,stage:'summary'});}

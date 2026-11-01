@@ -1,3 +1,4 @@
+import {folder} from './guided-test-helpers.mjs';
 import {attachRequiredSamples} from './task-navigation.mjs';
 import {openClientNavigation} from './client-navigation.mjs';
 import {chromium,expect} from '@playwright/test';
@@ -74,7 +75,7 @@ try{for(const width of [1440,390,320]){
  await page.getByLabel('איש קשר',{exact:true}).fill('איש קשר לדוגמה');
  await page.getByRole('button',{name:'שמירת איש קשר',exact:true}).click();
  await expect(page.getByText('פרטי הקשר נשמרו בתיק. לא נשלחה הודעה.')).toBeVisible();
- await openClientNavigation(page);await page.getByRole('navigation',{name:'תוכן תיק המשפחה'}).getByRole('button',{name:'שאלון',exact:true}).click();
+ await openClientNavigation(page);await folder(page,'שאלון');
  await page.getByRole('button',{name:'שמירת טיוטה',exact:true}).click();
  await expect(page.getByRole('alert')).toContainText('הנתונים השתנו');
  await expect(page.getByRole('alert')).not.toContainText('לרענן');

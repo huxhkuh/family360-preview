@@ -29,3 +29,4 @@ import './landing/premium.css';
 import './branding/editorial-workspaces.css';
 
 import './branding/studio-workspaces.css';
+import './branding/guided-studio-finish.css';

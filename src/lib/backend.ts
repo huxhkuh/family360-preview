@@ -17,6 +17,7 @@ import {registrationSchema} from '../customer/registration';
 import {questionnaireIssues} from '../families/questionnaire-validation';
 import {operationRpc} from './demo-operations';
 import {meetingRpc} from './demo-meeting';
+import {demoGuided} from './demo-guided';
 import {documentPreparation} from '../companion/document-preparation';
 import {clearinghouseConsent} from '../families/clearinghouse-consent';
 import {workspaceSchema,type Role} from './model';
@@ -32,8 +33,12 @@ export function resetDemo(){
  state.finalReports=[];state.finalReportHistory=[];state.documentTypes=catalogDocumentTypes();
  Object.assign(state,{workflowV2Enabled:true,questionnaireV2Enabled:true,familyWorkEnabled:true,familyDirectoryEnabled:true,activityFeedEnabled:true,resourceLibraryEnabled:true,professionalPoolEnabled:true,familyTasks:[],familyContacts:[]});
  state.families.forEach(f=>{f.representative_id='rep1';f.phone='';f.email='family@example.invalid';});
+ state.services.push({id:'s-mortgage',key:'mortgage',name:'ייעוץ ובדיקת משכנתא',active:true,trigger_conditions:[],client_fields:[],professional_fields:[{key:'mort_balance',label:'יתרת משכנתא'},{key:'mort_monthly',label:'החזר חודשי'},{key:'mort_bank',label:'בנק'}],required_documents:[]});
+ state.guidedDecisions=[];
+ Object.assign(state.families.find(f=>f.id==='f3').answers,{city:'כתובת להדגמה בלבד',ravkav_discount:'no',ravkav_review:'yes',has_mortgage:'yes',mort_balance:650000,mort_monthly:4200,mort_bank:'leumi'});
+ state.meetingItems.unshift({id:'mi-ravkav',meeting_id:'m3',family_id:'f3',title:'רב־קו',visible_to_client:true,sort_order:0,client_decision:'undecided',current_situation:'תרחיש הדגמה: פרופיל גאוגרפי טרם עודכן. בדיקת הכתובת המוצגת היא מדומה.',recommendation:'השלמת מסמכים לבקשת פרופיל גאוגרפי',client_summary:'נברר את הפרופיל הקיים ואת האפשרות לעדכן אותו.',financial:{comparison:{kind:'expense',period:'monthly',status:'estimate',current:140,proposed:70,setup_cost:0,current_detail:'עלות חודשית סינתטית',proposed_detail:'עלות מדומה לאחר הנחה',basis:'תרחיש הדגמה בלבד: 140 פחות 70, ללא בדיקת כתובת או תעריף חי',conditions:'בפועל נדרשים אישור פרופיל ותעריף עדכני; הסכום כאן להמחשה',current_source:'נתוני הדגמה',proposed_source:'נתוני הדגמה',checked_on:now().slice(0,10),valid_until:''}}});
  state.professionals=[1,2,3].map(n=>({id:'pro'+n,profile_id:'professional'+n,name:['מומחה א׳ לדוגמה','מומחה ב׳ לדוגמה','מומחה ג׳ לדוגמה'][n-1],active:true,profile_active:true,analysis_enabled:true,execution_enabled:true,business_name:'משרד לדוגמה'}));
- state.professionalServices=state.professionals.flatMap(p=>state.services.map(s=>({id:p.id+s.id,professional_id:p.id,service_id:s.id,analysis_enabled:true,execution_enabled:true})));
+ state.professionalServices=state.professionals.flatMap(p=>state.services.filter(s=>s.id!=='s-mortgage'||p.id==='pro1').map(s=>({id:p.id+s.id,professional_id:p.id,service_id:s.id,analysis_enabled:true,execution_enabled:true})));
  state.representatives=[{id:'rep1',profile_id:'representative',name:'נציג לדוגמה',active:true,permissions:['families.edit','documents.manage','analysis.send','analysis.approve','execution.send','execution.approve']}];
  state.profiles=[{id:'admin',name:'מנהל לדוגמה',role:'admin',active:true},{id:'client',name:'לקוח לדוגמה',role:'client',active:true},{id:'representative',name:'נציג לדוגמה',role:'representative',active:true},...state.professionals.map(p=>({id:p.profile_id,name:p.name,role:'professional',active:true}))];
  state.familyTasks=[{id:'ft1',family_id:'f1',title:'להכין רשימת הוצאות חודשית',details:'דוגמה למשימה בתיק שאינה תלויה בפגישה.',owner_role:'client',owner_name:'המשפחה',due_on:new Date(Date.now()+86400000*4).toISOString().slice(0,10),visible_to_client:true,status:'open',revision:1,updated_at:now()}];
@@ -84,6 +89,7 @@ export function loadCompletedFamilyExample(){
 export function selectRole(next:Role){role=next;}
 function workspace(){
  const data=structuredClone(state);
+ data.guidedCallEnabled=['admin','representative'].includes(role);data.guidedDecisions=['admin','representative'].includes(role)?state.guidedDecisions||[]:[];
  Object.assign(data,growthProjection(growth,role,state.families));
  if(role==='marketer'){
   data.familyDirectoryEnabled=false;
@@ -197,6 +203,7 @@ export async function rpc<T=unknown>(name:string,a:Record<string,any>={}):Promis
  if(name==='rpc_manage_meeting'){if(!staff)throw Error('PERMISSION_DENIED');const m=find('meetings',a.p_meeting_id);if(m.scheduled_at!==a.p_expected_scheduled_at)throw Error('CONFLICT');if(m.status!=='scheduled')throw Error('INVALID_STATE');if(a.p_action==='reschedule'){if(!Number.isFinite(Date.parse(a.p_scheduled_at)))throw Error('VALIDATION');m.scheduled_at=a.p_scheduled_at;}else if(a.p_action==='cancel'){if(String(a.p_reason||'').trim().length<3)throw Error('VALIDATION');m.status='cancelled';m.cancel_reason=a.p_reason;for(const item of state.meetingItems.filter(i=>i.meeting_id===m.id)){const fs=state.familyServices.find(s=>s.id===item.family_service_id);if(fs?.status==='waiting_meeting'&&fs.analysis_task_id===item.analysis_task_id)fs.status='approved_analysis';}find('families',m.family_id).status='ready_meeting';}else throw Error('VALIDATION');return null;}
  if(name==='rpc_save_decision_followup'){if(!staff)throw Error('PERMISSION_DENIED');const item=find('meetingItems',a.p_item_id);Object.assign(item,{client_decision:a.p_decision,decision_note:a.p_note,execution_instructions:a.p_instructions});return update('followUps',a.p_followup_id,{...a.p_followup,meeting_id:a.p_meeting_id,item_id:a.p_item_id,family_id:item.family_id,status:'open',owner_name:'נציג לדוגמה'},a.p_expected_revision);}
  if(name==='rpc_list_agent_invitations')return [];
+ const guided=demoGuided(name,a,state,role);if(guided!==undefined)return guided;
  const legacy=meetingRpc('/rest/v1/rpc/'+name,a,state,role,workspace);if(legacy!==undefined)return legacy;
  throw Error('DEMO_UNAVAILABLE');
  };return structuredClone(run()) as T;

@@ -1,3 +1,4 @@
+import {publicAsset} from '../lib/assets';
 import {BenefitIcon} from './BenefitIcon';
 import {usePageStack,scrollToPage} from './usePageStack';
 import {BrandLogo,brandAsset} from '../branding/Brand';
@@ -5,7 +6,7 @@ const WELCOME_ART={logo:brandAsset()};
 import {BrandCompanion} from '../customer/BrandCompanion';
 type PublicProps={accountName?:string;onAccount?:()=>void;onSystem:()=>void;onStart:()=>void;onLearn:()=>void;continuing?:boolean;onHome?:()=>void};
 function PublicHeader({onSystem,onStart,onLearn,continuing,onHome,accountName,onAccount}:PublicProps){return <header className="public-header"><button onClick={onHome||(()=>window.scrollTo({top:0,behavior:"auto"}))} className="public-logo" aria-label="מסודרים 360, דף הבית"><BrandLogo/></button><nav aria-label="ניווט באתר">{accountName&&<button className="account-access" onClick={onAccount}>האזור האישי</button>}<button className="quiet-button" onClick={onLearn}>איך זה עובד?</button><button className="quiet-button" onClick={onSystem}>כניסה למערכת</button><button className="primary brand-primary nav-start" onClick={onStart}>{continuing?'ממשיכים מאיפה שעצרתם':'מתחילים יחד'}</button></nav></header>;}
-function WelcomeArt({name,caption}:{name:string;caption:string;number?:string}){return <figure className={`integrated-art art-${name}`}>{name==='welcome'?<><div className="companion-backdrop" aria-hidden="true"><i/><i/><i/><i/></div><BrandCompanion full tracking/></>:<img src={`${import.meta.env.BASE_URL}homepage/${name}.png`} alt={caption} loading="lazy"/>}</figure>;}
+function WelcomeArt({name,caption}:{name:string;caption:string;number?:string}){return <figure className={`integrated-art art-${name}`}>{name==='welcome'?<><div className="companion-backdrop" aria-hidden="true"><i/><i/><i/><i/></div><BrandCompanion full tracking/></>:<img src={publicAsset(`homepage/${name}.png`)} alt={caption} loading="lazy"/>}</figure>;}
 export function ReserveWelcomePage(props:PublicProps){
  const {rootRef,headerTheme,headerVisible}=usePageStack();
  return <div ref={rootRef} className="brand-public welcome-page restored-home premium-public page-stack" onClick={e=>{if(e.defaultPrevented)return;const anchor=(e.target as HTMLElement).closest('a[href^="#"]');if(!anchor)return;const id=anchor.getAttribute('href')?.slice(1);const target=id==='welcome'?e.currentTarget:document.getElementById(id||'');if(target){e.preventDefault();scrollToPage(e.currentTarget,target);}}}>

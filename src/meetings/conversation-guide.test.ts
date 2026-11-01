@@ -1,0 +1,11 @@
+import {describe,it,expect} from 'vitest';
+import {CHAPTERS} from '../families/questionnaire-definition';
+import {conversationGuides,questionnaireCoverage,guideAnswers,savingsEvidence} from './conversation-guide';
+import type {Family,MeetingItem} from '../lib/model';
+describe('complete speaking guide',()=>{
+ it('maps every questionnaire field, including repeated records, to an explained conversation topic',()=>{const keys=CHAPTERS.flatMap(c=>c.secs.flatMap(s=>(s.fields||[]).map(f=>f.k)));expect(keys.filter(k=>!questionnaireCoverage[k])).toEqual([]);for(const key of new Set(Object.values(questionnaireCoverage))){const g=conversationGuides.find(g=>g.key===key)!;expect(g).toBeDefined();expect(g.explain.length).toBeGreaterThan(25);expect(g.say.length).toBeGreaterThan(25);expect(g.needs.length).toBeGreaterThan(0);}});
+ it('includes original topics plus loans, additional insurance/savings, credit and wedding planning',()=>{for(const key of ['rav_kav','mortgage_refinance','loans','savings_overview','insurance_overview','weddings','overdraft','gemach','injury_rights'])expect(conversationGuides.some(g=>g.key===key)).toBe(true);});
+ it('shows human labels for repeated loans and wedding targets',()=>{const family={answers:{loans:[{lender:'Bank',balance:15000,monthly:500}],children:[{name:'Child'}],wt_0:200000,wa_0:22}} as unknown as Family;expect(guideAnswers(conversationGuides.find(g=>g.key==='loans')!,family)[0].value).toContain('הסכום שנותר להחזר');expect(guideAnswers(conversationGuides.find(g=>g.key==='weddings')!,family)[0].value).toContain('200000');});
+ it('never invents savings from a legacy total or incomplete comparison',()=>{expect(savingsEvidence({financial:{monthly:70}} as unknown as MeetingItem)).toBeNull();expect(savingsEvidence({financial:{comparison:{current:140,proposed:70,status:'estimate'}}} as unknown as MeetingItem)).toBeNull();});
+ it('calculates 70 monthly and 840 annually from a documented comparison',()=>{const item={financial:{comparison:{kind:'expense',period:'monthly',status:'estimate',current:140,proposed:70,current_source:'Synthetic invoice',proposed_source:'Synthetic offer',basis:'Equal period',conditions:'Subject to approval',checked_on:'2026-10-31'}}} as unknown as MeetingItem;expect(savingsEvidence(item)).toMatchObject({monthly:70,annual:840,estimate:true});});
+});

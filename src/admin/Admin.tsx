@@ -1,3 +1,4 @@
+import {useEffect} from 'react';
 import {ResourceLibrary} from '../resources/ResourceLibrary';
 import {useRetainedState} from '../lib/draft-guard';
 import {RetainedForm} from '../RetainedForm';
@@ -14,8 +15,9 @@ const permissionCopy:Record<string,[string,string]>={
  'execution.approve':['אישור השלמת ביצוע','אישור התוצאה שדווחה על ידי בעל המקצוע.'],
  'documents.manage':['ניהול מסמכים','בקשת מסמכים, בדיקה וניהול השיתוף לפי הרשאות התיק.']
 };
-export function Admin({w,refresh,leave}:{w:Workspace;refresh:()=>Promise<void>;leave:()=>boolean}){
+export function Admin({w,refresh,leave,initialTab}:{w:Workspace;refresh:()=>Promise<void>;leave:()=>boolean;initialTab?:string}){
  const [tab,setTab]=useRetainedState('admin-tab',()=> 'profiles');
+ useEffect(()=>{if(initialTab&&['profiles','services','professionals','representatives','documents','templates','automations','settings','resources','audit','invitations'].includes(initialTab))setTab(initialTab);},[initialTab]);
  const [choice,setChoice]=useRetainedState('admin-selection:'+tab,()=> '');const [query,setQuery]=useRetainedState('admin-search:'+tab,()=> '');
  const catalog:Record<string,{id:string;name:string}[]>={profiles:w.profiles,services:w.services,professionals:w.professionals,representatives:w.representatives,documents:w.documentTypes,templates:w.templates,automations:w.automations};
  const entries=catalog[tab]?.filter(r=>r.name.includes(query.trim()));const selected=choice||entries?.[0]?.id||'';

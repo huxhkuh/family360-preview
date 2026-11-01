@@ -1,8 +1,9 @@
+import {publicAsset} from '../lib/assets';
 import {useState,type ReactNode} from 'react';
 import './companion.css';
 export type Pose='welcome'|'explain'|'pause'|'document'|'later'|'success'|'review'|'complete';
 export function CompanionPortrait({pose,className=''}:{pose:Pose;className?:string}){
- return <span className={`companion-portrait ${className}`} data-pose={pose} aria-hidden="true"><img src={`${import.meta.env.BASE_URL}companion/${pose}.webp`} alt="" width="160" height="230" draggable={false}/></span>;
+ return <span className={`companion-portrait ${className}`} data-pose={pose} aria-hidden="true"><img src={publicAsset(`companion/${pose}.webp`)} alt="" width="160" height="230" draggable={false}/></span>;
 }
 export function Companion({pose,title,children}:{pose:Pose;title:string;children:ReactNode}){
  return <aside className={`companion companion-${pose}`} aria-label={title}>

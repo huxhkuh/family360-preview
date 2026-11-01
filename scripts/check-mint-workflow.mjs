@@ -1,3 +1,4 @@
+import {openTopic,saveChoice} from './guided-test-helpers.mjs';
 import {revealTaskContent} from './task-navigation.mjs';
 import {chromium,expect} from '@playwright/test';
 import {writeFileSync,mkdirSync} from 'node:fs';
@@ -24,13 +25,10 @@ try{for(const [device,width,height] of [['desktop',1440,900],['tablet',820,900],
  }
  await expect(page.getByText('תיעוד קשר ראשון לבדיקה',{exact:true})).toBeVisible();
  // A checklist draft survives a topic switch; saving leaves the editor in place.
- await go('meetings/m3');await page.getByRole('button',{name:'התחלת פגישה',exact:true}).click();await page.getByRole('button',{name:/^רשימת בדיקה ·/}).click();
- const topicButtons=page.locator('.checklist-topic');await topicButtons.first().click();const editor=page.getByRole('region',{name:'בדיקת נושא',exact:true});
- const directory=page.locator('details.checklist-directory');const openDirectory=async()=>{if(!await directory.evaluate(el=>el.open))await directory.locator('summary').click();};
- await editor.getByLabel('תיעוד הבדיקה — פנימי לצוות').fill('תיעוד שנשאר בנושא');await openDirectory();await topicButtons.nth(1).click();await openDirectory();await topicButtons.first().click();await expect(editor.getByLabel('תיעוד הבדיקה — פנימי לצוות')).toHaveValue('תיעוד שנשאר בנושא');await editor.getByLabel('תוצאת הבדיקה').selectOption('no_action');await editor.getByRole('button',{name:'שמירת בדיקת הנושא',exact:true}).click();await expect(editor.getByText('הפעולה נשמרה בהצלחה',{exact:true})).toBeVisible();await expect(editor).toBeVisible();
- await editor.getByLabel('תיעוד הבדיקה — פנימי לצוות').fill('שמירה נוספת של אותו נושא');await editor.getByRole('button',{name:'שמירת בדיקת הנושא',exact:true}).click();await expect(editor.getByText('הפעולה נשמרה בהצלחה',{exact:true})).toBeVisible();
+ await go('meetings/m3');await page.getByRole('button',{name:'התחלת פגישה',exact:true}).click();await openTopic(page,'ביטוח חיים למשכנתא');
+ const note=page.getByLabel('הערות מהשיחה — לצוות בלבד');await note.fill('תיעוד שנשאר בנושא');await openTopic(page,'ביטוח מבנה');await openTopic(page,'ביטוח חיים למשכנתא');await expect(note).toHaveValue('תיעוד שנשאר בנושא');await saveChoice(page,'אין צורך בטיפול',false);await expect(page.getByText('ההחלטה נשמרה',{exact:true})).toBeVisible();await expect(page.locator('.guided-topic-heading')).toContainText('ביטוח חיים למשכנתא');await note.fill('שמירה נוספת של אותו נושא');await page.getByRole('button',{name:'שמירה',exact:true}).click();await expect(page.getByText('ההחלטה נשמרה',{exact:true})).toBeVisible();
  // Two follow-ups, then an inline update followed by the full editor use fresh revisions.
- await page.getByRole('navigation',{name:'שלבי השיחה'}).getByRole('button',{name:/סיכום והמשך/}).click();const followups=page.getByRole('region',{name:'משימות המשך ומועדים',exact:true});
+ await page.getByRole('navigation',{name:'שלבי השיחה'}).getByRole('button',{name:/סיכום והמשך/}).click();await page.locator('.guided-summary>details>summary').filter({hasText:'משימות ההמשך'}).click();const followups=page.getByRole('region',{name:'משימות המשך ומועדים',exact:true});
  for(const title of ['משימת המשך ראשונה','משימת המשך שנייה']){
   await followups.getByRole('button',{name:'הוספת משימת המשך',exact:true}).click();await followups.getByLabel('מה צריך לעשות?').fill(title);await followups.getByLabel('עד מתי?').fill('2026-12-20');await followups.getByRole('button',{name:'שמירת משימת המשך',exact:true}).click();await expect(followups.getByRole('heading',{name:title,exact:true})).toBeVisible();
  }

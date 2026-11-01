@@ -1,3 +1,4 @@
+import {completeTopics} from './guided-test-helpers.mjs';
 import {chromium,expect} from '@playwright/test';
 import {mkdirSync,writeFileSync} from 'node:fs';
 const base=(process.env.DEMO_URL||'http://127.0.0.1:5262/family360-preview/').replace(/\/?$/,'/'),out='test-results/final-report';mkdirSync(out,{recursive:true});
@@ -5,7 +6,7 @@ const browser=await chromium.launch(),results=[];
 try{for(const [device,width,height] of [['desktop',1440,1000],['mobile',390,844]]){
  const page=await browser.newPage({viewport:{width,height},reducedMotion:'reduce'});page.setDefaultTimeout(10000);const errors=[],requests=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());page.on('request',r=>requests.push(r.url()));
  await page.goto(base+'#workspace');await expect(page.locator('.demo-welcome').getByText(/מחיר השירות:.*490/)).toBeVisible();await page.getByRole('button',{name:/^01 נציג/}).click();const nav=page.getByRole('navigation',{name:'ניווט ראשי'});await expect(nav.getByRole('button',{name:'מוקד טלפוני',exact:true})).toHaveCount(0);
- await page.goto(base+'#/meetings/m3?family=f3');await page.getByRole('button',{name:'התחלת פגישה',exact:true}).click();for(let i=0;i<2;i++){await page.getByLabel('מה הלקוח החליט?').selectOption('no_action');await page.getByRole('button',{name:/^שמירה והמשך ל/}).click();}
+ await page.goto(base+'#/meetings/m3?family=f3');await page.getByRole('button',{name:'התחלת פגישה',exact:true}).click();await completeTopics(page);
  await page.getByRole('navigation',{name:'שלבי השיחה'}).getByRole('button',{name:/סיכום והמשך/}).click();
  const editor=page.getByRole('region',{name:'הדוח הסופי',exact:true}),context=editor.getByLabel('מה היה חשוב למשפחה בתהליך?');
  await context.fill('המשפחה ביקשה להפחית עמלות ולרכז את התוצאות בסיכום ברור.');await nav.getByRole('button',{name:'סקירה',exact:true}).click();await page.locator('.draft-shelf summary').click();await page.getByRole('button',{name:'חזרה לטיוטה — נתוני הדוח הסופי',exact:true}).click();await expect(context).toHaveValue('המשפחה ביקשה להפחית עמלות ולרכז את התוצאות בסיכום ברור.');

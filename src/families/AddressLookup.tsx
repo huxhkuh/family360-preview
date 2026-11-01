@@ -1,8 +1,9 @@
+import {publicAsset} from '../lib/assets';
 import {useEffect,useId,useState,type InputHTMLAttributes} from 'react';
 type Catalog={cities:string[];streets:Record<string,string[]>};
 let catalogRequest:Promise<Catalog>|undefined;
 function catalog(){
- return catalogRequest??=fetch(import.meta.env.BASE_URL+'data/address-catalog.json').then(async response=>{if(!response.ok)throw Error('ADDRESS_CATALOG');return response.json() as Promise<Catalog>;}).catch(error=>{catalogRequest=undefined;throw error;});
+ return catalogRequest??=fetch(publicAsset('data/address-catalog.json')).then(async response=>{if(!response.ok)throw Error('ADDRESS_CATALOG');return response.json() as Promise<Catalog>;}).catch(error=>{catalogRequest=undefined;throw error;});
 }
 const normalize=(text:string)=>text.normalize('NFKC').replace(/[״"׳']/g,'').replace(/[-־]/g,' ').trim();
 export function AddressLookup({kind,city,value,onChange,answerKey,required,id:inputId,name,autoComplete,'aria-invalid':invalid,'aria-describedby':describedBy}:{kind:'city'|'address';city:string;value:string;onChange:(value:string)=>void;answerKey:string;required:boolean}&Pick<InputHTMLAttributes<HTMLInputElement>,'id'|'name'|'autoComplete'|'aria-invalid'|'aria-describedby'>){

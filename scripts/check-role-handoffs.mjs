@@ -1,3 +1,4 @@
+import {proFindings,submitAnalysis,completeTopics,saveChoice} from './guided-test-helpers.mjs';
 import {chromium,expect} from '@playwright/test';
 import {mkdirSync,writeFileSync} from 'node:fs';
 import {revealTaskContent} from './task-navigation.mjs';
@@ -17,8 +18,8 @@ try{for(const width of [1440,390]){
  const openNewTask=async kind=>{
   await page.getByRole('navigation',{name:'ניווט ראשי'}).getByRole('button',{name:'משימות',exact:true}).click();
   if(kind==='execution')await button('משימות ביצוע').click();
-  const card=page.locator('.task-card').filter({hasText:kind==='analysis'?/AN-\d+/:/EX-\d+/});
-  await expect(card).toHaveCount(1);await card.getByRole('button',{name:/^פתיחת משימה /}).click();await expect(page.locator('.task-detail')).toBeVisible();
+  const card=page.locator('.task-card').filter({hasText:kind==='analysis'?/AN-\d+/:/EX-[A-Z0-9]+/});
+  await expect(card).toHaveCount(1);await card.getByRole('button',{name:/^פתיחת משימה /}).click();await expect(page.locator('.task-detail,.professional-desk')).toBeVisible();if(kind==='execution'&&await page.locator('.professional-desk').count())await proFindings(page);
  };
  try{
   console.log(`Role handoff journey ${width}: assignment and document sharing`);
@@ -30,24 +31,16 @@ try{for(const width of [1440,390]){
   await service().locator('summary').filter({hasText:'שיתוף מסמכים עם בעל המקצוע'}).click();await service().getByLabel('מסמך',{exact:true}).selectOption('d2');await button('עדכון שיתוף').click();
   await role('professional');await openNewTask('analysis');
   await revealTaskContent(page,'article.document');await expect(page.locator('article.document')).toHaveCount(1);await expect(page.locator('article.document')).toContainText('דוח פנסיה שנתי');
-  await page.getByLabel('חומרה',{exact:true}).selectOption('yellow');await page.getByLabel('פירוט המצב כיום',{exact:true}).fill('עלות של מאה שקלים לחודש לפי הדוח');await page.getByLabel('פירוט החלופה המוצעת',{exact:true}).fill('חלופה בעלות שמונים שקלים לחודש בכפוף לתנאים');await page.getByLabel('סיכום ללקוח',{exact:true}).fill('נמצאה חלופה לבדיקה עם המשפחה');await button('הגשת הניתוח לאישור').click();
+  await proFindings(page);await page.getByLabel('חומרה',{exact:true}).selectOption('yellow');await page.getByLabel('פירוט המצב כיום',{exact:true}).fill('עלות של מאה שקלים לחודש לפי הדוח');await page.getByLabel('פירוט החלופה המוצעת',{exact:true}).fill('חלופה בעלות שמונים שקלים לחודש בכפוף לתנאים');await page.getByLabel('סיכום ללקוח',{exact:true}).fill('נמצאה חלופה לבדיקה עם המשפחה');await submitAnalysis(page);
   await expect(continuation()).toContainText('העבודה נשלחה לנציג לבדיקה');await capture('analysis-submitted');
   console.log(`Role handoff journey ${width}: return, correction and approval`);
   await role('representative');await go('families/f2/services?focus=fs2');await revealTaskContent(page,'input[name="reason"]');await page.getByLabel('סיבת ההחזרה',{exact:true}).fill('להוסיף מקור להשוואת העלויות');await button('החזרה לתיקון').click();await expect(service().locator('.badge').first()).toHaveText('בניתוח');
-  await role('professional');await openNewTask('analysis');await expect(page.locator('.task-detail')).toContainText('להוסיף מקור להשוואת העלויות');await page.locator('.analysis-evidence summary').click();await page.getByLabel('מקור המידע הקיים',{exact:true}).fill('דוח פנסיה שנתי שהועבר לבדיקה');await page.getByLabel('מקור החלופה / ההצעה',{exact:true}).fill('הצעה כתובה שנבדקה עם הגוף המנהל');await button('הגשת הניתוח לאישור').click();await expect(continuation()).toBeVisible();
+  await role('professional');await openNewTask('analysis');await expect(page.locator('.professional-desk')).toContainText('להוסיף מקור להשוואת העלויות');await proFindings(page);await page.locator('.analysis-evidence summary').click();await page.getByLabel('מקור המידע הקיים',{exact:true}).fill('דוח פנסיה שנתי שהועבר לבדיקה');await page.getByLabel('מקור החלופה / ההצעה',{exact:true}).fill('הצעה כתובה שנבדקה עם הגוף המנהל');await submitAnalysis(page);await expect(continuation()).toBeVisible();
   await role('representative');await go('families/f2/services?focus=fs2');await button('אישור ניתוח').click();await expect(service().locator('.badge').first()).toHaveText('ניתוח אושר');await expect(continuation()).toBeVisible();await capture('analysis-approved');
   console.log(`Role handoff journey ${width}: schedule, discuss and finish meeting`);
   await go('meetings?family=f2');await page.getByLabel('משפחה',{exact:true}).selectOption('f2');await page.getByLabel('תאריך ושעה',{exact:true}).fill('2030-01-01T10:00');await page.getByLabel('סוג פגישה',{exact:true}).selectOption('phone');await button('קביעת פגישה').click();
   const meeting=page.locator('.meeting-list>article').filter({hasText:'משפחת כהן'});await expect(meeting).toHaveCount(1);await meeting.getByRole('button',{name:'פתיחת סביבת השיחה',exact:true}).click();await button('התחלת פגישה').click();
-  await page.getByLabel('מה הלקוח החליט?',{exact:true}).selectOption('progress');
-  const executionNotes=page.locator('details.call-execution-notes');await executionNotes.locator('summary').click();await page.getByLabel('הוראות לביצוע',{exact:true}).fill('לתאם את הפעולה שאושרה ולבדוק את החיוב המעודכן');await page.getByLabel('תיעוד ההחלטה לצוות',{exact:true}).fill('המשפחה אישרה לאחר קבלת הסבר');
-  await page.getByRole('button',{name:/^שמירה והמשך ל/}).click();
-  if(await button('לבדיקת הסיכום והמשך הטיפול').count())await button('לבדיקת הסיכום והמשך הטיפול').click();
-  else if(!await button('סיום הפגישה ושמירת הסיכום').count()){
-   await revealTaskContent(page,'.meeting-steps');await page.getByRole('navigation',{name:'שלבי השיחה'}).getByRole('button',{name:/סיכום/}).click();
-  }
-  await button('סיום הפגישה ושמירת הסיכום').click();await expect(button('לשיוך בתחומי הטיפול')).toBeVisible();await capture('meeting-finished');await button('לשיוך בתחומי הטיפול').click();
-  await service().getByLabel('בעל מקצוע',{exact:true}).selectOption('pro1');await service().getByLabel('הנחיות',{exact:true}).fill('להתקדם לפי ההחלטה המתועדת');await service().getByRole('button',{name:'שליחה לביצוע',exact:true}).click();await expect(service().locator('.badge').first()).toHaveText('נשלח לביצוע');
+  await page.getByRole('radio',{name:'מעוניינים להתקדם',exact:true}).check();await page.locator('details.call-execution-notes>summary').click();await page.getByLabel('הוראות לביצוע',{exact:true}).fill('לתאם את הפעולה שאושרה ולבדוק את החיוב המעודכן');await page.getByLabel('הערות מהשיחה — לצוות בלבד').fill('המשפחה אישרה לאחר קבלת הסבר');await page.getByRole('button',{name:'שמירה והמשך',exact:true}).click();await completeTopics(page);await button('סיום הפגישה ושמירת הסיכום').click();await capture('meeting-finished');await go('families/f2/services?focus=fs2');await expect(service().locator('.badge').first()).toHaveText('נשלח לביצוע');
   console.log(`Role handoff journey ${width}: execute, report and approve completion`);
   await role('professional');await openNewTask('execution');await expect(page.getByRole('region',{name:'טיפול במשימת ביצוע'}).locator('.work-guidance')).toContainText('לתאם את הפעולה שאושרה');await button('התחלת טיפול').click();await page.getByLabel('תוכן',{exact:true}).fill('תואמה הפעולה ונבדק החיוב');await button('שמירת עדכון בטיפול').click();await expect(page.getByLabel('תוכן',{exact:true})).toHaveValue('');
   await button('דיווח סיום לנציג').click();await page.getByLabel('תוצאה',{exact:true}).fill('הפעולה הושלמה');await page.getByLabel('סיכום',{exact:true}).fill('בוצעה הפעולה שאושרה ונבדקה התוצאה מול האסמכתה');await page.locator('.analysis-evidence summary').click();await page.getByLabel('שווי כספי (אם נמדד)',{exact:true}).fill('0');await button('שליחת דיווח סיום לנציג').click();await expect(continuation()).toContainText('העבודה נשלחה לנציג לבדיקה');await capture('execution-reported');
