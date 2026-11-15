@@ -15,6 +15,8 @@ import {questionnaireDiscussion} from "../families/questionnaire-discussion";
 // No network, persistence, credentials or production service initialization.
 import type {SupabaseClient} from '@supabase/supabase-js';
 import seed from './demo-seed';
+import {installMortgageDemo,mortgageDemoDocuments} from './demo-mortgage';
+import {publicAsset} from './assets';
 import {registrationSchema} from '../customer/registration';
 import {questionnaireIssues} from '../families/questionnaire-validation';
 import {operationRpc} from './demo-operations';
@@ -88,6 +90,10 @@ export function loadCompletedFamilyExample(){
  reportOperation('rpc_save_final_report',{p_meeting_id:meetingId,p_expected_revision:0,p_content:structuredClone(exampleReportContent)},state,'representative');
  reportOperation('rpc_approve_final_report',{p_meeting_id:meetingId,p_expected_revision:1,p_treatment_complete:true,p_reviewed:true},state,'representative');
  return meetingId;
+}
+export function loadMortgageFamilyExample(){
+ resetDemo();installMortgageDemo(state);selectRole('professional');
+ return 'a-mortgage-demo';
 }
 export function selectRole(next:Role){role=next;}
 function workspace(){
@@ -214,6 +220,10 @@ export async function rpc<T=unknown>(name:string,a:Record<string,any>={}):Promis
  };return structuredClone(run()) as T;
 }
 export async function uploadDocument(_familyId:string,_documentId:string,_file:File):Promise<void>{throw Error('DEMO_UNAVAILABLE');}
-export async function documentUrl(_path:string):Promise<string>{if(['representative','admin'].includes(role)&&_path.startsWith('demo/'))return demoDocumentSource(_path.split('/')[1]);throw Error('DEMO_UNAVAILABLE');}
+export async function documentUrl(_path:string):Promise<string>{
+ if(mortgageDemoDocuments.some(doc=>doc.path===_path)&&workspace().documents.some(doc=>doc.storage_path===_path))return publicAsset(_path);
+ if(['representative','admin'].includes(role)&&_path.startsWith('demo/'))return demoDocumentSource(_path.split('/')[1]);
+ throw Error('DEMO_UNAVAILABLE');
+}
 
 export async function telephoneMessageUrl(_messageId:string):Promise<string>{throw Error('DEMO_UNAVAILABLE');}
