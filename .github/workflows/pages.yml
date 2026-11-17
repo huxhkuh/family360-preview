@@ -3,6 +3,10 @@ name: Test and publish demo
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'demo-static/professionals/**'
+      - '.github/workflows/professional-demo.yml'
+      - '.github/workflows/pages.yml'
   workflow_dispatch:
 
 permissions:
@@ -28,6 +32,7 @@ jobs:
       - run: npm run build:live
       - run: npm run test:live-boundary
       - run: npm run build
+      - run: cp -R demo-static/professionals dist/professionals
       - name: Install browser and dependencies
         run: |
           # The Azure package mirror throttled font downloads for over ten minutes.
