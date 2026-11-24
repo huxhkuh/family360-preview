@@ -1,3 +1,4 @@
+import {shortIntakeVersion} from '../families/short-intake';
 import {hasOwnedProperty,type Answers} from '../families/questionnaire-definition';
 import {employed} from '../lib/employment';
 import {DOCUMENT_CATALOG,type CatalogDocument} from '../families/document-catalog';
@@ -16,5 +17,5 @@ export function documentPreparation(a:Answers):Preparation[]{
  if(Number(a.bank_count)>0)keys.add('bank_identity');
  if(['own','rent','family'].includes(a.housing)){keys.add('municipal_bill');keys.add('electricity_bill');}
  if(Array.isArray(a.savings)&&a.savings.includes('pension'))keys.add('pension_report');
- return DOCUMENT_CATALOG.filter(d=>keys.has(d.key)&&d.requirement!=='pending');
+ return DOCUMENT_CATALOG.filter(d=>keys.has(d.key)&&d.requirement!=='pending').map(d=>a.intake_version===shortIntakeVersion && d.key.startsWith('clearinghouse_auth_') ? {...d,chapter:'family'} : d);
 }

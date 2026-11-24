@@ -22,12 +22,9 @@ try{for(const [device,width,height] of [['desktop',1440,1000],['tablet',820,900]
  await page.locator('[data-answer-key=marital]').selectOption('single');
  for(const [key,value] of Object.entries({h_first:'ישראל',h_last:'לדוגמה',h_id:'000000018',h_dob:'1990-01-01',h_phone:'0500000000',h_email:'demo@example.invalid'}))await page.locator(`[data-answer-key=${key}]`).fill(value);
  await page.locator('[data-answer-key=city]').fill('עיר לדוגמה');
- await chapter.getByRole('button',{name:'עבודה והכנסות',exact:true}).click();await page.getByRole('checkbox',{name:'לא עובד',exact:true}).check();await page.locator('[data-answer-key=h_work_continuity]').selectOption('dk');
+ await chapter.getByRole('button',{name:'עבודה והכנסות',exact:true}).click();await page.getByRole('checkbox',{name:'לא עובד',exact:true}).check();
  await chapter.getByRole('button',{name:'מגורים',exact:true}).click();await page.locator('[data-answer-key=housing]').selectOption('family');
- await chapter.getByRole('button',{name:'חסכונות והשקעות',exact:true}).click();await page.locator('[data-answer-key=savings]').getByRole('checkbox',{name:'אין חסכונות',exact:true}).check();
- await chapter.getByRole('button',{name:'ביטוחים',exact:true}).click();await page.locator('[data-answer-key=ins]').getByRole('checkbox',{name:'אין ביטוחים',exact:true}).check();await page.locator('[data-answer-key=has_car]').selectOption('no');
- await chapter.getByRole('button',{name:'זכויות והטבות',exact:true}).click();await page.locator('[data-answer-key=water_persons]').selectOption('dk');
- await chapter.getByRole('button',{name:'בנקים ואשראי',exact:true}).click();await page.locator('[data-answer-key=bank_count]').fill('1');
+ await chapter.getByRole('button',{name:'ביטוחים',exact:true}).click();await page.locator('[data-answer-key=has_car]').selectOption('no');
  await page.getByRole('button',{name:'שמירת טיוטה',exact:true}).click();await expect(page.getByText('הטיוטה נשמרה. אפשר להמשיך בין המסכים; רענון הדמו מאפס את הנתונים.')).toBeVisible();
  await expect(journey).toContainText('למילוי ושליחה');
  await page.getByRole('button',{name:'שליחת השאלון לבדיקה',exact:true}).click();

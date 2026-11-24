@@ -1,3 +1,4 @@
+import {intakeServices} from './short-intake';
 import {answerAutofill} from './autofill';
 import {chapterNavigationIssues} from './questionnaire-validation';
 import {AddressLookup} from './AddressLookup';
@@ -77,7 +78,7 @@ export function Questionnaire({family,services,refresh,onDirtyChange,onComplete,
  const chooseChapter=(key:string)=>{if(key===current.key){focusChapter();return;}if(visible.findIndex(c=>c.key===key)>index&&!validateChapter())return;setBlockedChapter('');focusRequested.current=true;setChapter(key);};
  useEffect(()=>{if(focusRequested.current){focusRequested.current=false;focusChapter();}},[current.key]);
  const set=(k:string,v:unknown)=>setAnswers(prev=>({...prev,[k]:v}));
- const custom=services.filter(s=>s.active&&s.trigger_conditions.every(r=>conditionMatches(answers,r)));
+ const custom=intakeServices(answers,services).filter(s=>s.active&&s.trigger_conditions.every(r=>conditionMatches(answers,r)));
  const issues=questionnaireIssues(answers,services);const errors=Object.fromEntries((showMissing?issues:chapterNavigationIssues(answers,services,blockedChapter)).map(i=>[i.key,i.message]));
  const persistDraft=async()=>{const result=await rpc<Family>('rpc_save_family',{p_family_id:family.id,p_patch:{answers},p_expected_updated_at:revision});setWork(prev=>({...prev,saved:JSON.stringify(answers),revision:result.updated_at}));await refresh();};
  const saveDraft=async()=>{setBusy(true);try{await persistDraft();}finally{setBusy(false);}};

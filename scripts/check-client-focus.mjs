@@ -10,8 +10,8 @@ try{for(const width of [1440,820,390,320]){
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  const field=k=>page.locator(`[data-answer-key="${k}"]`);
  const chapter=title=>page.getByRole('navigation',{name:'פרקי השאלון'}).getByRole('button',{name:title,exact:true}).click();
- await page.goto(base+'#workspace');
- await page.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();
+ await page.goto(base+'?demo=previous-intake#workspace');
+ await page.getByRole('button',{name:'פתיחת שאלון מהגרסה הקודמת',exact:true}).click();
  await page.getByRole('button',{name:'התחלת השאלון',exact:true}).click();
  await expect(page.locator('.focus-case-context')).not.toHaveAttribute('open');
  const firstField=await field('marital').boundingBox();

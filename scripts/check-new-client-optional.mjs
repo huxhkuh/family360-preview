@@ -15,13 +15,11 @@ try{for(const width of [1440,390,320]){
  // Use the visible calendar, including a real month/year selection, rather than just programmatic date filling.
  await page.getByRole('button',{name:'פתיחת לוח שנה: תאריך לידה',exact:true}).click();
  const calendar=page.getByRole('dialog',{name:'בחירת תאריך: תאריך לידה',exact:true});await calendar.getByRole('combobox',{name:'שנה',exact:true}).selectOption('1990');await calendar.getByRole('combobox',{name:'חודש',exact:true}).selectOption('0');await calendar.getByRole('button',{name:'1 בינואר 1990',exact:true}).click();await expect(field('h_dob')).toHaveValue('1990-01-01');
- await next();await field('h_emp').getByLabel('שכיר',{exact:true}).check();await field('h_gross').fill('12000');await field('h_work_continuity').selectOption('dk');
+ await next();await field('h_emp').getByLabel('שכיר',{exact:true}).check();await field('h_gross').fill('12000');
  const inline=page.getByRole('region',{name:'מסמכים לפרק הנוכחי'});await expect(inline).toContainText('אפשר לשלוח את השאלון לפני הצירוף');await expect(inline.getByRole('button',{name:'אולי בהמשך',exact:true})).toBeVisible();
  expect(await page.locator('.chapter-actions').evaluate(el=>!!(el.compareDocumentPosition(document.querySelector('.document-companion'))&Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);await page.locator('.chapter-actions').scrollIntoViewIfNeeded();await page.screenshot({path:`${out}/${width}-optional-inline.png`});
  await next();await field('housing').selectOption('rent');await field('owns_property').selectOption('no');await field('rent_amount').fill('3500');await next();
- await field('savings').getByLabel('לא יודעים',{exact:true}).check();await next();await field('ins').getByLabel('אין ביטוחים',{exact:true}).check();await field('has_car').selectOption('no');await next();
- await expect(page.getByText('אם אין הלוואות, אפשר להמשיך לפרק הבא בלי להוסיף שורה.',{exact:true})).toBeVisible();await next();await field('water_persons').selectOption('dk');await field('btl_allowances').getByLabel('לא מקבלים',{exact:true}).check();await next();
- chapters.push(await page.locator('.chapter-heading h3').innerText());await field('bank_count').fill('1');
+ await field('has_car').selectOption('no');chapters.push(await page.locator('.chapter-heading h3').innerText());
  await page.getByRole('button',{name:'בדיקה לפני שליחה',exact:true}).click();await expect(page.locator('.validation-summary')).toContainText('לא נמצאו שדות חובה חסרים');
  await page.getByRole('button',{name:'שליחת השאלון לבדיקה',exact:true}).click();await expect(page.locator('[role=alert]')).toHaveCount(0);await expect(page.locator('.questionnaire-paper')).toHaveCount(0);await expect(page.locator('.client-completion')).toHaveCount(0);await expect(page.locator('article.document[data-document-required=true]')).toHaveCount(1);await attachRequiredSamples(page);await expect(page.locator('.client-completion')).toBeVisible();
  await expect(page.locator('.client-completion')).toContainText('המסמכים ממתינים לבדיקה');
@@ -32,10 +30,10 @@ try{for(const width of [1440,390,320]){
  await prep.locator('[data-preparation-key=clearinghouse_auth_h]').getByRole('button',{name:'הוספת הרשאה להשלמה עם הנציג',exact:true}).click();
  await expect(page.locator('article.document[data-document-type=signature]').locator('.badge')).toHaveText('חתימה לפני פנייה למסלקה');await expect(page.locator('.client-completion')).toBeVisible();await expect(page.locator('article.document[data-document-type=signature]')).toHaveCount(1);
  await home.scrollIntoViewIfNeeded();await page.screenshot({path:`${out}/${width}-optional-authorization.png`});
- await prep.locator('[data-preparation-key=bank_identity]').getByRole('button',{name:'צירוף דוגמה',exact:true}).click();await expect(page.locator('article.document')).toHaveCount(3);await expect(page.locator('.client-completion')).toBeVisible();
+ await prep.locator('[data-preparation-key=rental_contract]').getByRole('button',{name:'צירוף דוגמה',exact:true}).click();await expect(page.locator('article.document')).toHaveCount(3);await expect(page.locator('.client-completion')).toBeVisible();
  await page.getByLabel('צפייה בתפקיד',{exact:true}).selectOption('representative');await page.evaluate(()=>{location.hash='/families/f1/documents'});
- const bankDoc=page.locator('article.document').filter({hasText:'תעודת זהות בנקאית'});await bankDoc.getByLabel('סיבת הדחייה').fill('דוגמה לבדיקה: חסר עמוד');await bankDoc.getByRole('button',{name:'דחיית מסמך',exact:true}).click();
- await page.getByLabel('צפייה בתפקיד',{exact:true}).selectOption('client');await page.evaluate(()=>{location.hash='/families/f1/documents'});await expect(bankDoc.locator('.badge')).toHaveText('התקבלה הערה · רשות');await expect(page.locator('.client-completion')).toBeVisible();await expect(home).toBeVisible();
+ const rentalDoc=page.locator('article.document').filter({hasText:'חוזה שכירות'});await rentalDoc.getByLabel('סיבת הדחייה').fill('דוגמה לבדיקה: חסר עמוד');await rentalDoc.getByRole('button',{name:'דחיית מסמך',exact:true}).click();
+ await page.getByLabel('צפייה בתפקיד',{exact:true}).selectOption('client');await page.evaluate(()=>{location.hash='/families/f1/documents'});await expect(rentalDoc.locator('.badge')).toHaveText('התקבלה הערה · רשות');await expect(page.locator('.client-completion')).toBeVisible();await expect(home).toBeVisible();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);expect(errors).toEqual([]);expect(requests).toEqual([]);
  results.push({width,mobileEmulation:width<500,chapters,confirmedRequiredDocumentsAfterSubmission:true,optionalSignatureNonblocking:true,sampleUpload:true,optionalRejectionNonblocking:true,homeButtonBottom:Math.round(pos.y+pos.height),pageErrors:errors,httpErrors:requests});await page.close();
 }}finally{await browser.close();}

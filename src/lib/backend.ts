@@ -17,6 +17,7 @@ import type {SupabaseClient} from '@supabase/supabase-js';
 import seed from './demo-seed';
 import {installMortgageDemo,mortgageDemoDocuments} from './demo-mortgage';
 import {publicAsset} from './assets';
+import {shortIntakeVersion} from '../families/short-intake';
 import {registrationSchema} from '../customer/registration';
 import {questionnaireIssues} from '../families/questionnaire-validation';
 import {operationRpc} from './demo-operations';
@@ -61,16 +62,16 @@ export function resetDemo(){
  state.notifications=[{id:'notice1',title:'ברוכים הבאים לדמו',body:'הנתונים והפעולות כאן הם להמחשה בלבד. אפשר לאפס את הדמו בכל עת.',read_at:null}];
 }
 resetDemo();
-export function startClientIntake(code?:string){
+export function startClientIntake(code?:string, previousVersion=false){
  const retainedGrowth=growth;resetDemo();growth=retainedGrowth;
- Object.assign(state.families.find(f=>f.id==='f1'),{status:'new',onboarding_pct:0,answers:{},contact_name:'לקוח לדוגמה',phone:'0500000000'});
+ Object.assign(state.families.find(f=>f.id==='f1'),{status:'new',onboarding_pct:0,answers:previousVersion?{}:{intake_version:shortIntakeVersion},contact_name:'לקוח לדוגמה',phone:'0500000000'});
  for(const key of ['familyServices','documents','meetings','meetingItems','followUps','familyTasks','familyContacts','executionTasks'])state[key]=state[key].filter(x=>x.family_id!=='f1');
  if(code)registerReferral(growth,code,'f1');
 }
 export function registerClientIntake(input:unknown,code?:string){
  const account=registrationSchema.parse(input);startClientIntake(code);
  const family=state.families.find(f=>f.id==='f1'),name=account.first+' '+account.last;
- Object.assign(family,{name:'משפחת '+account.last,contact_name:name,email:account.email,phone:account.phone,answers:{h_first:account.first,h_last:account.last,h_email:account.email,h_phone:account.phone}});
+ Object.assign(family,{name:'משפחת '+account.last,contact_name:name,email:account.email,phone:account.phone,answers:{...family.answers,city:account.city,address:account.address,h_first:account.first,h_last:account.last,h_email:account.email,h_phone:account.phone}});
  Object.assign(state.profiles.find(p=>p.id==='client'),{name,email:account.email});
  return account;
 }

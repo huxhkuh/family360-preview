@@ -1,4 +1,5 @@
-import {CHAPTERS,type Answers,type LegacyField} from './questionnaire-definition';
+import {intakeChapters} from './short-intake';
+import {type Answers,type LegacyField} from './questionnaire-definition';
 export type DiscussionTopic={key:string;label:string;chapter:string;value:string;token:string};
 export function questionnaireDiscussion(answers:Answers):DiscussionTopic[]{
  const topics:DiscussionTopic[]=[];
@@ -15,7 +16,7 @@ export function questionnaireDiscussion(answers:Answers):DiscussionTopic[]{
   if(!(review||empty&&field.followUp))return;
   topics.push({key,chapter,label:context+(field.l||({savings:'חסכונות',ins:'ביטוחים'}[field.k])||field.k),value:empty?field.followUp!:selected.map(v=>field.opts?.find(([k])=>k===v)?.[1]||String(v)).join(' · '),token:JSON.stringify({value:value??null,context:path?values:null})});
  }
- for(const chapter of CHAPTERS){
+ for(const chapter of intakeChapters(answers)){
   if(chapter.cond&&!chapter.cond(answers))continue;
   chapter.secs.filter(s=>!s.cond||s.cond(answers)).forEach(section=>section.fields?.forEach(field=>visit(field,answers,chapter.title,'',section.t+' · ')));
  }

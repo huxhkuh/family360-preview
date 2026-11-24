@@ -1,4 +1,5 @@
-import {CHAPTERS,type Answers,type LegacyField} from './questionnaire-definition';
+import {intakeChapters,intakeServices} from './short-intake';
+import {type Answers,type LegacyField} from './questionnaire-definition';
 import {conditionMatches} from '../lib/core';
 import type {Service} from '../lib/model';
 export function questionnaireReview(answers:Answers,services:Service[]){
@@ -10,8 +11,8 @@ export function questionnaireReview(answers:Answers,services:Service[]){
    return [{label:prefix+(f.l||({savings:'חסכונות',ins:'ביטוחים'} as Record<string,string>)[f.k]||f.k),value:Array.isArray(value)?value.map(text).join(', '):text(value)}];
   });
  }
- const rows=CHAPTERS.filter(c=>!c.cond||c.cond(answers)).map(c=>({key:c.key,title:c.title,items:c.secs.filter(s=>!s.cond||s.cond(answers)).flatMap(s=>s.dyn==='perChild'?(answers.children||[]).flatMap((child:{name?:string},i:number)=>fields([{k:`wt_${i}`,l:`${child.name||`ילד ${i+1}`} · יעד לחתונה`},{k:`wa_${i}`,l:`${child.name||`ילד ${i+1}`} · גיל יעד`}],answers)):fields(s.fields||[],answers))}));
- for(const service of services.filter(s=>s.active&&s.trigger_conditions.every(r=>conditionMatches(answers,r)))){
+ const rows=intakeChapters(answers).filter(c=>!c.cond||c.cond(answers)).map(c=>({key:c.key,title:c.title,items:c.secs.filter(s=>!s.cond||s.cond(answers)).flatMap(s=>s.dyn==='perChild'?(answers.children||[]).flatMap((child:{name?:string},i:number)=>fields([{k:`wt_${i}`,l:`${child.name||`ילד ${i+1}`} · יעד לחתונה`},{k:`wa_${i}`,l:`${child.name||`ילד ${i+1}`} · גיל יעד`}],answers)):fields(s.fields||[],answers))}));
+ for(const service of intakeServices(answers,services).filter(s=>s.active&&s.trigger_conditions.every(r=>conditionMatches(answers,r)))){
   const items=fields(service.client_fields.filter(f=>!f.show_when||conditionMatches(answers,f.show_when)).map(f=>({k:f.key,l:f.label,type:f.type,opts:f.options?.map(x=>[x,x])})),answers);
   if(items.length)rows.push({key:'custom',title:service.name,items});
  }

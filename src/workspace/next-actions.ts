@@ -12,7 +12,7 @@ export function clientActions(w:Workspace):NextAction[]{
   if(['completed','archived'].includes(f.status))continue;
   const base={familyId:f.id,familyName:f.name};
   const target=(tab:string,focus?:string):RouteState=>({page:'families',id:f.id,tab,focus});
-  if(f.onboarding_pct!==100){const intake=clientIntake(f,w);actions.push({...base,id:'intake:'+f.id,title:intake.action.title,detail:'כדאי לפנות כחצי שעה. ממלאים פרק אחד בכל פעם, ואפשר לשמור ולהמשיך מאוחר יותר.',label:intake.action.label,target:target('questionnaire'),reason:'היכרות לפני תחילת הבדיקה'});continue;}
+  if(f.onboarding_pct!==100){const intake=clientIntake(f,w);actions.push({...base,id:'intake:'+f.id,title:intake.action.title,detail:'ממלאים פרק אחד בכל פעם, ואפשר לשמור ולהמשיך מאוחר יותר.',label:intake.action.label,target:target('questionnaire'),reason:'היכרות לפני תחילת הבדיקה'});continue;}
   const tasks=[...w.familyTasks,...w.followUps.filter(t=>!t.item_id||w.meetingItems.some(i=>i.id===t.item_id&&i.visible_to_client))].filter(t=>t.family_id===f.id&&t.visible_to_client&&t.owner_role==='client'&&['open','in_progress'].includes(t.status));
   const linked=new Set<string>();
   for(const t of tasks){const doc=w.documents.find(d=>d.id===t.document_id&&d.family_id===f.id);if(doc)linked.add(doc.id);const attach=doc&&['missing','rejected'].includes(doc.status);actions.push({...base,id:'client-task:'+t.id,title:t.title,detail:t.details,label:attach?'לצירוף המסמך':'לפרטי הפעולה ולעדכון',target:target(attach?'documents':'followups',attach?doc.id:t.id),due:t.due_on,reason:attach?'המסמך נחוץ להמשך הטיפול':'בקשה מהנציג שלכם'});}

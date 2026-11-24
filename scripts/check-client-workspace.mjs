@@ -28,7 +28,7 @@ try{for(const [device,width,height] of [['desktop',1440,1000],['tablet',820,900]
  await revealTaskContent(page,'nav[aria-label="סינון משימות המשך"]');await page.getByRole('navigation',{name:'סינון משימות המשך'}).getByRole('button',{name:'הכול',exact:true}).click();await followup.getByRole('button',{name:'פתיחה מחדש',exact:true}).click();await followup.getByRole('button',{name:/עדכון אחראי או מועד/}).click();await followup.getByRole('button',{name:'שמירת אחראי ומועד',exact:true}).click();await expect(followup.getByRole('link',{name:/פתיחת המסמך/})).toBeVisible();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1)).toBe(false);
  // Start a fresh synthetic intake in a new page: validate drafts and nested errors.
- const fresh=await browser.newPage({viewport:{width,height}});fresh.on('pageerror',e=>errors.push(e.message));await fresh.goto(base+'#workspace');await fresh.getByRole('button',{name:'התנסות כלקוח חדש',exact:true}).click();await fresh.getByRole('button',{name:'התחלת השאלון',exact:true}).click();
+ const fresh=await browser.newPage({viewport:{width,height}});fresh.on('pageerror',e=>errors.push(e.message));await fresh.goto(base+'?demo=previous-intake#workspace');await fresh.getByRole('button',{name:'פתיחת שאלון מהגרסה הקודמת',exact:true}).click();await fresh.getByRole('button',{name:'התחלת השאלון',exact:true}).click();
  const chapters=fresh.getByRole('navigation',{name:'פרקי השאלון'});
  await fresh.locator('[data-answer-key=marital]').selectOption('single');
  for(const [key,value] of Object.entries({city:'עיר לדוגמה',address:'רחוב הדוגמה 1',h_first:'ישראל',h_last:'לדוגמה',h_id:'abc',h_dob:'1990-01-01',h_phone:'0500000000',h_email:'not-an-email'}))await fresh.locator(`[data-answer-key=${key}]`).fill(value);

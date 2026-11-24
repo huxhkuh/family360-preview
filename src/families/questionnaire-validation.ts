@@ -1,11 +1,12 @@
+import {intakeChapters,intakeServices} from './short-intake';
 import {validApproxDate} from './questionnaire-decisions';
-import {CHAPTERS,type Answers,type LegacyField} from './questionnaire-definition';
+import {type Answers,type LegacyField} from './questionnaire-definition';
 import {conditionMatches} from '../lib/core';
 import type {Service} from '../lib/model';
 export function missingAnswers(answers:Answers,services:Service[]){
  const absent=(v:unknown)=>v===undefined||v===null||(typeof v==='string'&&!v.trim())||(Array.isArray(v)&&!v.length);
- const missing=CHAPTERS.filter(c=>!c.cond||c.cond(answers)).flatMap(c=>c.secs.filter(s=>!s.cond||s.cond(answers)).flatMap(s=>(s.fields||[]).filter(f=>f.req&&(!f.cond||f.cond(answers))&&absent(answers[f.k])).map(f=>({key:f.k,label:`${c.title} · ${s.t}: ${f.l}`,chapter:c.key}))));
- services.filter(s=>s.active&&s.trigger_conditions.every(r=>conditionMatches(answers,r))).forEach(s=>s.client_fields.filter(f=>f.required&&(!f.show_when||conditionMatches(answers,f.show_when))&&absent(answers[f.key])).forEach(f=>missing.push({key:f.key,label:`${s.name}: ${f.label}`,chapter:'custom'})));
+ const missing=intakeChapters(answers).filter(c=>!c.cond||c.cond(answers)).flatMap(c=>c.secs.filter(s=>!s.cond||s.cond(answers)).flatMap(s=>(s.fields||[]).filter(f=>f.req&&(!f.cond||f.cond(answers))&&absent(answers[f.k])).map(f=>({key:f.k,label:`${c.title} · ${s.t}: ${f.l}`,chapter:c.key}))));
+ intakeServices(answers,services).filter(s=>s.active&&s.trigger_conditions.every(r=>conditionMatches(answers,r))).forEach(s=>s.client_fields.filter(f=>f.required&&(!f.show_when||conditionMatches(answers,f.show_when))&&absent(answers[f.key])).forEach(f=>missing.push({key:f.key,label:`${s.name}: ${f.label}`,chapter:'custom'})));
  return missing;
 }
 
@@ -27,6 +28,7 @@ export function questionnaireIssues(answers:Answers,services:Service[],today=new
    value.forEach((row,index)=>{if(!row||typeof row!=='object'||Array.isArray(row)){add('יש לבדוק את הרשימה.');return;}field.sub?.forEach(sub=>check(sub,row,chapter,`${key}.${index}.`,`${label} ${index+1} · `));});return;
   }
   const text=String(value).trim();
+  if (['children_count','h_employers','w_employers'].includes(field.k) && !Number.isInteger(Number(value))) add('יש להזין מספר שלם.');
   if(field.type==='approx-date'&&!validApproxDate(text,today))add('אפשר להזין שנה (2018), חודש ושנה (2018-06) או תאריך מלא בעבר.');
   if(field.opts){const selected=Array.isArray(value)?value:[value];if(selected.length>1&&selected.some(v=>field.exclusive?.includes(v)))add('אין לשלב ״אין״ או ״לא יודעים״ עם תשובות אחרות.');if(selected.some(v=>!field.opts!.some(([key])=>key===v)))add('יש לבחור אפשרות מהרשימה.');return;}
   if(field.type==='email'&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text))add('יש להזין כתובת דוא״ל תקינה, למשל name@example.com.');
@@ -39,11 +41,11 @@ export function questionnaireIssues(answers:Answers,services:Service[],today=new
    else if(/(^|_)dob$/.test(field.k)&&text>today)add('תאריך הלידה לא יכול להיות בעתיד.');
   }
  }
- CHAPTERS.filter(c=>!c.cond||c.cond(answers)).forEach(c=>c.secs.filter(s=>!s.cond||s.cond(answers)).forEach(s=>{
+ intakeChapters(answers).filter(c=>!c.cond||c.cond(answers)).forEach(c=>c.secs.filter(s=>!s.cond||s.cond(answers)).forEach(s=>{
   s.fields?.forEach(f=>check(f,answers,c.key));
   if(s.dyn==='perChild'&&Array.isArray(answers.children))answers.children.forEach((_:unknown,i:number)=>{check({k:`wt_${i}`,l:`יעד חתונה לילד ${i+1}`,type:'currency'},answers,c.key);check({k:`wa_${i}`,l:`גיל יעד לילד ${i+1}`,type:'number'},answers,c.key);});
  }));
- services.filter(s=>s.active&&s.trigger_conditions.every(r=>conditionMatches(answers,r))).forEach(s=>s.client_fields.filter(f=>!f.show_when||conditionMatches(answers,f.show_when)).forEach(f=>check({k:f.key,l:s.name+' · '+f.label,type:f.type,req:f.required?1:0,opts:f.options?.map(x=>[x,x])},answers,'custom')));
+ intakeServices(answers,services).filter(s=>s.active&&s.trigger_conditions.every(r=>conditionMatches(answers,r))).forEach(s=>s.client_fields.filter(f=>!f.show_when||conditionMatches(answers,f.show_when)).forEach(f=>check({k:f.key,l:s.name+' · '+f.label,type:f.type,req:f.required?1:0,opts:f.options?.map(x=>[x,x])},answers,'custom')));
  return issues;
 }
 
